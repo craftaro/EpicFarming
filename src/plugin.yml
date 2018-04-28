@@ -1,0 +1,12 @@
+name: EpicFarming
+description: EpicFarming
+main: com.songoda.epicfarming.EpicFarming
+version: 1.1
+depend: [Arconix]
+author: Songoda
+commands:
+  EpicFarming:
+    description: View information on this plugin.
+    default: true
+    aliases: [efa]
+    usage: /ed
