@@ -1,6 +1,7 @@
 package com.songoda.epicfarming.events;
 
 import com.songoda.epicfarming.EpicFarming;
+import com.songoda.epicfarming.api.UpgradeType;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.player.PlayerData;
 import com.songoda.epicfarming.utils.Debugger;
@@ -10,7 +11,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.event.inventory.InventoryCloseEvent;
 import org.bukkit.event.inventory.InventoryType;
-
 /**
  * Created by songoda on 3/14/2017.
  */
@@ -41,12 +41,12 @@ public class InventoryListeners implements Listener {
 
             if (event.getSlot() == 11 && player.hasPermission("EpicFarming.Upgrade.XP")) {
                 if (!event.getCurrentItem().getItemMeta().getDisplayName().equals("§l")) {
-                    farm.upgrade("XP", player);
+                    farm.upgrade(UpgradeType.EXPERIENCE, player);
                     player.closeInventory();
                 }
             } else if (event.getSlot() == 15 && player.hasPermission("EpicFarming.Upgrade.ECO")) {
                 if (!event.getCurrentItem().getItemMeta().getDisplayName().equals("§l")) {
-                    farm.upgrade("ECO", player);
+                    farm.upgrade(UpgradeType.ECONOMY, player);
                     player.closeInventory();
                 }
             }
@@ -59,9 +59,6 @@ public class InventoryListeners implements Listener {
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
         try {
-            if (instance.getPlayerActionManager().getRegisteredPlayers().size() == 0
-                    || instance.getPlayerActionManager().getPlayerAction((Player)event.getPlayer()).getFarm() != null) return;
-
             instance.getPlayerActionManager().getPlayerAction((Player)event.getPlayer()).setFarm(null);
         } catch (Exception ex) {
             Debugger.runReport(ex);

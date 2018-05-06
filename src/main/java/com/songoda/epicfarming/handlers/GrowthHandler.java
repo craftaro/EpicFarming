@@ -5,6 +5,7 @@ import com.songoda.epicfarming.farming.Crop;
 import org.bukkit.Bukkit;
 import org.bukkit.CropState;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.material.Crops;
 
@@ -42,9 +43,12 @@ public class GrowthHandler {
             BlockState cropState = crop.getLocation().getBlock().getState();
             Crops cropData = (Crops) cropState.getData();
 
+            Material material = crop.getLocation().getBlock().getType();
+
             switch(cropData.getState()) {
                 case SEEDED:
-                    cropData.setState(CropState.GERMINATED);
+                    if (material == Material.BEETROOT_BLOCK) cropData.setState(CropState.VERY_SMALL);
+                    else cropData.setState(CropState.GERMINATED);
                     break;
                 case GERMINATED:
                     cropData.setState(CropState.VERY_SMALL);

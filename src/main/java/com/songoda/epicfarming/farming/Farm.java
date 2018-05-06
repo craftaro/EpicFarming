@@ -1,22 +1,19 @@
 package com.songoda.epicfarming.farming;
 
-
 import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.Lang;
+import com.songoda.epicfarming.api.IFarm;
+import com.songoda.epicfarming.api.ILevel;
+import com.songoda.epicfarming.api.UpgradeType;
 import com.songoda.epicfarming.player.PlayerData;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
@@ -25,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Farm implements InventoryHolder {
+public class Farm implements IFarm {
 
     private Location location;
     private Level level;
@@ -37,12 +34,13 @@ public class Farm implements InventoryHolder {
         this.inventory = Bukkit.createInventory(null, 54, Methods.formatName(level.getLevel(),false));
     }
 
+    @Override
     public void view(Player player) {
         try {
             if (!player.hasPermission("epicfarming.view"))
                 return;
 
-                setupOverview(player);
+            setupOverview(player);
 
             player.openInventory(inventory);
             PlayerData playerData = EpicFarming.getInstance().getPlayerActionManager().getPlayerAction(player);
@@ -56,7 +54,7 @@ public class Farm implements InventoryHolder {
         }
     }
 
-    public void setupOverview(Player player) {
+    private void setupOverview(Player player, String... arg) {
         Inventory inventory = Bukkit.createInventory(null, 54, Methods.formatName(level.getLevel(),false));
         inventory.setContents(this.inventory.getContents());
         this.inventory = inventory;
@@ -67,14 +65,14 @@ public class Farm implements InventoryHolder {
 
         int level = this.level.getLevel();
 
-        ItemStack item = new ItemStack(Material.END_ROD, 1);
+        ItemStack item = new ItemStack(Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")), 1);
         ItemMeta itemmeta = item.getItemMeta();
-        itemmeta.setDisplayName(Arconix.pl().getApi().format().formatText(Lang.LEVEL.getConfigValue(level)));
-        ArrayList<String> lore = this.level.getDescription();
+        itemmeta.setDisplayName(instance.getLocale().getMessage("general.nametag.farm", level));
+        List<String> lore = this.level.getDescription();
         lore.add("");
-        if (nextLevel == null) lore.add(Lang.MAXED.getConfigValue());
+        if (nextLevel == null) lore.add(instance.getLocale().getMessage("event.upgrade.maxed"));
         else {
-            lore.add(Lang.NEXT_LEVEL.getConfigValue(nextLevel.getLevel()));
+            lore.add(instance.getLocale().getMessage("interface.button.level", nextLevel.getLevel()));
             lore.addAll(nextLevel.getDescription());
         }
 
@@ -83,23 +81,23 @@ public class Farm implements InventoryHolder {
 
         ItemStack itemXP = new ItemStack(Material.valueOf(instance.getConfig().getString("Interfaces.XP Icon")), 1);
         ItemMeta itemmetaXP = itemXP.getItemMeta();
-        itemmetaXP.setDisplayName(Lang.XPTITLE.getConfigValue());
+        itemmetaXP.setDisplayName(instance.getLocale().getMessage("interface.button.upgradewithxp"));
         ArrayList<String> loreXP = new ArrayList<>();
         if (nextLevel != null)
-            loreXP.add(Lang.XPLORE.getConfigValue(Integer.toString(nextLevel.getCostExperiance())));
+            loreXP.add(instance.getLocale().getMessage("interface.button.upgradewithxplore", nextLevel.getCostExperiance()));
         else
-            loreXP.add(Lang.MAXED.getConfigValue());
+            loreXP.add(instance.getLocale().getMessage("event.upgrade.maxed"));
         itemmetaXP.setLore(loreXP);
         itemXP.setItemMeta(itemmetaXP);
 
         ItemStack itemECO = new ItemStack(Material.valueOf(instance.getConfig().getString("Interfaces.Economy Icon")), 1);
         ItemMeta itemmetaECO = itemECO.getItemMeta();
-        itemmetaECO.setDisplayName(Lang.ECOTITLE.getConfigValue());
+        itemmetaECO.setDisplayName(instance.getLocale().getMessage("interface.button.upgradewitheconomy"));
         ArrayList<String> loreECO = new ArrayList<>();
         if (nextLevel != null)
-            loreECO.add(Lang.ECOLORE.getConfigValue(Arconix.pl().getApi().format().formatEconomy(nextLevel.getCostExperiance())));
+            loreECO.add(instance.getLocale().getMessage("interface.button.upgradewitheconomylore", Arconix.pl().getApi().format().formatEconomy(nextLevel.getCostEconomy())));
         else
-            loreECO.add(Lang.MAXED.getConfigValue());
+            loreECO.add(instance.getLocale().getMessage("event.upgrade.maxed"));
         itemmetaECO.setLore(loreECO);
         itemECO.setItemMeta(itemmetaECO);
 
@@ -159,20 +157,21 @@ public class Farm implements InventoryHolder {
         return items;
     }
 
-    public void upgrade(String type, Player player) {
+    @Override
+    public void upgrade(UpgradeType type, Player player) {
         try {
             EpicFarming instance = EpicFarming.getInstance();
             if (instance.getLevelManager().getLevels().containsKey(this.level.getLevel()+1)) {
 
                 Level level = instance.getLevelManager().getLevel(this.level.getLevel()+1);
                 int cost;
-                if (type == "XP") {
+                if (type == UpgradeType.EXPERIENCE) {
                     cost = level.getCostExperiance();
                 } else {
                     cost = level.getCostEconomy();
                 }
 
-                if (type == "ECO") {
+                if (type == UpgradeType.ECONOMY) {
                     if (instance.getServer().getPluginManager().getPlugin("Vault") != null) {
                         RegisteredServiceProvider<Economy> rsp = instance.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
                         net.milkbowl.vault.economy.Economy econ = rsp.getProvider();
@@ -180,19 +179,19 @@ public class Farm implements InventoryHolder {
                             econ.withdrawPlayer(player, cost);
                             upgradeFinal(level, player);
                         } else {
-                            player.sendMessage(instance.references.getPrefix() + Lang.CANT_AFFORD.getConfigValue(null));
+                            player.sendMessage(instance.getLocale().getMessage("event.upgrade.cannotafford"));
                         }
                     } else {
                         player.sendMessage("Vault is not installed.");
                     }
-                } else if (type == "XP") {
+                } else if (type == UpgradeType.EXPERIENCE) {
                     if (player.getLevel() >= cost || player.getGameMode() == GameMode.CREATIVE) {
                         if (player.getGameMode() != GameMode.CREATIVE) {
                             player.setLevel(player.getLevel() - cost);
                         }
                         upgradeFinal(level, player);
                     } else {
-                        player.sendMessage(instance.references.getPrefix() + Lang.CANT_AFFORD.getConfigValue(null));
+                        player.sendMessage(instance.getLocale().getMessage("event.upgrade.cannotafford"));
                     }
                 }
             }
@@ -202,27 +201,25 @@ public class Farm implements InventoryHolder {
     }
 
 
-    public void upgradeFinal(Level level, Player player) {
+    private void upgradeFinal(Level level, Player player) {
         try {
             EpicFarming instance = EpicFarming.getInstance();
             this.level = level;
             if (instance.getLevelManager().getHighestLevel() != level) {
-                player.sendMessage(Lang.UPGRADE_MESSAGE.getConfigValue(level.getLevel()));
+                player.sendMessage(instance.getLocale().getMessage("event.upgrade.success", level.getLevel()));
             } else {
-                player.sendMessage(Lang.YOU_MAXED.getConfigValue(Integer.toString(level.getLevel())));
+                player.sendMessage(instance.getLocale().getMessage("event.upgrade.successmaxed", level.getLevel()));
             }
-            if (instance.getConfig().getBoolean("settings.On-upgrade-particles")) {
-                Location loc = location.clone().add(.5,.5,.5);
-                if (!instance.v1_8 && !instance.v1_7) {
-                    player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), loc, 200, .5, .5, .5);
-                } else {
-                    player.getWorld().playEffect(loc, org.bukkit.Effect.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), 1, 0);
-                    //Can't get that to resolve.
-                    //player.getWorld().spigot().playEffect(loc, org.bukkit.Effect.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), 1, 0, (float) 1, (float) 1, (float) 1, 1, 200, 10);
-                }
+            Location loc = location.clone().add(.5, .5, .5);
+            if (!instance.v1_8 && !instance.v1_7) {
+                player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), loc, 200, .5, .5, .5);
+            } else {
+                player.getWorld().playEffect(loc, org.bukkit.Effect.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), 1, 0);
+                //Cannot get this to resolve
+                //player.getWorld().spigot().playEffect(loc, org.bukkit.Effect.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), 1, 0, (float) 1, (float) 1, (float) 1, 1, 200, 10);
             }
             if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
-                if (instance.getLevelManager().getHighestLevel() == level) {
+                if (instance.getLevelManager().getHighestLevel() != level) {
                     if (!instance.v1_8 && !instance.v1_7) {
                         player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 0.6F, 15.0F);
                     } else {
@@ -264,15 +261,23 @@ public class Farm implements InventoryHolder {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
                             b2.getRelative(BlockFace.DOWN).setType(Material.SOIL);
                             b2.breakNaturally();
-                            if (instance.getConfig().getBoolean("Main.Sounds Enabled"))
-                                b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
-                            }, random.nextInt(30) + 1);
+                            if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
+                                if (!instance.v1_7 && !instance.v1_8)
+                                    b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
+                                else
+                                    b2.getWorld().playSound(b2.getLocation(), Sound.valueOf("DIG_GRASS"), 10, 15);
+                            }
+                        }, random.nextInt(30) + 1);
                     }
                     if ((b2.getType() == Material.GRASS || b2.getType() == Material.DIRT) && b2.getRelative(BlockFace.UP).getType() == Material.AIR) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
                             b2.setType(Material.SOIL);
-                            if (instance.getConfig().getBoolean("Main.Sounds Enabled"))
-                                b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
+                            if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
+                                if (!instance.v1_7 && !instance.v1_8)
+                                    b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
+                                else
+                                    b2.getWorld().playSound(b2.getLocation(), Sound.valueOf("DIG_GRASS"), 10, 15);
+                            }
                         }, random.nextInt(30) + 1);
                     }
 
@@ -282,6 +287,7 @@ public class Farm implements InventoryHolder {
         return false;
     }
 
+    @Override
     public Location getLocation() {
         return location.clone();
     }
@@ -290,7 +296,8 @@ public class Farm implements InventoryHolder {
         this.location = location;
     }
 
-    public Level getLevel() {
+    @Override
+    public ILevel getLevel() {
         return level;
     }
 }

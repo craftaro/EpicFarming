@@ -1,6 +1,7 @@
 package com.songoda.epicfarming.farming;
 
 import org.bukkit.Location;
+import org.bukkit.block.Block;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -20,6 +21,10 @@ public class FarmManager {
 
     public Farm getFarm(Location location) {
         return registeredFarms.get(roundLocation(location));
+    }
+
+    public Farm getFarm(Block block) {
+        return getFarm(block.getLocation());
     }
 
     public Map<Location, Farm> getFarms() {

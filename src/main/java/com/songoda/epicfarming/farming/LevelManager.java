@@ -24,7 +24,12 @@ public class LevelManager {
     public Level getHighestLevel() {
         return registeredLevels.lastEntry().getValue();
     }
+
     public Map<Integer, Level> getLevels() {
         return Collections.unmodifiableMap(registeredLevels);
+    }
+
+    public void clear() {
+        registeredLevels.clear();
     }
 }

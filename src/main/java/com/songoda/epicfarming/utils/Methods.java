@@ -2,15 +2,11 @@ package com.songoda.epicfarming.utils;
 
 import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.Lang;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
-/**
- * Created by songoda on 2/24/2017.
- */
 public class Methods {
 
     public static ItemStack getGlass() {
@@ -50,7 +46,7 @@ public class Methods {
 
     public static String formatName(int level, boolean full) {
         try {
-            String name = Lang.NAME_FORMAT.getConfigValue(level);
+            String name = EpicFarming.getInstance().getLocale().getMessage("general.nametag.farm", level);
 
             String info = "";
             if (full) {
@@ -65,7 +61,7 @@ public class Methods {
     }
 
     public static ItemStack makeFarmItem(int level) {
-        ItemStack item = new ItemStack(Material.END_ROD, 1);
+        ItemStack item = new ItemStack(Material.valueOf(EpicFarming.getInstance().getConfig().getString("Main.Farm Block Material")), 1);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(Arconix.pl().getApi().format().formatText(Methods.formatName(level, true)));
         item.setItemMeta(meta);

@@ -1,4 +1,5 @@
 package com.songoda.epicfarming.api;
 
-public class UpgradeType {
+public enum UpgradeType {
+    EXPERIENCE, ECONOMY
 }

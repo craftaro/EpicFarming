@@ -2,7 +2,6 @@ package com.songoda.epicfarming.handlers;
 
 import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.Lang;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
@@ -16,9 +15,9 @@ import org.bukkit.entity.Player;
  */
 
 public class CommandHandler implements CommandExecutor {
-    
+
     private EpicFarming instance;
-    
+
     public CommandHandler(EpicFarming instance) {
         this.instance = instance;
     }
@@ -36,14 +35,14 @@ public class CommandHandler implements CommandExecutor {
                 sender.sendMessage("");
             } else if (args[0].equalsIgnoreCase("reload")) {
                 if (!sender.hasPermission("epicfarming.admin")) {
-                    sender.sendMessage(instance.references.getPrefix() + Lang.NO_PERMS.getConfigValue());
+                    sender.sendMessage(instance.references.getPrefix() + instance.getLocale().getMessage("event.general.nopermission"));
                 } else {
                     instance.reload();
                     sender.sendMessage(Arconix.pl().getApi().format().formatText(instance.references.getPrefix() + "&8Configuration and Language files reloaded."));
                 }
             } else if (args[0].equalsIgnoreCase("givefarmitem")) {
                 if (!sender.hasPermission("epicfarming.admin")) {
-                    sender.sendMessage(instance.references.getPrefix() + Lang.NO_PERMS.getConfigValue());
+                    sender.sendMessage(instance.references.getPrefix() + instance.getLocale().getMessage("event.general.nopermission"));
                     return true;
                 }
                 //ToDo: add the ability to specify level.
@@ -58,7 +57,7 @@ public class CommandHandler implements CommandExecutor {
             } else if (sender instanceof Player) {
                 if (args[0].equalsIgnoreCase("settings")) {
                     if (!sender.hasPermission("epicfarming.admin")) {
-                        sender.sendMessage(instance.references.getPrefix() + Lang.NO_PERMS.getConfigValue());
+                        sender.sendMessage(instance.references.getPrefix() + instance.getLocale().getMessage("event.general.nopermission"));
                     } else {
                         Player p = (Player) sender;
                         instance.settingsManager.openSettingsManager(p);

@@ -44,6 +44,7 @@ public class EpicFarming extends JavaPlugin implements Listener {
     public boolean v1_7 = Bukkit.getServer().getClass().getPackage().getName().contains("1_7");
     public boolean v1_8 = Bukkit.getServer().getClass().getPackage().getName().contains("1_8");
 
+    private Locale locale;
 
     private FarmingHandler farmingHandler;
     private GrowthHandler growthHandler;
@@ -63,29 +64,18 @@ public class EpicFarming extends JavaPlugin implements Listener {
         console.sendMessage(Arconix.pl().getApi().format().formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Brianna <3&7!"));
         console.sendMessage(Arconix.pl().getApi().format().formatText("&7Action: &aEnabling&7..."));
 
-        langFile.createNewFile("Loading Language File", "EpicFarming Language File");
-        loadLanguageFile();
+        // Locales
+        Locale.init(this);
+        Locale.saveDefaultLocale("en_US");
+        this.locale = Locale.getLocale(this.getConfig().getString("Locale", "en_US"));
 
         settingsManager = new SettingsManager(this);
         setupConfig();
-        levelManager = new LevelManager();
 
         dataFile.createNewFile("Loading Data File", "EpicFarming Data File");
         loadDataFile();
 
-        /*
-         * Register Levels into LevelManager from configuration.
-         */
-        for (String levelName : getConfig().getConfigurationSection("settings.levels").getKeys(false)) {
-            int level = Integer.valueOf(levelName.split("-")[1]);
-            int radius = getConfig().getInt("settings.levels." + levelName + ".Radius");
-            int costExperiance = getConfig().getInt("settings.levels." + levelName + ".Cost-xp");
-            int costEconomy = getConfig().getInt("settings.levels." + levelName + ".Cost-eco");
-            double speedMultiplier = getConfig().getDouble("settings.levels." + levelName + ".Speed-Multiplier");
-            boolean autoHarvest = getConfig().getBoolean("settings.levels." + levelName + ".Auto-Harvest");
-            boolean autoReplant = getConfig().getBoolean("settings.levels." + levelName + ".Auto-Replant");
-            levelManager.addLevel(level, costExperiance, costEconomy, speedMultiplier, radius, autoHarvest, autoReplant);
-        }
+        loadLevelManager();
 
         farmManager = new FarmManager();
 
@@ -123,6 +113,8 @@ public class EpicFarming extends JavaPlugin implements Listener {
 
         this.getServer().getPluginManager().registerEvents(this, this);
 
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
+
         new MCUpdate(this, true);
 
         console.sendMessage(Arconix.pl().getApi().format().formatText("&a============================="));
@@ -140,6 +132,26 @@ public class EpicFarming extends JavaPlugin implements Listener {
         console.sendMessage(Arconix.pl().getApi().format().formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Brianna <3!"));
         console.sendMessage(Arconix.pl().getApi().format().formatText("&7Action: &cDisabling&7..."));
         console.sendMessage(Arconix.pl().getApi().format().formatText("&a============================="));
+    }
+
+    private void loadLevelManager() {
+        // Load an instance of LevelManager
+        levelManager = new LevelManager();
+
+        /*
+         * Register Levels into LevelManager from configuration.
+         */
+        levelManager.clear();
+        for (String levelName : getConfig().getConfigurationSection("settings.levels").getKeys(false)) {
+            int level = Integer.valueOf(levelName.split("-")[1]);
+            int costExperiance = getConfig().getInt("settings.levels." + levelName + ".Cost-xp");
+            int costEconomy = getConfig().getInt("settings.levels." + levelName + ".Cost-eco");
+            int radius = getConfig().getInt("settings.levels." + levelName + ".Radius");
+            double speedMultiplier = getConfig().getDouble("settings.levels." + levelName + ".Speed-Multiplier");
+            boolean autoHarvest = getConfig().getBoolean("settings.levels." + levelName + ".Auto-Harvest");
+            boolean autoReplant = getConfig().getBoolean("settings.levels." + levelName + ".Auto-Replant");
+            levelManager.addLevel(level, costExperiance, costEconomy, speedMultiplier, radius, autoHarvest, autoReplant);
+        }
     }
 
     /*
@@ -169,7 +181,7 @@ public class EpicFarming extends JavaPlugin implements Listener {
         hooks.hooksFile.createNewFile("Loading hooks File", "EpicFarming hooks File");
         hooks = new HookHandler();
         hooks.hook();
-        loadLanguageFile();
+        locale.reloadMessages();
         references = new References();
         reloadConfig();
         saveConfig();
@@ -223,17 +235,6 @@ public class EpicFarming extends JavaPlugin implements Listener {
         saveConfig();
     }
 
-    private void loadLanguageFile() {
-        Lang.setFile(langFile.getConfig());
-
-        for (final Lang value : Lang.values()) {
-            langFile.getConfig().addDefault(value.getPath(), value.getDefault());
-        }
-
-        langFile.getConfig().options().copyDefaults(true);
-        langFile.saveConfig();
-    }
-
     private void loadDataFile() {
         dataFile.getConfig().options().copyDefaults(true);
         dataFile.saveConfig();
@@ -245,6 +246,10 @@ public class EpicFarming extends JavaPlugin implements Listener {
 
     public static EpicFarming getInstance() {
         return INSTANCE;
+    }
+
+    public Locale getLocale() {
+        return locale;
     }
 
     public FarmManager getFarmManager() {

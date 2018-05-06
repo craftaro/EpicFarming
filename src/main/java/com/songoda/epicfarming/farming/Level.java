@@ -1,10 +1,12 @@
 package com.songoda.epicfarming.farming;
 
-import com.songoda.epicfarming.Lang;
+import com.songoda.epicfarming.EpicFarming;
+import com.songoda.epicfarming.api.ILevel;
 
 import java.util.ArrayList;
+import java.util.List;
 
-public class Level {
+public class Level implements ILevel {
 
     private int level, costExperiance, costEconomy, radius;
 
@@ -12,7 +14,7 @@ public class Level {
 
     private boolean autoHarvest, autoReplant;
 
-    private ArrayList<String> description = new ArrayList<>();
+    private List<String> description = new ArrayList<>();
 
     public Level(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant) {
         this.level = level;
@@ -23,45 +25,55 @@ public class Level {
         this.autoHarvest = autoHarvest;
         this.autoReplant = autoReplant;
 
-        description.add(Lang.NEXT_RADIUS.getConfigValue(radius));
-        description.add(Lang.NEXT_SPEED.getConfigValue(speedMultiplier));
+        EpicFarming instance = EpicFarming.getInstance();
+
+        description.add(instance.getLocale().getMessage("interface.button.radius", radius));
+        description.add(instance.getLocale().getMessage("interface.button.speed", speedMultiplier));
 
         if (autoHarvest)
-            description.add(Lang.NEXT_AUTO_HARVEST.getConfigValue(autoHarvest));
+            description.add(instance.getLocale().getMessage("interface.button.autoharvest", autoHarvest));
 
         if (autoReplant)
-            description.add(Lang.NEXT_AUTO_REPLANT.getConfigValue(autoReplant));
+            description.add(instance.getLocale().getMessage("interface.button.autoreplant", autoReplant));
 
     }
 
-    public ArrayList<String> getDescription() {
-        return (ArrayList<String>)description.clone();
+    @Override
+    public List<String> getDescription() {
+        return new ArrayList<>(description);
     }
 
+    @Override
     public int getLevel() {
         return level;
     }
 
+    @Override
     public int getRadius() {
         return radius;
     }
 
+    @Override
     public boolean isAutoHarvest() {
         return autoHarvest;
     }
 
+    @Override
     public boolean isAutoReplant() {
         return autoReplant;
     }
 
+    @Override
     public double getSpeedMultiplier() {
         return speedMultiplier;
     }
 
+    @Override
     public int getCostExperiance() {
         return costExperiance;
     }
 
+    @Override
     public int getCostEconomy() {
         return costEconomy;
     }

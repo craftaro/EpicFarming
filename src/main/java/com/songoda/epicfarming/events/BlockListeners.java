@@ -44,9 +44,11 @@ public class BlockListeners implements Listener {
     @EventHandler
     public void onGrow(BlockGrowEvent e) {
         try {
+
             if (checkForFarm(e.getNewState().getLocation())) {
                 e.setCancelled(true);
             }
+
         } catch (Exception ex) {
             Debugger.runReport(ex);
         }
@@ -55,10 +57,12 @@ public class BlockListeners implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e) {
         try {
-            if (e.getPlayer().getItemInHand().getType() != Material.END_ROD
+            Material farmBlock = Material.valueOf(instance.getConfig().getString("Main.Farm Block Material"));
+
+            if (e.getPlayer().getItemInHand().getType() != farmBlock
                     || Methods.getLevelFromItem(e.getItemInHand()) == 0) return;
 
-            if (e.getBlockAgainst().getType() == Material.END_ROD) e.setCancelled(true);
+            if (e.getBlockAgainst().getType() == farmBlock) e.setCancelled(true);
 
             Location location = e.getBlock().getLocation();
 
@@ -86,7 +90,7 @@ public class BlockListeners implements Listener {
                 for (int fy = -2; fy <= 1; fy++) {
                     for (int fz = -radius; fz <= radius; fz++) {
                         Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
-                        if (b2.getType() == Material.END_ROD) {
+                        if (b2.getType() == Material.valueOf(instance.getConfig().getString("Main.Farm Block Material"))) {
                             if (!farmManager.getFarms().containsKey(b2.getLocation())) continue;
                             if (level.getRadius() != farmManager.getFarm(b2.getLocation()).getLevel().getRadius()) continue;
                             return true;
@@ -102,7 +106,8 @@ public class BlockListeners implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockBreak(BlockBreakEvent event) {
         try {
-            if (event.getBlock().getType() != Material.END_ROD) return;
+            if (event.getBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
+                return;
 
             Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
 
