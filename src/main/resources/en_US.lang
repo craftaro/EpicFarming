@@ -1,0 +1,24 @@
+#General Messages
+
+general.nametag.prefix = "&8[&6EpicFarming&8]"
+general.nametag.farm = "&eLevel %level% &fFarm"
+
+#Interface Messages
+
+interface.button.upgradewithxp = "&aUpgrade with XP"
+interface.button.upgradewithxplore = "&7Cost: &a%cost% Levels"
+interface.button.upgradewitheconomy = "&aUpgrade with ECO"
+interface.button.upgradewitheconomylore = "&7Cost: &a$%cost%"
+interface.button.level = "&6Next Level &7%level%"
+interface.button.radius = "&7Radius: &6%speed%"
+interface.button.speed = "&7Speed: &6%speed%x"
+interface.button.autoharvest =  "&7Auto Harvest: &6%status%"
+interface.button.autoreplant = "&7Auto Replant: &6%status%"
+
+#Event Messages
+
+event.general.nopermission = "&cYou do not have permission to do that."
+event.upgrade.cannotafford = "&cYou cannot afford this upgrade."
+event.upgrade.success = "&7You successfully upgraded this farm to &6level %level%&7!"
+event.upgrade.maxed = "&6This farm is maxed out."
+event.upgrade.successmaxed = "&7You maxed out this farm at &6%level%x&7."
