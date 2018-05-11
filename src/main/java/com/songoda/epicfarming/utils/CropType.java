@@ -1,13 +1,75 @@
 package com.songoda.epicfarming.utils;
 
+import com.songoda.epicfarming.EpicFarming;
 import org.bukkit.Material;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A list of all crop types available in Minecraft that can be
  * modified by CropsReborn
  */
-public enum CropType {
+public class CropType {
+    private static List<CropTypeData> crops = new ArrayList<>();
 
+    private CropType() {
+        crops.add(new CropTypeData("Wheat", Material.CROPS, Material.WHEAT, Material.SEEDS));
+        crops.add(new CropTypeData("Carrot", Material.CARROT, Material.CARROT_ITEM, Material.CARROT_ITEM));
+        crops.add(new CropTypeData("Potato", Material.POTATO, Material.CARROT_ITEM, Material.POTATO_ITEM));
+        crops.add(new CropTypeData("Watermelon", Material.MELON_STEM, Material.MELON, Material.MELON_SEEDS));
+        crops.add(new CropTypeData("Pumpkin", Material.PUMPKIN_STEM, Material.PUMPKIN, Material.PUMPKIN_SEEDS));
+        crops.add(new CropTypeData("Nether Wart", Material.NETHER_WART_BLOCK, Material.NETHER_WARTS, Material.NETHER_WARTS));
+
+        if (!EpicFarming.pl().v1_8 && !EpicFarming.pl().v1_7) {
+            crops.add(new CropTypeData("Beetroot", Material.BEETROOT_BLOCK, Material.BEETROOT, Material.BEETROOT_SEEDS));
+        }
+    }
+
+    private void handleAdd() {
+        if (crops.size() < 1) {
+            crops.add(new CropTypeData("Wheat", Material.CROPS, Material.WHEAT, Material.SEEDS));
+            crops.add(new CropTypeData("Carrot", Material.CARROT, Material.CARROT_ITEM, Material.CARROT_ITEM));
+            crops.add(new CropTypeData("Potato", Material.POTATO, Material.CARROT_ITEM, Material.POTATO_ITEM));
+            crops.add(new CropTypeData("Watermelon", Material.MELON_STEM, Material.MELON, Material.MELON_SEEDS));
+            crops.add(new CropTypeData("Pumpkin", Material.PUMPKIN_STEM, Material.PUMPKIN, Material.PUMPKIN_SEEDS));
+            crops.add(new CropTypeData("Nether Wart", Material.NETHER_WART_BLOCK, Material.NETHER_WARTS, Material.NETHER_WARTS));
+
+            if (!EpicFarming.pl().v1_8 && !EpicFarming.pl().v1_7) {
+                crops.add(new CropTypeData("Beetroot", Material.BEETROOT_BLOCK, Material.BEETROOT, Material.BEETROOT_SEEDS));
+            }
+        }
+    }
+
+    public static boolean isCrop(Material material) {
+        for (CropTypeData type : values())
+            if (type.getBlockMaterial() == material) return true;
+        return false;
+    }
+
+    public static boolean isCropSeed(Material material) {
+        for (CropTypeData type : values())
+            if (type.getSeedMaterial() == material) return true;
+        return false;
+    }
+
+    public static CropTypeData getCropType(Material material) {
+        for (CropTypeData type : values())
+            if (type.getBlockMaterial() == material) return type;
+        return null;
+    }
+
+    public static List<CropTypeData> values() {
+        if (crops.size() < 1) {
+            new CropType().handleAdd();
+        }
+        return crops;
+    }
+
+
+
+
+    /*
     WHEAT("Wheat", Material.CROPS, Material.WHEAT, Material.SEEDS),
 
     CARROT("Carrot", Material.CARROT, Material.CARROT_ITEM, Material.CARROT_ITEM),
@@ -32,76 +94,50 @@ public enum CropType {
         this.yieldMaterial = yieldMaterial;
     }
 
-    /**
-     * Get the friendly name of the crop
-     *
-     * @return the name of the crop
-     */
     public String getName() {
         return name;
     }
 
-    /**
-     * Get the blockMaterial that represents this crop type
-     *
-     * @return the represented blockMaterial
-     */
     public Material getBlockMaterial() {
         return blockMaterial;
     }
 
-    /**
-     * Get the yield Material that represents this crop type
-     *
-     * @return the represented yieldMaterial
-     */
     public Material getYieldMaterial() {
         return yieldMaterial;
     }
 
-    /**
-     * Get the blockMaterial that represents the seed item for this crop type
-     *
-     * @return the represented seed blockMaterial
-     */
     public Material getSeedMaterial() {
         return seedMaterial;
     }
+    */
 
-    /**
-     * Check whether a specific blockMaterial is an enumerated crop type or not
-     *
-     * @param material the blockMaterial to check
-     * @return true if it is a crop, false otherwise
-     */
-    public static boolean isCrop(Material material) {
-        for (CropType type : values())
-            if (type.getBlockMaterial() == material) return true;
-        return false;
+    public class CropTypeData {
+        private final String name;
+        private final Material blockMaterial;
+        private final Material seedMaterial;
+        private final Material yieldMaterial;
+
+        public CropTypeData(String _name, Material _blockMaterial, Material _seedMaterial, Material _yieldMaterial) {
+            name = _name;
+            blockMaterial = _blockMaterial;
+            seedMaterial = _seedMaterial;
+            yieldMaterial = _yieldMaterial;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public Material getBlockMaterial() {
+            return blockMaterial;
+        }
+
+        public Material getSeedMaterial() {
+            return seedMaterial;
+        }
+
+        public Material getYieldMaterial() {
+            return yieldMaterial;
+        }
     }
-
-    /**
-     * Check whether a specific blockMaterial is an enumerated crop type seed or not
-     *
-     * @param material the blockMaterial to check
-     * @return true if it is a seed, false otherwise
-     */
-    public static boolean isCropSeed(Material material) {
-        for (CropType type : values())
-            if (type.getSeedMaterial() == material) return true;
-        return false;
-    }
-
-    /**
-     * Get the crop type based on the specified blockMaterial
-     *
-     * @param material the crop blockMaterial
-     * @return the respective CropType. null if none found
-     */
-    public static CropType getCropType(Material material) {
-        for (CropType type : values())
-            if (type.getBlockMaterial() == material) return type;
-        return null;
-    }
-
 }
