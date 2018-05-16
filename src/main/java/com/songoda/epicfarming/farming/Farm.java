@@ -289,7 +289,7 @@ public class Farm implements IFarm {
 
     @Override
     public Location getLocation() {
-        return location;
+        return location.clone();
     }
 
     public void setLocation(Location location) {
