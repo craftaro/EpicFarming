@@ -26,7 +26,7 @@ public class InventoryListeners implements Listener {
     public void onInventoryClick(InventoryClickEvent event) {
         try {
             if (instance.getPlayerActionManager().getPlayerAction((Player)event.getWhoClicked()).getFarm() == null
-                    || event.getInventory() == null) return;
+                    || event.getInventory() == null || event.getRawSlot() >= event.getView().getTopInventory().getSize()) return;
 
 
             if (event.getInventory().getType() != InventoryType.CHEST) return;

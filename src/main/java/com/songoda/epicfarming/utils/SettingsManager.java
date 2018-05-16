@@ -170,7 +170,6 @@ public class SettingsManager implements Listener {
                         lore.add(Arconix.pl().getApi().format().formatText("&c" + false));
                     else
                         lore.add(Arconix.pl().getApi().format().formatText("&a" + true));
-
                     break;
                 case "java.lang.String":
                     item.setType(Material.PAPER);
