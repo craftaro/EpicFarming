@@ -117,7 +117,7 @@ public class BlockListeners implements Listener {
 
             event.setCancelled(true);
 
-            ItemStack item = Methods.makeFarmItem(farm.getLevel().getLevel());
+            ItemStack item = Methods.makeFarmItem(farm.getLevel());
 
             Block block = event.getBlock();
 

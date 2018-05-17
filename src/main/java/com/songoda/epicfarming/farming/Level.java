@@ -1,12 +1,11 @@
 package com.songoda.epicfarming.farming;
 
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.api.ILevel;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Level implements ILevel {
+public class Level {
 
     private int level, costExperiance, costEconomy, radius;
 
@@ -38,42 +37,34 @@ public class Level implements ILevel {
 
     }
 
-    @Override
     public List<String> getDescription() {
         return new ArrayList<>(description);
     }
 
-    @Override
     public int getLevel() {
         return level;
     }
 
-    @Override
     public int getRadius() {
         return radius;
     }
 
-    @Override
     public boolean isAutoHarvest() {
         return autoHarvest;
     }
 
-    @Override
     public boolean isAutoReplant() {
         return autoReplant;
     }
 
-    @Override
     public double getSpeedMultiplier() {
         return speedMultiplier;
     }
 
-    @Override
     public int getCostExperiance() {
         return costExperiance;
     }
 
-    @Override
     public int getCostEconomy() {
         return costEconomy;
     }

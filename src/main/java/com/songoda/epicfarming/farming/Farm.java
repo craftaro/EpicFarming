@@ -2,8 +2,6 @@ package com.songoda.epicfarming.farming;
 
 import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.api.IFarm;
-import com.songoda.epicfarming.api.ILevel;
 import com.songoda.epicfarming.api.UpgradeType;
 import com.songoda.epicfarming.player.PlayerData;
 import com.songoda.epicfarming.utils.Debugger;
@@ -22,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class Farm implements IFarm {
+public class Farm {
 
     private Location location;
     private Level level;
@@ -34,7 +32,6 @@ public class Farm implements IFarm {
         this.inventory = Bukkit.createInventory(null, 54, Methods.formatName(level.getLevel(),false));
     }
 
-    @Override
     public void view(Player player) {
         try {
             if (!player.hasPermission("epicfarming.view"))
@@ -134,7 +131,6 @@ public class Farm implements IFarm {
         inventory.setItem(26, Methods.getBackgroundGlass(true));
     }
 
-    @Override
     public Inventory getInventory() {
         return inventory;
     }
@@ -157,7 +153,6 @@ public class Farm implements IFarm {
         return items;
     }
 
-    @Override
     public void upgrade(UpgradeType type, Player player) {
         try {
             EpicFarming instance = EpicFarming.getInstance();
@@ -287,7 +282,6 @@ public class Farm implements IFarm {
         return false;
     }
 
-    @Override
     public Location getLocation() {
         return location.clone();
     }
@@ -296,8 +290,7 @@ public class Farm implements IFarm {
         this.location = location;
     }
 
-    @Override
-    public ILevel getLevel() {
+    public Level getLevel() {
         return level;
     }
 }

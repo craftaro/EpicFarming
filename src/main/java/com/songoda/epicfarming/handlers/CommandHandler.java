@@ -2,6 +2,7 @@ package com.songoda.epicfarming.handlers;
 
 import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.EpicFarming;
+import com.songoda.epicfarming.farming.Level;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
@@ -31,7 +32,7 @@ public class CommandHandler implements CommandExecutor {
                 sender.sendMessage(Arconix.pl().getApi().format().formatText(" &8- &aEFA help &7Displays this page."));
                 sender.sendMessage(Arconix.pl().getApi().format().formatText(" &8- &aEFA settings &7Edit the EpicFarming Settings."));
                 sender.sendMessage(Arconix.pl().getApi().format().formatText(" &8- &aEFA reload &7Reloads Configuration and Language files."));
-                sender.sendMessage(Arconix.pl().getApi().format().formatText(" &8- &aEFA givefarmitem [player] &7Give a farm item to a player."));
+                sender.sendMessage(Arconix.pl().getApi().format().formatText(" &8- &aEFA givefarmitem [player] [level] &7Give a farm item to a player."));
                 sender.sendMessage("");
             } else if (args[0].equalsIgnoreCase("reload")) {
                 if (!sender.hasPermission("epicfarming.admin")) {
@@ -46,13 +47,30 @@ public class CommandHandler implements CommandExecutor {
                     return true;
                 }
                 //ToDo: add the ability to specify level.
-                if (args.length == 1) {
-                    if (sender instanceof Player)
-                        ((Player) sender).getInventory().addItem(Methods.makeFarmItem(1));
+                if (args.length >= 1) {
+                    if (!(sender instanceof Player) && args.length == 1) return true;
+
+                    Level level = instance.getLevelManager().getLowestLevel();
+                    Player player;
+                    if (args.length != 1 && Bukkit.getPlayer(args[1]) == null) {
+                        sender.sendMessage("Not a player...");
+                        return true;
+                    } else if (args.length == 1) {
+                        player = (Player)sender;
+                    } else {
+                        player = Bukkit.getPlayer(args[1]);
+                    }
+
+
+                    if (args.length >= 3 && !instance.getLevelManager().isLevel(Integer.parseInt(args[2]))) {
+                        sender.sendMessage("Not a level...");
+                        return true;
+                    } else {
+                        level = instance.getLevelManager().getLevel(Integer.parseInt(args[2]));
+                    }
+                        player.getInventory().addItem(Methods.makeFarmItem(level));
                 } else if (Bukkit.getPlayerExact(args[1]) == null) {
                     sender.sendMessage(instance.references.getPrefix() + Arconix.pl().getApi().format().formatText("&cThat username does not exist, or the user is not online!"));
-                } else {
-                    Bukkit.getPlayerExact(args[1]).getInventory().addItem(Methods.makeFarmItem(1));
                 }
             } else if (sender instanceof Player) {
                 if (args[0].equalsIgnoreCase("settings")) {

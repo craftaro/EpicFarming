@@ -25,6 +25,10 @@ public class LevelManager {
         return registeredLevels.lastEntry().getValue();
     }
 
+    public boolean isLevel(int level) {
+        return registeredLevels.containsKey(level);
+    }
+
     public Map<Integer, Level> getLevels() {
         return Collections.unmodifiableMap(registeredLevels);
     }

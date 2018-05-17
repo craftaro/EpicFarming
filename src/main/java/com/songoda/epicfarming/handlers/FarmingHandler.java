@@ -9,7 +9,9 @@ import org.bukkit.Bukkit;
 import org.bukkit.CropState;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.Hopper;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Crops;
@@ -25,6 +27,7 @@ public class FarmingHandler {
     public FarmingHandler(EpicFarming instance) {
         this.instance = instance;
         Bukkit.getScheduler().scheduleSyncRepeatingTask(EpicFarming.getInstance(), this::farmRunner, 0, instance.getConfig().getInt("Main.Farm Tick Speed"));
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(EpicFarming.getInstance(), this::hopRunner, 0, 8);
     }
 
 
@@ -56,6 +59,63 @@ public class FarmingHandler {
         } catch (Exception ex) {
             Debugger.runReport(ex);
         }
+    }
+
+    private void hopRunner() {
+
+        for (Farm farm : instance.getFarmManager().getFarms().values()) {
+            Block block = farm.getLocation().getBlock();
+
+            if (block.getRelative(BlockFace.DOWN).getType() == Material.HOPPER) {
+                Inventory inventory = farm.getInventory();
+                Inventory hopperInventory = ((Hopper) block.getRelative(BlockFace.DOWN).getState()).getInventory();
+
+                for (int i = 27; i < inventory.getSize(); i++) {
+                    if (inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) continue;
+
+                    int amtToMove = 1;
+
+                    ItemStack item = inventory.getItem(i);
+
+                    ItemStack toMove = item.clone();
+                    toMove.setAmount(amtToMove);
+
+                    if (canHop(hopperInventory, toMove)) {
+
+                        hopperInventory.addItem(toMove);
+                        item.setAmount(item.getAmount() - amtToMove);
+                    }
+                    break;
+                }
+            }
+        }
+
+    }
+
+    public boolean canHop(Inventory i, ItemStack item) {
+        try {
+            if (i.firstEmpty() != -1) {
+                return true;
+            }
+            boolean can = false;
+            for (ItemStack it : i.getContents()) {
+                if (it == null) {
+                    can = true;
+                    break;
+                } else {
+                    if (it.isSimilar(item)) {
+                        if (it.getAmount() <= it.getMaxStackSize()) {
+                            can = true;
+                            break;
+                        }
+                    }
+                }
+            }
+            return can;
+        } catch (Exception e) {
+            Debugger.runReport(e);
+        }
+        return false;
     }
 
     private boolean doDrop(Farm farm, Material material) {

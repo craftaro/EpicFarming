@@ -2,6 +2,7 @@ package com.songoda.epicfarming.utils;
 
 import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.EpicFarming;
+import com.songoda.epicfarming.farming.Level;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
@@ -60,10 +61,10 @@ public class Methods {
         return null;
     }
 
-    public static ItemStack makeFarmItem(int level) {
+    public static ItemStack makeFarmItem(Level level) {
         ItemStack item = new ItemStack(Material.valueOf(EpicFarming.getInstance().getConfig().getString("Main.Farm Block Material")), 1);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(Arconix.pl().getApi().format().formatText(Methods.formatName(level, true)));
+        meta.setDisplayName(Arconix.pl().getApi().format().formatText(Methods.formatName(level.getLevel(), true)));
         item.setItemMeta(meta);
         return item;
     }

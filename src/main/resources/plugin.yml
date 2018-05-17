@@ -1,7 +1,7 @@
 name: EpicFarming
 description: EpicFarming
 main: com.songoda.epicfarming.EpicFarming
-version: 1.2.1
+version: 1.3
 depend: [Arconix]
 author: Songoda
 commands:
