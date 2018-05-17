@@ -96,27 +96,11 @@ public class FarmingHandler {
     }
 
     private boolean canHop(Inventory i, ItemStack item) {
-        try {
-            if (i.firstEmpty() != -1) {
+        if (i.firstEmpty() != -1) return true;
+        for (ItemStack it : i.getContents()) {
+            if (it == null || it.isSimilar(item) && (it.getAmount() + item.getAmount()) <= it.getMaxStackSize()) {
                 return true;
             }
-            boolean can = false;
-            for (ItemStack it : i.getContents()) {
-                if (it == null) {
-                    can = true;
-                    break;
-                } else {
-                    if (it.isSimilar(item)) {
-                        if (it.getAmount() <= it.getMaxStackSize()) {
-                            can = true;
-                            break;
-                        }
-                    }
-                }
-            }
-            return can;
-        } catch (Exception e) {
-            Debugger.runReport(e);
         }
         return false;
     }
