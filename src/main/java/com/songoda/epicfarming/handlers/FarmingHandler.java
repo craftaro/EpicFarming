@@ -34,6 +34,7 @@ public class FarmingHandler {
     private void farmRunner() {
         try {
             for (Farm farm : instance.getFarmManager().getFarms().values()) {
+                if (farm.getLocation() == null) continue;
                 for (Block block : getCrops(farm, true)) {
                     Crops crop = (Crops) block.getState().getData();
 
@@ -62,7 +63,6 @@ public class FarmingHandler {
     }
 
     private void hopRunner() {
-
         for (Farm farm : instance.getFarmManager().getFarms().values()) {
             Block block = farm.getLocation().getBlock();
 
@@ -80,19 +80,22 @@ public class FarmingHandler {
                     ItemStack toMove = item.clone();
                     toMove.setAmount(amtToMove);
 
-                    if (canHop(hopperInventory, toMove)) {
+                    int newAmt = item.getAmount() - amtToMove;
 
+                    if (canHop(hopperInventory, toMove)) {
+                        if (newAmt <= 0)
+                            inventory.setItem(i, null);
+                        else
+                            item.setAmount(newAmt);
                         hopperInventory.addItem(toMove);
-                        item.setAmount(item.getAmount() - amtToMove);
                     }
                     break;
                 }
             }
         }
-
     }
 
-    public boolean canHop(Inventory i, ItemStack item) {
+    private boolean canHop(Inventory i, ItemStack item) {
         try {
             if (i.firstEmpty() != -1) {
                 return true;
@@ -122,7 +125,7 @@ public class FarmingHandler {
         Random random = new Random();
 
         ItemStack stack = new ItemStack(CropType.getCropType(material).getYieldMaterial());
-        ItemStack seedStack = new ItemStack(CropType.getCropType(material).getSeedMaterial(), random.nextInt(3));
+        ItemStack seedStack = new ItemStack(CropType.getCropType(material).getSeedMaterial(), random.nextInt(3) + 1);
 
         if (!canMove(farm.getInventory(), stack)) return false;
         farm.getInventory().addItem(stack);
