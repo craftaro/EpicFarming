@@ -23,8 +23,13 @@ public class InteractListeners implements Listener {
     @EventHandler
     public void onBlockInteract(PlayerInteractEvent e) {
         try {
-            if (e.getClickedBlock() != null && e.getClickedBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
+            if (e.getClickedBlock() == null || e.getClickedBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
                 return;
+
+            if (!instance.hooks.canBuild(e.getPlayer(), e.getClickedBlock().getLocation())) {
+                e.setCancelled(true);
+                return;
+            }
 
             if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
