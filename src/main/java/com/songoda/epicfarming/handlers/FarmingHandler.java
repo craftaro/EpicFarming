@@ -108,8 +108,12 @@ public class FarmingHandler {
     private boolean doDrop(Farm farm, Material material) {
         Random random = new Random();
 
-        ItemStack stack = new ItemStack(CropType.getCropType(material).getYieldMaterial());
-        ItemStack seedStack = new ItemStack(CropType.getCropType(material).getSeedMaterial(), random.nextInt(3) + 1);
+        CropType.CropTypeData cropTypeData = CropType.getCropType(material);
+
+        if (material == null || farm == null || cropTypeData == null) return false;
+
+        ItemStack stack = new ItemStack(cropTypeData.getYieldMaterial());
+        ItemStack seedStack = new ItemStack(cropTypeData.getSeedMaterial(), random.nextInt(3) + 1);
 
         if (!canMove(farm.getInventory(), stack)) return false;
         farm.getInventory().addItem(stack);

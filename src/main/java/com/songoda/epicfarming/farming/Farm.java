@@ -103,13 +103,13 @@ public class Farm {
             inventory.setItem(nu, Methods.getGlass());
             nu++;
         }
-        if (instance.getConfig().getBoolean("Main.Upgrade With XP") && player != null && player.hasPermission("EpicDispensers.Upgrade.XP")) {
+        if (instance.getConfig().getBoolean("Main.Upgrade With XP") && player != null && player.hasPermission("EpicFarming.Upgrade.XP")) {
             inventory.setItem(11, itemXP);
         }
 
         inventory.setItem(13, item);
 
-        if (instance.getConfig().getBoolean("Main.Upgrade With Economy") && player != null && player.hasPermission("EpicDispensers.Upgrade.ECO")) {
+        if (instance.getConfig().getBoolean("Main.Upgrade With Economy") && player != null && player.hasPermission("EpicFarming.Upgrade.ECO")) {
             inventory.setItem(15, itemECO);
         }
 
