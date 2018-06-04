@@ -31,7 +31,7 @@ public class CropType {
         if (crops.size() < 1) {
             crops.add(new CropTypeData("Wheat", Material.CROPS, Material.WHEAT, Material.SEEDS));
             crops.add(new CropTypeData("Carrot", Material.CARROT, Material.CARROT_ITEM, Material.CARROT_ITEM));
-            crops.add(new CropTypeData("Potato", Material.POTATO, Material.CARROT_ITEM, Material.POTATO_ITEM));
+            crops.add(new CropTypeData("Potato", Material.POTATO, Material.POTATO_ITEM, Material.POTATO_ITEM));
             crops.add(new CropTypeData("Watermelon", Material.MELON_STEM, Material.MELON, Material.MELON_SEEDS));
             crops.add(new CropTypeData("Pumpkin", Material.PUMPKIN_STEM, Material.PUMPKIN, Material.PUMPKIN_SEEDS));
             crops.add(new CropTypeData("Melon", Material.MELON_STEM, Material.MELON, Material.MELON_SEEDS));

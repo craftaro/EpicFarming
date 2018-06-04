@@ -28,7 +28,7 @@ public class GrowthHandler {
 
         for (Crop crop : liveCrops.values()) {
 
-            if (!(crop.getLocation().getBlock().getState().getData() instanceof Crops)) continue;
+            if (!(crop.getLocation().getBlock().getState().getData() instanceof Crops) && !crop.getLocation().getBlock().getType().name().toLowerCase().contains("melon")) continue;
 
             //ToDO: This should be in config.
             int cap = (int)Math.ceil(60 / crop.getFarm().getLevel().getSpeedMultiplier()) - crop.getTicksLived();

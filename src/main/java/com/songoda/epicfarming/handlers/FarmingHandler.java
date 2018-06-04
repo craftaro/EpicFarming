@@ -46,6 +46,7 @@ public class FarmingHandler {
                             || !crop.getState().equals(CropState.RIPE)
                             || !doDrop(farm, block.getType())) continue;
 
+
                     if (farm.getLevel().isAutoReplant()) {
                         BlockState cropState = block.getState();
                         Crops cropData = (Crops) cropState.getData();
@@ -134,7 +135,8 @@ public class FarmingHandler {
                 for (int fz = -radius; fz <= radius; fz++) {
                     Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
 
-                    if (!(b2.getState().getData() instanceof Crops)) continue;
+                    if (!(b2.getState().getData() instanceof Crops) && !b2.getType().name().toLowerCase().contains("melon")) continue;
+
                     if (add)
                         crops.add(b2);
                     else {
@@ -152,7 +154,7 @@ public class FarmingHandler {
             if (inventory.firstEmpty() != -1) return true;
 
             for (ItemStack stack : inventory.getContents()) {
-                if (stack.isSimilar(item) && stack.getAmount() <= stack.getMaxStackSize()) {
+                if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {
                     return true;
                 }
             }
