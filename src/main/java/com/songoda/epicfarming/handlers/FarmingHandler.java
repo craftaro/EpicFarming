@@ -135,7 +135,7 @@ public class FarmingHandler {
                 for (int fz = -radius; fz <= radius; fz++) {
                     Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
 
-                    if (!(b2.getState().getData() instanceof Crops) && !b2.getType().name().toLowerCase().contains("melon")) continue;
+                    if (!(b2.getState().getData() instanceof Crops)) continue;
 
                     if (add)
                         crops.add(b2);
