@@ -20,7 +20,7 @@ public class InteractListeners implements Listener {
         this.instance = instance;
     }
 
-    @EventHandler
+    @EventHandler(ignoreCancelled = true)
     public void onBlockInteract(PlayerInteractEvent e) {
         try {
             if (e.getClickedBlock() == null || e.getClickedBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
