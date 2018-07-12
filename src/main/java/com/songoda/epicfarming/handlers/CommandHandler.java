@@ -46,14 +46,13 @@ public class CommandHandler implements CommandExecutor {
                     sender.sendMessage(instance.references.getPrefix() + instance.getLocale().getMessage("event.general.nopermission"));
                     return true;
                 }
-                //ToDo: add the ability to specify level.
                 if (args.length >= 1) {
-                    if (!(sender instanceof Player) && args.length == 1) return true;
+                    if (!(sender instanceof Player)) return true;
 
                     Level level = instance.getLevelManager().getLowestLevel();
                     Player player;
                     if (args.length != 1 && Bukkit.getPlayer(args[1]) == null) {
-                        sender.sendMessage("Not a player...");
+                        sender.sendMessage(instance.references.getPrefix() + Arconix.pl().getApi().format().formatText("&cThat player does not exist or is currently offline."));
                         return true;
                     } else if (args.length == 1) {
                         player = (Player)sender;
@@ -63,12 +62,14 @@ public class CommandHandler implements CommandExecutor {
 
 
                     if (args.length >= 3 && !instance.getLevelManager().isLevel(Integer.parseInt(args[2]))) {
-                        sender.sendMessage("Not a level...");
+                        sender.sendMessage(instance.references.getPrefix() + Arconix.pl().getApi().format().formatText("&cNot a valid level... The current valid levels are: &4" + instance.getLevelManager().getLowestLevel().getLevel() + "-" + instance.getLevelManager().getHighestLevel().getLevel() + "&c."));
                         return true;
-                    } else {
+                    } else if (args.length != 1){
                         level = instance.getLevelManager().getLevel(Integer.parseInt(args[2]));
                     }
                         player.getInventory().addItem(Methods.makeFarmItem(level));
+                    player.sendMessage(instance.references.getPrefix() + instance.getLocale().getMessage("command.give.success", level.getLevel()));
+
                 } else if (Bukkit.getPlayerExact(args[1]) == null) {
                     sender.sendMessage(instance.references.getPrefix() + Arconix.pl().getApi().format().formatText("&cThat username does not exist, or the user is not online!"));
                 }

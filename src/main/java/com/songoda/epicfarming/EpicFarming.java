@@ -36,24 +36,26 @@ public class EpicFarming extends JavaPlugin implements Listener {
     public SettingsManager settingsManager;
     public References references;
     public HookHandler hooks;
-
-    private ConfigWrapper langFile = new ConfigWrapper(this, "", "lang.yml");
-
     public boolean v1_10 = Bukkit.getServer().getClass().getPackage().getName().contains("1_10");
     public boolean v1_9 = Bukkit.getServer().getClass().getPackage().getName().contains("1_9");
     public boolean v1_7 = Bukkit.getServer().getClass().getPackage().getName().contains("1_7");
     public boolean v1_8 = Bukkit.getServer().getClass().getPackage().getName().contains("1_8");
-
+    public ConfigWrapper dataFile = new ConfigWrapper(this, "", "data.yml");
+    private ConfigWrapper langFile = new ConfigWrapper(this, "", "lang.yml");
     private Locale locale;
-
     private FarmingHandler farmingHandler;
     private GrowthHandler growthHandler;
-
     private FarmManager farmManager;
     private LevelManager levelManager;
     private PlayerActionManager playerActionManager;
 
-    public ConfigWrapper dataFile = new ConfigWrapper(this, "", "data.yml");
+    public static EpicFarming pl() {
+        return INSTANCE;
+    }
+
+    public static EpicFarming getInstance() {
+        return INSTANCE;
+    }
 
     public void onEnable() {
         INSTANCE = this;
@@ -87,7 +89,7 @@ public class EpicFarming extends JavaPlugin implements Listener {
                 Location location = Arconix.pl().getApi().serialize().unserializeLocation(locationStr);
                 int level = dataFile.getConfig().getInt("Farms." + locationStr + ".level");
 
-                List<ItemStack> items = (List<ItemStack>)dataFile.getConfig().getList("Farms." + locationStr + ".Contents");
+                List<ItemStack> items = (List<ItemStack>) dataFile.getConfig().getList("Farms." + locationStr + ".Contents");
 
                 Farm farm = new Farm(location, levelManager.getLevel(level));
                 farm.loadInventory(items);
@@ -166,6 +168,8 @@ public class EpicFarming extends JavaPlugin implements Listener {
          * Dump FarmManager to file.
          */
         for (Farm farm : farmManager.getFarms().values()) {
+            if (farm.getLocation() == null
+                    || farm.getLocation().getWorld() == null) continue;
             String locationStr = Arconix.pl().getApi().serialize().serializeLocation(farm.getLocation());
             dataFile.getConfig().set("Farms." + locationStr + ".level", farm.getLevel().getLevel());
             dataFile.getConfig().set("Farms." + locationStr + ".Contents", farm.dumpInventory());
@@ -238,14 +242,6 @@ public class EpicFarming extends JavaPlugin implements Listener {
     private void loadDataFile() {
         dataFile.getConfig().options().copyDefaults(true);
         dataFile.saveConfig();
-    }
-
-    public static EpicFarming pl() {
-        return INSTANCE;
-    }
-
-    public static EpicFarming getInstance() {
-        return INSTANCE;
     }
 
     public Locale getLocale() {

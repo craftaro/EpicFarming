@@ -15,6 +15,10 @@ interface.button.speed = "&7Speed: &6%speed%x"
 interface.button.autoharvest =  "&7Auto Harvest: &6%status%"
 interface.button.autoreplant = "&7Auto Replant: &6%status%"
 
+#Command Messages
+
+command.give.success = "&7You have been given a &6level %level% &7farm item."
+
 #Event Messages
 
 event.general.nopermission = "&cYou do not have permission to do that."
