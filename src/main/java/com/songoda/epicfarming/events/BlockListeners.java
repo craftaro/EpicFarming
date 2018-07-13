@@ -6,6 +6,7 @@ import com.songoda.epicfarming.farming.FarmManager;
 import com.songoda.epicfarming.farming.Level;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -59,17 +60,28 @@ public class BlockListeners implements Listener {
         try {
             Material farmBlock = Material.valueOf(instance.getConfig().getString("Main.Farm Block Material"));
 
+            boolean allowNonCommandIssued = instance.getConfig().getBoolean("Main.Allow Non Command Issued Farm Items");
+
             if (e.getPlayer().getItemInHand().getType() != farmBlock
-                    || Methods.getLevelFromItem(e.getItemInHand()) == 0) return;
+                    || Methods.getLevelFromItem(e.getItemInHand()) == 0 && !allowNonCommandIssued) return;
 
             if (e.getBlockAgainst().getType() == farmBlock) e.setCancelled(true);
 
             Location location = e.getBlock().getLocation();
 
-            Farm farm = new Farm(location, instance.getLevelManager().getLevel(Methods.getLevelFromItem(e.getItemInHand())));
-            instance.getFarmManager().addFarm(location, farm);
+            Bukkit.getScheduler().runTaskLater(instance, () -> {
+                int level = 1;
+                if (Methods.getLevelFromItem(e.getItemInHand()) != 0) {
+                    level = Methods.getLevelFromItem(e.getItemInHand());
+                }
 
-            farm.tillLand(e.getBlock().getLocation());
+                if (location.getBlock().getType() != farmBlock) return;
+
+                Farm farm = new Farm(location, instance.getLevelManager().getLevel(level));
+                instance.getFarmManager().addFarm(location, farm);
+
+                farm.tillLand(e.getBlock().getLocation());
+            }, 1);
 
         } catch (Exception ex) {
             Debugger.runReport(ex);

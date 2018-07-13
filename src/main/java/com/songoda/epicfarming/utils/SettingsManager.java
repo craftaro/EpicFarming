@@ -225,14 +225,15 @@ public class SettingsManager implements Listener {
         o6("Main.Growth Tick Speed", 20),
         o7("Main.Clear Tick Speed", 1800),
         o8("Main.Farm Block Material", "END_ROD"),
+        o9("Main.Allow Non Command Issued Farm Items", false),
 
-        o9("Interfaces.Economy Icon", "DOUBLE_PLANT"),
-        o10("Interfaces.XP Icon", "EXP_BOTTLE"),
-        o11("Interfaces.Glass Type 1", 7),
-        o12("Interfaces.Glass Type 2", 11),
-        o13("Interfaces.Glass Type 3", 3),
+        o10("Interfaces.Economy Icon", "DOUBLE_PLANT"),
+        o11("Interfaces.XP Icon", "EXP_BOTTLE"),
+        o12("Interfaces.Glass Type 1", 7),
+        o13("Interfaces.Glass Type 2", 11),
+        o14("Interfaces.Glass Type 3", 3),
 
-        o14("System.Debugger Enabled", false);
+        o15("System.Debugger Enabled", false);
 
         private String setting;
         private Object option;
