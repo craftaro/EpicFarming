@@ -47,7 +47,6 @@ public class CommandHandler implements CommandExecutor {
                     return true;
                 }
                 if (args.length >= 1) {
-                    if (!(sender instanceof Player)) return true;
 
                     Level level = instance.getLevelManager().getLowestLevel();
                     Player player;
@@ -55,6 +54,10 @@ public class CommandHandler implements CommandExecutor {
                         sender.sendMessage(instance.references.getPrefix() + Arconix.pl().getApi().format().formatText("&cThat player does not exist or is currently offline."));
                         return true;
                     } else if (args.length == 1) {
+                        if (!(sender instanceof Player)) {
+                            sender.sendMessage(instance.references.getPrefix() + Arconix.pl().getApi().format().formatText("&cYou need to be a player to give a farm item to yourself."));
+                            return true;
+                        }
                         player = (Player)sender;
                     } else {
                         player = Bukkit.getPlayer(args[1]);
