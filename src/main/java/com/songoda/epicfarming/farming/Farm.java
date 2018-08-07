@@ -221,14 +221,7 @@ public class Farm {
                         player.playSound(player.getLocation(), org.bukkit.Sound.valueOf("LEVEL_UP"), 2F, 15.0F);
                     }
                 } else {
-                    if (!instance.v1_10 && !instance.v1_9 && !instance.v1_8 && !instance.v1_7) {
-                        player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 2F, 25.0F);
-                        player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_NOTE_CHIME, 2F, 25.0F);
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_NOTE_CHIME, 1.2F, 35.0F), 5L);
-                        Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> player.playSound(player.getLocation(), org.bukkit.Sound.BLOCK_NOTE_CHIME, 1.8F, 35.0F), 10L);
-                    } else {
                         player.playSound(player.getLocation(), org.bukkit.Sound.valueOf("LEVEL_UP"), 2F, 25.0F);
-                    }
                 }
             }
             tillLand(location);
@@ -252,9 +245,9 @@ public class Farm {
                     Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
 
                     // ToDo: enum for all flowers.
-                    if (b2.getType() == Material.LONG_GRASS || b2.getType() == Material.RED_ROSE || b2.getType() == Material.YELLOW_FLOWER) {
+                    if (b2.getType() == Material.TALL_GRASS || b2.getType() == Material.POPPY || b2.getType() == Material.DANDELION) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
-                            b2.getRelative(BlockFace.DOWN).setType(Material.SOIL);
+                            b2.getRelative(BlockFace.DOWN).setType(Material.DIRT);
                             b2.breakNaturally();
                             if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
                                 if (!instance.v1_7 && !instance.v1_8)
@@ -266,7 +259,7 @@ public class Farm {
                     }
                     if ((b2.getType() == Material.GRASS || b2.getType() == Material.DIRT) && b2.getRelative(BlockFace.UP).getType() == Material.AIR) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
-                            b2.setType(Material.SOIL);
+                            b2.setType(Material.DIRT);
                             if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
                                 if (!instance.v1_7 && !instance.v1_8)
                                     b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);

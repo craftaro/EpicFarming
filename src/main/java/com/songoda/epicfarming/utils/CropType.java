@@ -14,34 +14,30 @@ public class CropType {
     private static List<CropTypeData> crops = new ArrayList<>();
 
     private CropType() {
-        crops.add(new CropTypeData("Wheat", Material.CROPS, Material.WHEAT, Material.SEEDS));
-        crops.add(new CropTypeData("Carrot", Material.CARROT, Material.CARROT_ITEM, Material.CARROT_ITEM));
-        crops.add(new CropTypeData("Potato", Material.POTATO, Material.POTATO_ITEM, Material.POTATO_ITEM));
+        crops.add(new CropTypeData("Wheat", Material.WHEAT, Material.WHEAT, Material.WHEAT_SEEDS));
+        crops.add(new CropTypeData("Carrot", Material.CARROT, Material.CARROT, Material.CARROT));
+        crops.add(new CropTypeData("Potato", Material.POTATO, Material.POTATO, Material.POTATO));
         crops.add(new CropTypeData("Watermelon", Material.MELON_STEM, Material.MELON, Material.MELON_SEEDS));
         crops.add(new CropTypeData("Pumpkin", Material.PUMPKIN_STEM, Material.PUMPKIN, Material.PUMPKIN_SEEDS));
         crops.add(new CropTypeData("Melon", Material.MELON_STEM, Material.MELON, Material.MELON_SEEDS));
 
-        if (!EpicFarming.pl().v1_8 && !EpicFarming.pl().v1_7) {
-            crops.add(new CropTypeData("Nether Wart", Material.NETHER_WART_BLOCK, Material.NETHER_WARTS, Material.NETHER_WARTS));
-            crops.add(new CropTypeData("Beetroot", Material.BEETROOT_BLOCK, Material.BEETROOT, Material.BEETROOT_SEEDS));
-        }
+            crops.add(new CropTypeData("Nether Wart", Material.NETHER_WART_BLOCK, Material.NETHER_WART, Material.NETHER_WART));
+            crops.add(new CropTypeData("Beetroot", Material.BEETROOT, Material.BEETROOT, Material.BEETROOT_SEEDS));
     }
 
     private void handleAdd() {
         if (crops.size() < 1) {
-            crops.add(new CropTypeData("Wheat", Material.CROPS, Material.WHEAT, Material.SEEDS));
-            crops.add(new CropTypeData("Carrot", Material.CARROT, Material.CARROT_ITEM, Material.CARROT_ITEM));
-            crops.add(new CropTypeData("Potato", Material.POTATO, Material.POTATO_ITEM, Material.POTATO_ITEM));
+            crops.add(new CropTypeData("Wheat", Material.WHEAT, Material.WHEAT, Material.WHEAT_SEEDS));
+            crops.add(new CropTypeData("Carrot", Material.CARROT, Material.CARROT, Material.CARROT));
+            crops.add(new CropTypeData("Potato", Material.POTATO, Material.POTATO, Material.POTATO));
             crops.add(new CropTypeData("Watermelon", Material.MELON_STEM, Material.MELON, Material.MELON_SEEDS));
             crops.add(new CropTypeData("Pumpkin", Material.PUMPKIN_STEM, Material.PUMPKIN, Material.PUMPKIN_SEEDS));
             crops.add(new CropTypeData("Melon", Material.MELON_STEM, Material.MELON, Material.MELON_SEEDS));
 
-            if (!EpicFarming.pl().v1_8 && !EpicFarming.pl().v1_7) {
-                crops.add(new CropTypeData("Nether Wart", Material.NETHER_WART_BLOCK, Material.NETHER_WARTS, Material.NETHER_WARTS));
-                crops.add(new CropTypeData("Beetroot", Material.BEETROOT_BLOCK, Material.BEETROOT, Material.BEETROOT_SEEDS));
-            }
+            crops.add(new CropTypeData("Nether Wart", Material.NETHER_WART_BLOCK, Material.NETHER_WART, Material.NETHER_WART));
+            crops.add(new CropTypeData("Beetroot", Material.BEETROOT, Material.BEETROOT, Material.BEETROOT_SEEDS));            }
         }
-    }
+
 
     public static boolean isCrop(Material material) {
         for (CropTypeData type : values())
