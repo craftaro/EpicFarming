@@ -245,7 +245,8 @@ public class Farm {
                     Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
 
                     // ToDo: enum for all flowers.
-                    if (b2.getType() == Material.TALL_GRASS || b2.getType() == Material.POPPY || b2.getType() == Material.DANDELION) {
+                    if (b2.getType() == Material.TALL_GRASS || b2.getType() == Material.GRASS || b2.getType().name().contains("TULIP") || b2.getType() == Material.AZURE_BLUET ||
+                            b2.getType() == Material.BLUE_ORCHID || b2.getType() == Material.ALLIUM ||  b2.getType() == Material.POPPY || b2.getType() == Material.DANDELION) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
                             b2.getRelative(BlockFace.DOWN).setType(Material.LEGACY_SOIL);
                             b2.breakNaturally();
