@@ -206,8 +206,8 @@ public class SettingsManager implements Listener {
         o8("Main.Farm Block Material", "END_ROD"),
         o9("Main.Allow Non Command Issued Farm Items", false),
 
-        o10("Interfaces.Economy Icon", "DOUBLE_PLANT"),
-        o11("Interfaces.XP Icon", "EXP_BOTTLE"),
+        o10("Interfaces.Economy Icon", "SUNFLOWER"),
+        o11("Interfaces.XP Icon", "EXPERIENCE_BOTTLE"),
         o12("Interfaces.Glass Type 1", 7),
         o13("Interfaces.Glass Type 2", 11),
         o14("Interfaces.Glass Type 3", 3),
