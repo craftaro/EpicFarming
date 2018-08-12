@@ -247,24 +247,18 @@ public class Farm {
                     // ToDo: enum for all flowers.
                     if (b2.getType() == Material.TALL_GRASS || b2.getType() == Material.POPPY || b2.getType() == Material.DANDELION) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
-                            b2.getRelative(BlockFace.DOWN).setType(Material.DIRT);
+                            b2.getRelative(BlockFace.DOWN).setType(Material.LEGACY_SOIL);
                             b2.breakNaturally();
                             if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
-                                if (!instance.v1_7 && !instance.v1_8)
                                     b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
-                                else
-                                    b2.getWorld().playSound(b2.getLocation(), Sound.valueOf("DIG_GRASS"), 10, 15);
                             }
                         }, random.nextInt(30) + 1);
                     }
-                    if ((b2.getType() == Material.GRASS || b2.getType() == Material.DIRT) && b2.getRelative(BlockFace.UP).getType() == Material.AIR) {
+                    if ((b2.getType() == Material.GRASS_BLOCK || b2.getType() == Material.DIRT) && b2.getRelative(BlockFace.UP).getType() == Material.AIR) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
-                            b2.setType(Material.DIRT);
+                            b2.setType(Material.LEGACY_SOIL);
                             if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
-                                if (!instance.v1_7 && !instance.v1_8)
                                     b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
-                                else
-                                    b2.getWorld().playSound(b2.getLocation(), Sound.valueOf("DIG_GRASS"), 10, 15);
                             }
                         }, random.nextInt(30) + 1);
                     }
