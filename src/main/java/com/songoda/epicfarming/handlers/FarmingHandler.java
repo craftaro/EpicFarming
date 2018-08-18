@@ -65,35 +65,41 @@ public class FarmingHandler {
 
     private void hopRunner() {
         for (Farm farm : instance.getFarmManager().getFarms().values()) {
+            if (farm.getLocation().getBlock() == null) {
+                instance.getFarmManager().removeFarm(farm.getLocation());
+                continue;
+            }
             Block block = farm.getLocation().getBlock();
 
-            if (block.getRelative(BlockFace.DOWN).getType() == Material.HOPPER) {
-                Inventory inventory = farm.getInventory();
-                Inventory hopperInventory = ((Hopper) block.getRelative(BlockFace.DOWN).getState()).getInventory();
+            if (block.getRelative(BlockFace.DOWN).getType() != Material.HOPPER)
+                return;
 
-                for (int i = 27; i < inventory.getSize(); i++) {
-                    if (inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) continue;
+            Inventory inventory = farm.getInventory();
+            Inventory hopperInventory = ((Hopper) block.getRelative(BlockFace.DOWN).getState()).getInventory();
 
-                    int amtToMove = 1;
+            for (int i = 27; i < inventory.getSize(); i++) {
+                if (inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) continue;
 
-                    ItemStack item = inventory.getItem(i);
+                int amtToMove = 1;
 
-                    ItemStack toMove = item.clone();
-                    toMove.setAmount(amtToMove);
+                ItemStack item = inventory.getItem(i);
 
-                    int newAmt = item.getAmount() - amtToMove;
+                ItemStack toMove = item.clone();
+                toMove.setAmount(amtToMove);
 
-                    if (canHop(hopperInventory, toMove)) {
-                        if (newAmt <= 0)
-                            inventory.setItem(i, null);
-                        else
-                            item.setAmount(newAmt);
-                        hopperInventory.addItem(toMove);
-                    }
-                    break;
+                int newAmt = item.getAmount() - amtToMove;
+
+                if (canHop(hopperInventory, toMove)) {
+                    if (newAmt <= 0)
+                        inventory.setItem(i, null);
+                    else
+                        item.setAmount(newAmt);
+                    hopperInventory.addItem(toMove);
                 }
+                break;
             }
         }
+
     }
 
     private boolean canHop(Inventory i, ItemStack item) {
@@ -109,9 +115,10 @@ public class FarmingHandler {
     private boolean doDrop(Farm farm, Material material) {
         Random random = new Random();
 
-        CropType.CropTypeData cropTypeData = CropType.getCropType(material);
+        CropType cropTypeData = CropType.getCropType(material);
 
         if (material == null || farm == null || cropTypeData == null) return false;
+
 
         ItemStack stack = new ItemStack(cropTypeData.getYieldMaterial());
         ItemStack seedStack = new ItemStack(cropTypeData.getSeedMaterial(), random.nextInt(3) + 1);
