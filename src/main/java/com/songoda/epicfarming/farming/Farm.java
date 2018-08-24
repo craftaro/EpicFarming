@@ -206,20 +206,12 @@ public class Farm {
                 player.sendMessage(instance.getLocale().getMessage("event.upgrade.successmaxed", level.getLevel()));
             }
             Location loc = location.clone().add(.5, .5, .5);
-            if (!instance.v1_8 && !instance.v1_7) {
                 player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), loc, 200, .5, .5, .5);
-            } else {
-                player.getWorld().playEffect(loc, org.bukkit.Effect.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), 1, 0);
-                //Cannot get this to resolve
-                //player.getWorld().spigot().playEffect(loc, org.bukkit.Effect.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), 1, 0, (float) 1, (float) 1, (float) 1, 1, 200, 10);
-            }
+
             if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
                 if (instance.getLevelManager().getHighestLevel() != level) {
-                    if (!instance.v1_8 && !instance.v1_7) {
                         player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 0.6F, 15.0F);
-                    } else {
-                        player.playSound(player.getLocation(), org.bukkit.Sound.valueOf("LEVEL_UP"), 2F, 15.0F);
-                    }
+
                 } else {
                         player.playSound(player.getLocation(), org.bukkit.Sound.valueOf("LEVEL_UP"), 2F, 25.0F);
                 }

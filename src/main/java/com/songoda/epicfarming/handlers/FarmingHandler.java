@@ -65,7 +65,7 @@ public class FarmingHandler {
 
     private void hopRunner() {
         for (Farm farm : instance.getFarmManager().getFarms().values()) {
-            if (farm.getLocation().getBlock() == null) {
+            if (farm.getLocation() == null || farm.getLocation().getBlock() == null) {
                 instance.getFarmManager().removeFarm(farm.getLocation());
                 continue;
             }

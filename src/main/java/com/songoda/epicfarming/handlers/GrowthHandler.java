@@ -47,14 +47,10 @@ public class GrowthHandler {
 
             switch(cropData.getState()) {
                 case SEEDED:
-                    if (!EpicFarming.pl().v1_7 && !EpicFarming.pl().v1_8) {
                         if (material == Material.BEETROOT)
                             cropData.setState(CropState.VERY_SMALL);
                         else
                             cropData.setState(CropState.GERMINATED);
-                    } else {
-                        cropData.setState(CropState.GERMINATED);
-                    }
                     break;
                 case GERMINATED:
                     cropData.setState(CropState.VERY_SMALL);

@@ -185,13 +185,7 @@ public class SettingsManager implements Listener {
 
     public void updateSettings() {
         for (settings s : settings.values()) {
-            if (s.setting.equals("Main.Upgrade Particle Type")) {
-                if (instance.v1_7 || instance.v1_8)
-                    instance.getConfig().addDefault(s.setting, "WITCH_MAGIC");
-                else
-                    instance.getConfig().addDefault(s.setting, s.option);
-            } else
-                instance.getConfig().addDefault(s.setting, s.option);
+            instance.getConfig().addDefault(s.setting, s.option);
         }
     }
 

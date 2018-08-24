@@ -19,6 +19,7 @@ import com.songoda.epicfarming.player.PlayerData;
 import com.songoda.epicfarming.utils.SettingsManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.event.Listener;
 import org.bukkit.inventory.ItemStack;
@@ -35,13 +36,7 @@ public class EpicFarming extends JavaPlugin implements Listener {
 
     public SettingsManager settingsManager;
     public References references;
-    public HookHandler hooks;
-    public boolean v1_10 = Bukkit.getServer().getClass().getPackage().getName().contains("1_10");
-    public boolean v1_9 = Bukkit.getServer().getClass().getPackage().getName().contains("1_9");
-    public boolean v1_7 = Bukkit.getServer().getClass().getPackage().getName().contains("1_7");
-    public boolean v1_8 = Bukkit.getServer().getClass().getPackage().getName().contains("1_8");
-    public ConfigWrapper dataFile = new ConfigWrapper(this, "", "data.yml");
-    private ConfigWrapper langFile = new ConfigWrapper(this, "", "lang.yml");
+    public HookHandler hooks;    public ConfigWrapper dataFile = new ConfigWrapper(this, "", "data.yml");
     private Locale locale;
     private FarmingHandler farmingHandler;
     private GrowthHandler growthHandler;
@@ -87,6 +82,7 @@ public class EpicFarming extends JavaPlugin implements Listener {
         if (dataFile.getConfig().contains("Farms")) {
             for (String locationStr : dataFile.getConfig().getConfigurationSection("Farms").getKeys(false)) {
                 Location location = Arconix.pl().getApi().serialize().unserializeLocation(locationStr);
+                if (location == null || location.getWorld() == null) continue;
                 int level = dataFile.getConfig().getInt("Farms." + locationStr + ".level");
 
                 List<ItemStack> items = (List<ItemStack>) dataFile.getConfig().getList("Farms." + locationStr + ".Contents");
@@ -181,7 +177,6 @@ public class EpicFarming extends JavaPlugin implements Listener {
     }
 
     public void reload() {
-        langFile.createNewFile("Loading Language File", "EpicFarming Language File");
         hooks.hooksFile.createNewFile("Loading hooks File", "EpicFarming hooks File");
         hooks = new HookHandler();
         hooks.hook();
