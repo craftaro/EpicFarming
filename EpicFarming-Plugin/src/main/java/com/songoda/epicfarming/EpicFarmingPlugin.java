@@ -151,7 +151,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         
         // Register default hooks
         if (pluginManager.isPluginEnabled("ASkyBlock")) this.register(HookASkyBlock::new);
-        if (pluginManager.isPluginEnabled("Factions")) this.register(HookFactions::new);
+        if (pluginManager.isPluginEnabled("FactionsFramework")) this.register(HookFactions::new);
         if (pluginManager.isPluginEnabled("GriefPrevention")) this.register(HookGriefPrevention::new);
         if (pluginManager.isPluginEnabled("Kingdoms")) this.register(HookKingdoms::new);
         if (pluginManager.isPluginEnabled("PlotSquared")) this.register(HookPlotSquared::new);
