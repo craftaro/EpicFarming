@@ -24,7 +24,7 @@ public class Debugger {
     }
 
     public static boolean isDebug() {
-        EpicFarmingPlugin plugin = EpicFarmingPlugin.pl();
+        EpicFarmingPlugin plugin = EpicFarmingPlugin.getInstance();
         return plugin.getConfig().getBoolean("System.Debugger Enabled");
     }
 

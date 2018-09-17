@@ -1,4 +1,4 @@
-package com.songoda.epicfarming.events;
+package com.songoda.epicfarming.listeners;
 
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.api.farming.UpgradeType;

@@ -8,20 +8,20 @@ import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.api.farming.Level;
 import com.songoda.epicfarming.api.utils.ClaimableProtectionPluginHook;
 import com.songoda.epicfarming.api.utils.ProtectionPluginHook;
-import com.songoda.epicfarming.events.BlockListeners;
-import com.songoda.epicfarming.events.EntityListeners;
-import com.songoda.epicfarming.events.InteractListeners;
-import com.songoda.epicfarming.events.InventoryListeners;
+import com.songoda.epicfarming.command.CommandManager;
+import com.songoda.epicfarming.listeners.BlockListeners;
+import com.songoda.epicfarming.listeners.EntityListeners;
+import com.songoda.epicfarming.listeners.InteractListeners;
+import com.songoda.epicfarming.listeners.InventoryListeners;
 import com.songoda.epicfarming.farming.EFarm;
 import com.songoda.epicfarming.farming.EFarmManager;
-import com.songoda.epicfarming.farming.ELevel;
 import com.songoda.epicfarming.farming.ELevelManager;
-import com.songoda.epicfarming.handlers.CommandHandler;
-import com.songoda.epicfarming.handlers.FarmingHandler;
-import com.songoda.epicfarming.handlers.GrowthHandler;
 import com.songoda.epicfarming.hooks.*;
 import com.songoda.epicfarming.player.PlayerActionManager;
 import com.songoda.epicfarming.player.PlayerData;
+import com.songoda.epicfarming.tasks.FarmTask;
+import com.songoda.epicfarming.tasks.GrowthTask;
+import com.songoda.epicfarming.tasks.HopperTask;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
 import com.songoda.epicfarming.utils.SettingsManager;
@@ -32,6 +32,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
@@ -52,20 +53,19 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
     private List<ProtectionPluginHook> protectionHooks = new ArrayList<>();
     private ClaimableProtectionPluginHook factionsHook, townyHook, aSkyblockHook, uSkyblockHook;
 
-    public SettingsManager settingsManager;
-    public References references;
+    private SettingsManager settingsManager;
+    private References references;
     private ConfigWrapper hooksFile = new ConfigWrapper(this, "", "hooks.yml");
-    public ConfigWrapper dataFile = new ConfigWrapper(this, "", "data.yml");
+    private ConfigWrapper dataFile = new ConfigWrapper(this, "", "data.yml");
     private Locale locale;
-    private FarmingHandler farmingHandler;
-    private GrowthHandler growthHandler;
     private EFarmManager farmManager;
     private ELevelManager levelManager;
     private PlayerActionManager playerActionManager;
+    private CommandManager commandManager;
 
-    public static EpicFarmingPlugin pl() {
-        return INSTANCE;
-    }
+    private GrowthTask growthTask;
+    private HopperTask hopperTask;
+    private FarmTask farmTask;
 
     public static EpicFarmingPlugin getInstance() {
         return INSTANCE;
@@ -105,7 +105,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         Locale.saveDefaultLocale("en_US");
         this.locale = Locale.getLocale(this.getConfig().getString("Locale", "en_US"));
 
-        settingsManager = new SettingsManager(this);
+        this.settingsManager = new SettingsManager(this);
         setupConfig();
 
         dataFile.createNewFile("Loading Data File", "EpicFarming Data File");
@@ -113,7 +113,9 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
 
         loadLevelManager();
 
-        farmManager = new EFarmManager();
+        this.farmManager = new EFarmManager();
+        this.playerActionManager = new PlayerActionManager();
+        this.commandManager = new CommandManager(this);
 
         /*
          * Register Farms into FarmManger from configuration
@@ -132,14 +134,8 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
                 farmManager.addFarm(location, farm);
             }
         }
-        playerActionManager = new PlayerActionManager();
 
-
-        farmingHandler = new FarmingHandler(this);
-        growthHandler = new GrowthHandler(this);
-        references = new References();
-
-        this.getCommand("EpicFarming").setExecutor(new CommandHandler(this));
+        this.references = new References();
 
         PluginManager pluginManager = Bukkit.getPluginManager();
 
@@ -160,7 +156,11 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         if (pluginManager.isPluginEnabled("USkyBlock")) this.register(HookUSkyBlock::new);
         if (pluginManager.isPluginEnabled("WorldGuard")) this.register(HookWorldGuard::new);
 
-        
+        // Start tasks
+        this.growthTask = GrowthTask.startTask(this);
+        this.hopperTask = HopperTask.startTask(this);
+        this.farmTask = FarmTask.startTask(this);
+
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
 
         new MCUpdate(this, true);
@@ -235,46 +235,48 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
 
     private void setupConfig() {
         settingsManager.updateSettings();
+        
+        ConfigurationSection levels = getConfig().createSection("settings.levels");
 
-        if (!getConfig().contains("settings.levels.Level-1")) {
-            getConfig().addDefault("settings.levels.Level-1.Radius", 1);
-            getConfig().addDefault("settings.levels.Level-1.Speed-Multiplier", 1);
-            getConfig().addDefault("settings.levels.Level-1.Cost-xp", 20);
-            getConfig().addDefault("settings.levels.Level-1.Cost-eco", 5000);
+        if (!levels.contains("Level-1")) {
+            levels.set("Level-1.Radius", 1);
+            levels.set("Level-1.Speed-Multiplier", 1);
+            levels.set("Level-1.Cost-xp", 20);
+            levels.set("Level-1.Cost-eco", 5000);
 
-            getConfig().addDefault("settings.levels.Level-2.Radius", 2);
-            getConfig().addDefault("settings.levels.Level-2.Speed-Multiplier", 1.5);
-            getConfig().addDefault("settings.levels.Level-2.Auto-Harvest", true);
-            getConfig().addDefault("settings.levels.Level-2.Cost-xp", 20);
-            getConfig().addDefault("settings.levels.Level-2.Cost-eco", 5000);
+            levels.set("Level-2.Radius", 2);
+            levels.set("Level-2.Speed-Multiplier", 1.5);
+            levels.set("Level-2.Auto-Harvest", true);
+            levels.set("Level-2.Cost-xp", 20);
+            levels.set("Level-2.Cost-eco", 5000);
 
-            getConfig().addDefault("settings.levels.Level-3.Radius", 3);
-            getConfig().addDefault("settings.levels.Level-3.Speed-Multiplier", 1.5);
-            getConfig().addDefault("settings.levels.Level-3.Auto-Harvest", true);
-            getConfig().addDefault("settings.levels.Level-3.Auto-Replant", true);
-            getConfig().addDefault("settings.levels.Level-3.Cost-xp", 25);
-            getConfig().addDefault("settings.levels.Level-3.Cost-eco", 7500);
+            levels.set("Level-3.Radius", 3);
+            levels.set("Level-3.Speed-Multiplier", 1.5);
+            levels.set("Level-3.Auto-Harvest", true);
+            levels.set("Level-3.Auto-Replant", true);
+            levels.set("Level-3.Cost-xp", 25);
+            levels.set("Level-3.Cost-eco", 7500);
 
-            getConfig().addDefault("settings.levels.Level-4.Radius", 3);
-            getConfig().addDefault("settings.levels.Level-4.Speed-Multiplier", 2);
-            getConfig().addDefault("settings.levels.Level-4.Auto-Harvest", true);
-            getConfig().addDefault("settings.levels.Level-4.Auto-Replant", true);
-            getConfig().addDefault("settings.levels.Level-4.Cost-xp", 30);
-            getConfig().addDefault("settings.levels.Level-4.Cost-eco", 10000);
+            levels.set("Level-4.Radius", 3);
+            levels.set("Level-4.Speed-Multiplier", 2);
+            levels.set("Level-4.Auto-Harvest", true);
+            levels.set("Level-4.Auto-Replant", true);
+            levels.set("Level-4.Cost-xp", 30);
+            levels.set("Level-4.Cost-eco", 10000);
 
-            getConfig().addDefault("settings.levels.Level-5.Radius", 3);
-            getConfig().addDefault("settings.levels.Level-5.Speed-Multiplier", 2.5);
-            getConfig().addDefault("settings.levels.Level-5.Auto-Harvest", true);
-            getConfig().addDefault("settings.levels.Level-5.Auto-Replant", true);
-            getConfig().addDefault("settings.levels.Level-5.Cost-xp", 35);
-            getConfig().addDefault("settings.levels.Level-5.Cost-eco", 12000);
+            levels.set("Level-5.Radius", 3);
+            levels.set("Level-5.Speed-Multiplier", 2.5);
+            levels.set("Level-5.Auto-Harvest", true);
+            levels.set("Level-5.Auto-Replant", true);
+            levels.set("Level-5.Cost-xp", 35);
+            levels.set("Level-5.Cost-eco", 12000);
 
-            getConfig().addDefault("settings.levels.Level-6.Radius", 4);
-            getConfig().addDefault("settings.levels.Level-6.Speed-Multiplier", 3);
-            getConfig().addDefault("settings.levels.Level-6.Auto-Harvest", true);
-            getConfig().addDefault("settings.levels.Level-6.Auto-Replant", true);
-            getConfig().addDefault("settings.levels.Level-6.Cost-xp", 40);
-            getConfig().addDefault("settings.levels.Level-6.Cost-eco", 25000);
+            levels.set("Level-6.Radius", 4);
+            levels.set("Level-6.Speed-Multiplier", 3);
+            levels.set("Level-6.Auto-Harvest", true);
+            levels.set("Level-6.Auto-Replant", true);
+            levels.set("Level-6.Cost-xp", 40);
+            levels.set("Level-6.Cost-eco", 25000);
         }
 
         getConfig().options().copyDefaults(true);
@@ -290,11 +292,9 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         return locale;
     }
 
-
     private void register(Supplier<ProtectionPluginHook> hookSupplier) {
         this.registerProtectionHook(hookSupplier.get());
     }
-
 
     @Override
     public void registerProtectionHook(ProtectionPluginHook hook) {
@@ -359,15 +359,27 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         return levelManager;
     }
 
-    public FarmingHandler getFarmingHandler() {
-        return farmingHandler;
+    public References getReferences() {
+        return references;
+    }
+
+    public SettingsManager getSettingsManager() {
+        return settingsManager;
+    }
+
+    public CommandManager getCommandManager() {
+        return commandManager;
     }
 
     public PlayerActionManager getPlayerActionManager() {
         return playerActionManager;
     }
 
-    public GrowthHandler getGrowthHandler() {
-        return growthHandler;
+    public GrowthTask getGrowthTask() {
+        return growthTask;
+    }
+
+    public FarmTask getFarmTask() {
+        return farmTask;
     }
 }

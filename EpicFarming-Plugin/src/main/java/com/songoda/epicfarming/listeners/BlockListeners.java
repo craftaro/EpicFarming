@@ -1,13 +1,11 @@
-package com.songoda.epicfarming.events;
+package com.songoda.epicfarming.listeners;
 
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.api.farming.Level;
 import com.songoda.epicfarming.farming.EFarm;
 import com.songoda.epicfarming.farming.EFarmManager;
-import com.songoda.epicfarming.farming.ELevel;
 import com.songoda.epicfarming.utils.Debugger;
-import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -125,7 +123,7 @@ public class BlockListeners implements Listener {
 
             Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
 
-            instance.getFarmingHandler().getCrops(farm, false);
+            instance.getFarmTask().getCrops(farm, false);
 
             if (farm == null) return;
 

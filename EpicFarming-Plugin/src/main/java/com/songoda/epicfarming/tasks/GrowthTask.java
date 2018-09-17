@@ -1,34 +1,43 @@
-package com.songoda.epicfarming.handlers;
+package com.songoda.epicfarming.tasks;
 
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.farming.Crop;
-import org.bukkit.Bukkit;
 import org.bukkit.CropState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.BlockState;
 import org.bukkit.material.Crops;
+import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
-public class GrowthHandler {
+public class GrowthTask extends BukkitRunnable {
 
-    public GrowthHandler(EpicFarmingPlugin instance) {
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(EpicFarmingPlugin.getInstance(), this::growthRunner, 0, instance.getConfig().getInt("Main.Growth Tick Speed"));
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(EpicFarmingPlugin.getInstance(), this::clear, 0, instance.getConfig().getInt("Main.Clear Tick Speed"));
-    }
+    private static GrowthTask instance;
 
-    Map<Location, Crop> liveCrops = new HashMap<>();
+    private Map<Location, Crop> liveCrops = new HashMap<>();
 
     private static final Random random = new Random();
 
-    private void growthRunner() {
+    public static GrowthTask startTask(EpicFarmingPlugin plugin) {
+        if (instance == null) {
+            instance = new GrowthTask();
+            instance.runTaskTimer(plugin, 0, plugin.getConfig().getInt("Main.Growth Tick Speed"));
+        }
+
+        return instance;
+    }
+
+    @Override
+    public void run() {
+        List<Crop> toRemove =  new ArrayList<>();
 
         for (Crop crop : liveCrops.values()) {
 
-            if (!(crop.getLocation().getBlock().getState().getData() instanceof Crops)) continue;
+            if (!(crop.getLocation().getBlock().getState().getData() instanceof Crops)) {
+                toRemove.add(crop);
+                continue;
+            }
 
             //ToDO: This should be in config.
             int cap = (int)Math.ceil(60 / crop.getFarm().getLevel().getSpeedMultiplier()) - crop.getTicksLived();
@@ -47,10 +56,10 @@ public class GrowthHandler {
 
             switch(cropData.getState()) {
                 case SEEDED:
-                        if (material == Material.BEETROOT)
-                            cropData.setState(CropState.VERY_SMALL);
-                        else
-                            cropData.setState(CropState.GERMINATED);
+                    if (material == Material.BEETROOT)
+                        cropData.setState(CropState.VERY_SMALL);
+                    else
+                        cropData.setState(CropState.GERMINATED);
                     break;
                 case GERMINATED:
                     cropData.setState(CropState.VERY_SMALL);
@@ -78,9 +87,17 @@ public class GrowthHandler {
             crop.setTicksLived(1);
 
         }
+        for (Crop crop : toRemove)
+            liveCrops.remove(crop);
     }
 
-    private void clear() {
-        liveCrops.clear();
+    public void addLiveCrop(Location location, Crop crop) {
+        if (!liveCrops.containsKey(location))
+            liveCrops.put(location, crop);
     }
+
+    public void removeCropByLocation(Location location) {
+        liveCrops.remove(location);
+    }
+
 }

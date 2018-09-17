@@ -1,4 +1,4 @@
-package com.songoda.epicfarming.events;
+package com.songoda.epicfarming.listeners;
 
 import com.songoda.epicfarming.utils.Debugger;
 import org.bukkit.event.EventHandler;
