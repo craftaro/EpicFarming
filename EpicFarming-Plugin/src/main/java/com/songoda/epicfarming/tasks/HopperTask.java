@@ -59,6 +59,7 @@ public class HopperTask extends BukkitRunnable {
                 int amtToMove = 1;
 
                 ItemStack item = inventory.getItem(i);
+                if (item.getType() == Material.BONE_MEAL) continue;
 
                 ItemStack toMove = item.clone();
                 toMove.setAmount(amtToMove);

@@ -70,13 +70,36 @@ public class FarmTask extends BukkitRunnable {
         if (material == null || farm == null || cropTypeData == null) return false;
 
 
-        ItemStack stack = new ItemStack(cropTypeData.getYieldMaterial());
-        ItemStack seedStack = new ItemStack(cropTypeData.getSeedMaterial(), random.nextInt(3) + 1);
+        ItemStack stack = new ItemStack(cropTypeData.getYieldMaterial(), useBoneMeal(farm) ? random.nextInt(2) + 2 : 1);
+        ItemStack seedStack = new ItemStack(cropTypeData.getSeedMaterial(), random.nextInt(3) + 1 + (useBoneMeal(farm) ? 1 : 0));
 
         if (!canMove(farm.getInventory(), stack)) return false;
         farm.getInventory().addItem(stack);
         farm.getInventory().addItem(seedStack);
         return true;
+    }
+
+    private boolean useBoneMeal(Farm farm) {
+        Inventory inventory = farm.getInventory();
+
+        for (int i = 27; i < inventory.getSize(); i++) {
+            if (inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) continue;
+
+            ItemStack item = inventory.getItem(i);
+
+            if (item.getType() != Material.BONE_MEAL) continue;
+
+            int newAmt = item.getAmount() - 1;
+
+            if (newAmt <= 0)
+                inventory.setItem(i, null);
+            else
+                item.setAmount(newAmt);
+
+            return true;
+
+        }
+        return false;
     }
 
     public List<Block> getCrops(Farm farm, boolean add) {
