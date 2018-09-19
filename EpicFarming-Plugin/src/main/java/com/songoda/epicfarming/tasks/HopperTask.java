@@ -4,6 +4,7 @@ import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.api.farming.FarmManager;
 import com.songoda.epicfarming.farming.Crop;
+import org.bukkit.Bukkit;
 import org.bukkit.CropState;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -47,7 +48,7 @@ public class HopperTask extends BukkitRunnable {
             Block block = farm.getLocation().getBlock();
 
             if (block.getRelative(BlockFace.DOWN).getType() != Material.HOPPER)
-                return;
+                continue;
 
             Inventory inventory = farm.getInventory();
             Inventory hopperInventory = ((Hopper) block.getRelative(BlockFace.DOWN).getState()).getInventory();

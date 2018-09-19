@@ -10,7 +10,6 @@ import com.songoda.epicfarming.api.utils.ClaimableProtectionPluginHook;
 import com.songoda.epicfarming.api.utils.ProtectionPluginHook;
 import com.songoda.epicfarming.command.CommandManager;
 import com.songoda.epicfarming.listeners.BlockListeners;
-import com.songoda.epicfarming.listeners.EntityListeners;
 import com.songoda.epicfarming.listeners.InteractListeners;
 import com.songoda.epicfarming.listeners.InventoryListeners;
 import com.songoda.epicfarming.farming.EFarm;
@@ -143,7 +142,6 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         pluginManager.registerEvents(new BlockListeners(this), this);
         pluginManager.registerEvents(new InteractListeners(this), this);
         pluginManager.registerEvents(new InventoryListeners(this), this);
-        pluginManager.registerEvents(new EntityListeners(), this);
         
         // Register default hooks
         if (pluginManager.isPluginEnabled("ASkyBlock")) this.register(HookASkyBlock::new);

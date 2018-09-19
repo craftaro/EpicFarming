@@ -98,8 +98,9 @@ public class BlockListeners implements Listener {
             int bx = block.getX();
             int by = block.getY();
             int bz = block.getZ();
+
             for (int fx = -radius; fx <= radius; fx++) {
-                for (int fy = -2; fy <= 1; fy++) {
+                for (int fy = -2; fy <= 2; fy++) {
                     for (int fz = -radius; fz <= radius; fz++) {
                         Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
                         if (b2.getType() == Material.valueOf(instance.getConfig().getString("Main.Farm Block Material"))) {
