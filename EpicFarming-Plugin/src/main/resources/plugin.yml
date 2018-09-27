@@ -11,4 +11,4 @@ commands:
     description: View information on this plugin.
     default: true
     aliases: [efa]
-    usage: /ed
+    usage: /efa

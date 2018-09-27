@@ -1,9 +1,12 @@
 package com.songoda.epicfarming.farming;
 
+import com.songoda.arconix.api.methods.formatting.TextComponent;
+import com.songoda.arconix.api.methods.formatting.TimeComponent;
 import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.api.farming.Level;
 import com.songoda.epicfarming.api.farming.UpgradeType;
+import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.player.PlayerData;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
@@ -21,16 +24,19 @@ import org.bukkit.plugin.RegisteredServiceProvider;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.UUID;
 
 public class EFarm implements Farm {
 
     private Location location;
     private Level level;
     private Inventory inventory;
+    private UUID placedBy;
 
-    public EFarm(Location location, Level level) {
+    public EFarm(Location location, Level level, UUID placedBy) {
         this.location = location;
         this.level = level;
+        this.placedBy = placedBy;
         this.inventory = Bukkit.createInventory(null, 54, Methods.formatName(level.getLevel(),false));
     }
 
@@ -73,6 +79,14 @@ public class EFarm implements Farm {
         else {
             lore.add(instance.getLocale().getMessage("interface.button.level", nextLevel.getLevel()));
             lore.addAll(nextLevel.getDescription());
+        }
+
+        BoostData boostData = instance.getBoostManager().getBoost(placedBy);
+        if (boostData != null) {
+            String[] parts = instance.getLocale().getMessage("interface.button.boostedstats", Integer.toString(boostData.getMultiplier()), TimeComponent.makeReadable(boostData.getEndTime() - System.currentTimeMillis())).split("\\|");
+            lore.add("");
+            for (String line : parts)
+                lore.add(TextComponent.formatText(line));
         }
 
         itemmeta.setLore(lore);
@@ -268,6 +282,11 @@ public class EFarm implements Farm {
     @Override
     public Location getLocation() {
         return location.clone();
+    }
+
+    @Override
+    public UUID getPlacedBy() {
+        return placedBy;
     }
 
     @Override

@@ -4,18 +4,21 @@ import com.google.common.base.Preconditions;
 import com.songoda.arconix.api.mcupdate.MCUpdate;
 import com.songoda.arconix.api.utils.ConfigWrapper;
 import com.songoda.arconix.plugin.Arconix;
+import com.songoda.epicfarming.api.EpicFarming;
 import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.api.farming.Level;
 import com.songoda.epicfarming.api.utils.ClaimableProtectionPluginHook;
 import com.songoda.epicfarming.api.utils.ProtectionPluginHook;
+import com.songoda.epicfarming.boost.BoostData;
+import com.songoda.epicfarming.boost.BoostManager;
 import com.songoda.epicfarming.command.CommandManager;
-import com.songoda.epicfarming.listeners.BlockListeners;
-import com.songoda.epicfarming.listeners.InteractListeners;
-import com.songoda.epicfarming.listeners.InventoryListeners;
 import com.songoda.epicfarming.farming.EFarm;
 import com.songoda.epicfarming.farming.EFarmManager;
 import com.songoda.epicfarming.farming.ELevelManager;
 import com.songoda.epicfarming.hooks.*;
+import com.songoda.epicfarming.listeners.BlockListeners;
+import com.songoda.epicfarming.listeners.InteractListeners;
+import com.songoda.epicfarming.listeners.InventoryListeners;
 import com.songoda.epicfarming.player.PlayerActionManager;
 import com.songoda.epicfarming.player.PlayerData;
 import com.songoda.epicfarming.tasks.FarmTask;
@@ -24,7 +27,6 @@ import com.songoda.epicfarming.tasks.HopperTask;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
 import com.songoda.epicfarming.utils.SettingsManager;
-import com.songoda.epicfarming.api.EpicFarming;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -40,6 +42,7 @@ import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.function.Supplier;
 
 /**
@@ -61,6 +64,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
     private ELevelManager levelManager;
     private PlayerActionManager playerActionManager;
     private CommandManager commandManager;
+    private BoostManager boostManager;
 
     private GrowthTask growthTask;
     private HopperTask hopperTask;
@@ -114,25 +118,45 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
 
         this.farmManager = new EFarmManager();
         this.playerActionManager = new PlayerActionManager();
+        this.boostManager = new BoostManager();
         this.commandManager = new CommandManager(this);
 
         /*
          * Register Farms into FarmManger from configuration
          */
-        if (dataFile.getConfig().contains("Farms")) {
-            for (String locationStr : dataFile.getConfig().getConfigurationSection("Farms").getKeys(false)) {
-                Location location = Arconix.pl().getApi().serialize().unserializeLocation(locationStr);
-                if (location == null || location.getWorld() == null) continue;
-                int level = dataFile.getConfig().getInt("Farms." + locationStr + ".level");
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            if (dataFile.getConfig().contains("Farms")) {
+                for (String locationStr : dataFile.getConfig().getConfigurationSection("Farms").getKeys(false)) {
+                    Location location = Arconix.pl().getApi().serialize().unserializeLocation(locationStr);
+                    if (location == null || location.getWorld() == null) continue;
+                    int level = dataFile.getConfig().getInt("Farms." + locationStr + ".level");
 
-                List<ItemStack> items = (List<ItemStack>) dataFile.getConfig().getList("Farms." + locationStr + ".Contents");
+                    List<ItemStack> items = (List<ItemStack>) dataFile.getConfig().getList("Farms." + locationStr + ".Contents");
 
-                EFarm farm = new EFarm(location, levelManager.getLevel(level));
-                farm.loadInventory(items);
+                    String placedByStr = dataFile.getConfig().getString("Farms." + locationStr + ".placedBy");
 
-                farmManager.addFarm(location, farm);
+                    UUID placedBy = placedByStr == null ? null : UUID.fromString(placedByStr);
+
+                    EFarm farm = new EFarm(location, levelManager.getLevel(level), placedBy);
+                    farm.loadInventory(items);
+
+                    farmManager.addFarm(location, farm);
+                }
             }
-        }
+
+            // Adding in Boosts
+            if (dataFile.getConfig().contains("data.boosts")) {
+                for (String key : dataFile.getConfig().getConfigurationSection("data.boosts").getKeys(false)) {
+                    if (!dataFile.getConfig().contains("data.boosts." + key + ".Player")) continue;
+                    BoostData boostData = new BoostData(
+                            dataFile.getConfig().getInt("data.boosts." + key + ".Amount"),
+                            Long.parseLong(key),
+                            UUID.fromString(dataFile.getConfig().getString("data.boosts." + key + ".Player")));
+
+                    this.boostManager.addBoostToPlayer(boostData);
+                }
+            }
+        }, 10);
 
         this.references = new References();
 
@@ -142,7 +166,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         pluginManager.registerEvents(new BlockListeners(this), this);
         pluginManager.registerEvents(new InteractListeners(this), this);
         pluginManager.registerEvents(new InventoryListeners(this), this);
-        
+
         // Register default hooks
         if (pluginManager.isPluginEnabled("ASkyBlock")) this.register(HookASkyBlock::new);
         if (pluginManager.isPluginEnabled("FactionsFramework")) this.register(HookFactions::new);
@@ -216,7 +240,17 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
                     || farm.getLocation().getWorld() == null) continue;
             String locationStr = Arconix.pl().getApi().serialize().serializeLocation(farm.getLocation());
             dataFile.getConfig().set("Farms." + locationStr + ".level", farm.getLevel().getLevel());
-            dataFile.getConfig().set("Farms." + locationStr + ".Contents", ((EFarm)farm).dumpInventory());
+            dataFile.getConfig().set("Farms." + locationStr + ".placedBy", farm.getPlacedBy() == null ? null : farm.getPlacedBy().toString());
+            dataFile.getConfig().set("Farms." + locationStr + ".Contents", ((EFarm) farm).dumpInventory());
+        }
+
+        /*
+         * Dump BoostManager to file.
+         */
+        for (BoostData boostData : boostManager.getBoosts()) {
+            String endTime = String.valueOf(boostData.getEndTime());
+            dataFile.getConfig().set("data.boosts." + endTime + ".Player", boostData.getPlayer().toString());
+            dataFile.getConfig().set("data.boosts." + endTime + ".Amount", boostData.getMultiplier());
         }
 
         //Save to file
@@ -233,7 +267,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
 
     private void setupConfig() {
         settingsManager.updateSettings();
-        
+
         ConfigurationSection levels = getConfig().createSection("settings.levels");
 
         if (!levels.contains("Level-1")) {
@@ -367,6 +401,10 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
 
     public CommandManager getCommandManager() {
         return commandManager;
+    }
+
+    public BoostManager getBoostManager() {
+        return boostManager;
     }
 
     public PlayerActionManager getPlayerActionManager() {

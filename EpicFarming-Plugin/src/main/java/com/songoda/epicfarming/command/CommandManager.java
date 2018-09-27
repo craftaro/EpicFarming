@@ -3,10 +3,7 @@ package com.songoda.epicfarming.command;
 import com.songoda.arconix.api.methods.formatting.TextComponent;
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.api.EpicFarming;
-import com.songoda.epicfarming.command.commands.CommandEpicFarming;
-import com.songoda.epicfarming.command.commands.CommandGiveFarmItem;
-import com.songoda.epicfarming.command.commands.CommandReload;
-import com.songoda.epicfarming.command.commands.CommandSettings;
+import com.songoda.epicfarming.command.commands.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -27,11 +24,12 @@ public class CommandManager implements CommandExecutor {
 
         instance.getCommand("EpicFarming").setExecutor(this);
 
-        AbstractCommand commandEpicSpawners = addCommand(new CommandEpicFarming());
+        AbstractCommand commandEpicFarming = addCommand(new CommandEpicFarming());
 
-        addCommand(new CommandReload(commandEpicSpawners));
-        addCommand(new CommandSettings(commandEpicSpawners));
-        addCommand(new CommandGiveFarmItem(commandEpicSpawners));
+        addCommand(new CommandReload(commandEpicFarming));
+        addCommand(new CommandSettings(commandEpicFarming));
+        addCommand(new CommandGiveFarmItem(commandEpicFarming));
+        addCommand(new CommandBoost(commandEpicFarming));
     }
 
     private AbstractCommand addCommand(AbstractCommand abstractCommand) {

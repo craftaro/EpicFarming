@@ -26,7 +26,7 @@ public class Locale {
     private static JavaPlugin plugin;
     private static final List<Locale> LOCALES = Lists.newArrayList();
 
-    private static final Pattern NODE_PATTERN = Pattern.compile("(\\w+(?:\\.{1}\\w+)*)\\s*=\\s*\"(.*)\"");
+    private static final Pattern NODE_PATTERN = Pattern.compile("(\\w+(?:\\.\\w+)*)\\s*=\\s*\"(.*)\"");
     private static final String FILE_EXTENSION = ".lang";
     private static File localeFolder;
 
@@ -101,21 +101,26 @@ public class Locale {
     }
 
     /**
-     * Get a message set for a specific node and replace its params with a supplied argument.
+     * Get a message set for a specific node and replace its params with a supplied arguments.
      *
      * @param node the node to get
-     * @param arg  the replacement argument
+     * @param args the replacement arguments
      * @return the message for the specified node
      */
-    public String getMessage(String node, Object arg) {
-        return getMessage(node).replaceAll("\\%.*?\\%", arg.toString());
+    public String getMessage(String node, Object... args) {
+        String message = getMessage(node);
+        for (Object arg : args) {
+            message = message.replaceFirst("%.*?%", arg.toString());
+        }
+        return message;
     }
 
     /**
      * Get a message set for a specific node
      *
-     * @param node         the node to get
+     * @param node the node to get
      * @param defaultValue the default value given that a value for the node was not found
+     *
      * @return the message for the specified node. Default if none found
      */
     public String getMessageOrDefault(String node, String defaultValue) {
@@ -144,7 +149,7 @@ public class Locale {
 
         this.nodes.clear(); // Clear previous data (if any)
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        try(BufferedReader reader = new BufferedReader(new FileReader(file))) {
             String line;
             for (int lineNumber = 0; (line = reader.readLine()) != null; lineNumber++) {
                 if (line.isEmpty() || line.startsWith("#") /* Comment */) continue;
@@ -264,8 +269,9 @@ public class Locale {
     /**
      * Save a default locale file from the project source directory, to the locale folder
      *
-     * @param path     the path to the file to save
+     * @param path the path to the file to save
      * @param fileName the name of the file to save
+     *
      * @return true if the operation was successful, false otherwise
      */
     public static boolean saveDefaultLocale(String path, String fileName) {
@@ -339,8 +345,7 @@ public class Locale {
 
                 if (!existingLines.contains(key)) {
                     if (!changed) {
-                        writer.newLine();
-                        writer.newLine();
+                        writer.newLine(); writer.newLine();
                         writer.write("# New messages for " + plugin.getName() + " v" + plugin.getDescription().getVersion());
                     }
 

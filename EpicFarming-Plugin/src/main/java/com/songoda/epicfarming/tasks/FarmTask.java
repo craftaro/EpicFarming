@@ -3,6 +3,7 @@ package com.songoda.epicfarming.tasks;
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.api.EpicFarming;
 import com.songoda.epicfarming.api.farming.Farm;
+import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.utils.CropType;
 import com.songoda.epicfarming.utils.Debugger;
@@ -70,7 +71,11 @@ public class FarmTask extends BukkitRunnable {
         if (material == null || farm == null || cropTypeData == null) return false;
 
 
-        ItemStack stack = new ItemStack(cropTypeData.getYieldMaterial(), useBoneMeal(farm) ? random.nextInt(2) + 2 : 1);
+
+
+        BoostData boostData = plugin.getBoostManager().getBoost(farm.getPlacedBy());
+
+        ItemStack stack = new ItemStack(cropTypeData.getYieldMaterial(), (useBoneMeal(farm) ? random.nextInt(2) + 2 : 1) * (boostData == null ? 1 : boostData.getMultiplier()));
         ItemStack seedStack = new ItemStack(cropTypeData.getSeedMaterial(), random.nextInt(3) + 1 + (useBoneMeal(farm) ? 1 : 0));
 
         if (!canMove(farm.getInventory(), stack)) return false;

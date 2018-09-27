@@ -77,7 +77,7 @@ public class BlockListeners implements Listener {
 
                 if (location.getBlock().getType() != farmBlock) return;
 
-                EFarm farm = new EFarm(location, instance.getLevelManager().getLevel(level));
+                EFarm farm = new EFarm(location, instance.getLevelManager().getLevel(level), e.getPlayer().getUniqueId());
                 instance.getFarmManager().addFarm(location, farm);
 
                 farm.tillLand(e.getBlock().getLocation());
