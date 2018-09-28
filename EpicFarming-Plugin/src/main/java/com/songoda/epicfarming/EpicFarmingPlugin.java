@@ -21,6 +21,7 @@ import com.songoda.epicfarming.listeners.InteractListeners;
 import com.songoda.epicfarming.listeners.InventoryListeners;
 import com.songoda.epicfarming.player.PlayerActionManager;
 import com.songoda.epicfarming.player.PlayerData;
+import com.songoda.epicfarming.tasks.EntityTask;
 import com.songoda.epicfarming.tasks.FarmTask;
 import com.songoda.epicfarming.tasks.GrowthTask;
 import com.songoda.epicfarming.tasks.HopperTask;
@@ -69,6 +70,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
     private GrowthTask growthTask;
     private HopperTask hopperTask;
     private FarmTask farmTask;
+    private EntityTask entityTask;
 
     public static EpicFarmingPlugin getInstance() {
         return INSTANCE;
@@ -182,6 +184,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         this.growthTask = GrowthTask.startTask(this);
         this.hopperTask = HopperTask.startTask(this);
         this.farmTask = FarmTask.startTask(this);
+        this.entityTask = entityTask.startTask(this);
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
 
@@ -220,7 +223,8 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
             double speedMultiplier = getConfig().getDouble("settings.levels." + levelName + ".Speed-Multiplier");
             boolean autoHarvest = getConfig().getBoolean("settings.levels." + levelName + ".Auto-Harvest");
             boolean autoReplant = getConfig().getBoolean("settings.levels." + levelName + ".Auto-Replant");
-            levelManager.addLevel(level, costExperiance, costEconomy, speedMultiplier, radius, autoHarvest, autoReplant);
+            boolean autoBreeding = getConfig().getBoolean("settings.levels." + levelName + ".Auto-Breeding");
+            levelManager.addLevel(level, costExperiance, costEconomy, speedMultiplier, radius, autoHarvest, autoReplant, autoBreeding);
         }
     }
 
@@ -286,6 +290,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
             levels.set("Level-3.Speed-Multiplier", 1.5);
             levels.set("Level-3.Auto-Harvest", true);
             levels.set("Level-3.Auto-Replant", true);
+            levels.set("Level-3.Auto-Breeding", true);
             levels.set("Level-3.Cost-xp", 25);
             levels.set("Level-3.Cost-eco", 7500);
 
@@ -293,6 +298,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
             levels.set("Level-4.Speed-Multiplier", 2);
             levels.set("Level-4.Auto-Harvest", true);
             levels.set("Level-4.Auto-Replant", true);
+            levels.set("Level-4.Auto-Breeding", true);
             levels.set("Level-4.Cost-xp", 30);
             levels.set("Level-4.Cost-eco", 10000);
 
@@ -300,6 +306,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
             levels.set("Level-5.Speed-Multiplier", 2.5);
             levels.set("Level-5.Auto-Harvest", true);
             levels.set("Level-5.Auto-Replant", true);
+            levels.set("Level-5.Auto-Breeding", true);
             levels.set("Level-5.Cost-xp", 35);
             levels.set("Level-5.Cost-eco", 12000);
 
@@ -307,6 +314,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
             levels.set("Level-6.Speed-Multiplier", 3);
             levels.set("Level-6.Auto-Harvest", true);
             levels.set("Level-6.Auto-Replant", true);
+            levels.set("Level-6.Auto-Breeding", true);
             levels.set("Level-6.Cost-xp", 40);
             levels.set("Level-6.Cost-eco", 25000);
         }
@@ -417,5 +425,9 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
 
     public FarmTask getFarmTask() {
         return farmTask;
+    }
+
+    public EntityTask getEntityTask() {
+        return entityTask;
     }
 }

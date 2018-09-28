@@ -1,8 +1,5 @@
 package com.songoda.epicfarming.boost;
 
-import com.songoda.epicfarming.EpicFarmingPlugin;
-import org.bukkit.Bukkit;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,7 +26,7 @@ public class BoostManager {
         for (BoostData boostData : registeredBoosts) {
             if (boostData.getPlayer().toString().equals(player.toString())) {
                 if (System.currentTimeMillis() >= boostData.getEndTime()) {
-                    Bukkit.getScheduler().scheduleSyncDelayedTask(EpicFarmingPlugin.getInstance(), () -> removeBoostFromPlayer(boostData), 1);
+                    removeBoostFromPlayer(boostData);
                 }
                 return boostData;
             }

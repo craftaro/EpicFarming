@@ -4,7 +4,7 @@ import java.util.Map;
 
 public interface LevelManager {
 
-    void addLevel(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant);
+    void addLevel(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant, boolean autoBreeding);
 
     Level getLevel(int level);
 

@@ -12,11 +12,11 @@ public class ELevel implements Level {
 
     private double speedMultiplier;
 
-    private boolean autoHarvest, autoReplant;
+    private boolean autoHarvest, autoReplant, autoBreeding;
 
     private List<String> description = new ArrayList<>();
 
-    public ELevel(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant) {
+    public ELevel(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant, boolean autoBreeding) {
         this.level = level;
         this.costExperiance = costExperiance;
         this.costEconomy = costEconomy;
@@ -24,6 +24,7 @@ public class ELevel implements Level {
         this.radius = radius;
         this.autoHarvest = autoHarvest;
         this.autoReplant = autoReplant;
+        this.autoBreeding = autoBreeding;
 
         EpicFarmingPlugin instance = EpicFarmingPlugin.getInstance();
 
@@ -35,6 +36,9 @@ public class ELevel implements Level {
 
         if (autoReplant)
             description.add(instance.getLocale().getMessage("interface.button.autoreplant", autoReplant));
+
+        if (autoBreeding)
+            description.add(instance.getLocale().getMessage("interface.button.autobreeding", autoBreeding));
 
     }
 
@@ -62,6 +66,9 @@ public class ELevel implements Level {
     public boolean isAutoReplant() {
         return autoReplant;
     }
+
+    @Override
+    public boolean isAutoBreeding() { return autoBreeding; }
 
     @Override
     public double getSpeedMultiplier() {

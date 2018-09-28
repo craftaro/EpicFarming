@@ -194,17 +194,20 @@ public class SettingsManager implements Listener {
         o3("Main.Upgrade Particle Type", "SPELL_WITCH"),
         o4("Main.Sounds Enabled", true),
         o5("Main.Farm Tick Speed", 70),
-        o6("Main.Growth Tick Speed", 20),
-        o7("Main.Farm Block Material", "END_ROD"),
-        o8("Main.Allow Non Command Issued Farm Items", false),
+        o6("Main.Entity Tick Speed", 100),
+        o7("Main.Growth Tick Speed", 20),
+        o8("Main.Farm Block Material", "END_ROD"),
+        o9("Main.Allow Non Command Issued Farm Items", false),
+        o10("Main.Auto Breeding Cap", 15),
+        o11("Main.Animate", true),
 
-        o9("Interfaces.Economy Icon", "SUNFLOWER"),
-        o10("Interfaces.XP Icon", "EXPERIENCE_BOTTLE"),
-        o11("Interfaces.Glass Type 1", 7),
-        o12("Interfaces.Glass Type 2", 11),
-        o13("Interfaces.Glass Type 3", 3),
+        o12("Interfaces.Economy Icon", "SUNFLOWER"),
+        o13("Interfaces.XP Icon", "EXPERIENCE_BOTTLE"),
+        o14("Interfaces.Glass Type 1", 7),
+        o15("Interfaces.Glass Type 2", 11),
+        o16("Interfaces.Glass Type 3", 3),
 
-        o14("System.Debugger Enabled", false);
+        o17("System.Debugger Enabled", false);
 
         private String setting;
         private Object option;

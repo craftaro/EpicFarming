@@ -13,6 +13,8 @@ public interface Level {
 
     boolean isAutoReplant();
 
+    boolean isAutoBreeding();
+
     double getSpeedMultiplier();
 
     int getCostExperiance();

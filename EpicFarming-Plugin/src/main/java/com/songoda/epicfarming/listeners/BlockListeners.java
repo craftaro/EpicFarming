@@ -10,6 +10,11 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.Item;
+import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -17,7 +22,12 @@ import org.bukkit.event.block.BlockBreakEvent;
 import org.bukkit.event.block.BlockFadeEvent;
 import org.bukkit.event.block.BlockGrowEvent;
 import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.entity.ItemSpawnEvent;
+import org.bukkit.event.entity.SheepRegrowWoolEvent;
 import org.bukkit.inventory.ItemStack;
+
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Created by songoda on 3/14/2017.
@@ -93,7 +103,7 @@ public class BlockListeners implements Listener {
         EFarmManager farmManager = instance.getFarmManager();
 
         Block block = location.getBlock();
-        for(Level level : instance.getLevelManager().getLevels().values()) {
+        for (Level level : instance.getLevelManager().getLevels().values()) {
             int radius = level.getRadius();
             int bx = block.getX();
             int by = block.getY();
@@ -105,10 +115,10 @@ public class BlockListeners implements Listener {
                         Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
                         if (b2.getType() == Material.valueOf(instance.getConfig().getString("Main.Farm Block Material"))) {
                             if (!farmManager.getFarms().containsKey(b2.getLocation())) continue;
-                            if (level.getRadius() != farmManager.getFarm(b2.getLocation()).getLevel().getRadius()) continue;
+                            if (level.getRadius() != farmManager.getFarm(b2.getLocation()).getLevel().getRadius())
+                                continue;
                             return true;
                         }
-
                     }
                 }
             }
@@ -135,14 +145,45 @@ public class BlockListeners implements Listener {
             Block block = event.getBlock();
 
             block.setType(Material.AIR);
-            block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5,.5,.5), item);
+            block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
 
-            for (ItemStack itemStack : ((EFarm)farm).dumpInventory()) {
+            for (ItemStack itemStack : ((EFarm) farm).dumpInventory()) {
                 if (itemStack == null) continue;
-                farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5,.5,.5), itemStack);
+                farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
             }
         } catch (Exception ex) {
             Debugger.runReport(ex);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onSpawn(ItemSpawnEvent event) {
+        Item item = event.getEntity();
+
+        if (item.getItemStack().getType() != Material.EGG) return;
+
+        Location location = event.getEntity().getLocation();
+        Collection<Entity> nearby = location.getWorld().getNearbyEntities(location, 0.01, 0.3, 0.01);
+
+        Entity entity = null;
+        for (Entity e : nearby) {
+            if (e instanceof Player) return;
+            if (e instanceof Chicken) entity = e;
+        }
+
+        if (instance.getEntityTask().getTicksLived().containsKey(entity)) {
+            event.setCancelled(true);
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST)
+    public void onSpawn(SheepRegrowWoolEvent event) {
+        if (instance.getEntityTask().getTicksLived().containsKey(event.getEntity())) {
+            event.setCancelled(true);
+            Block block = event.getEntity().getLocation().getBlock().getRelative(BlockFace.DOWN);
+            if (block.getType() == Material.DIRT) {
+                block.setType(Material.GRASS_BLOCK);
+            }
         }
     }
 }

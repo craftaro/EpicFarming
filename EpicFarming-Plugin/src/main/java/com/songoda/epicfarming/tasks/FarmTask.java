@@ -7,11 +7,11 @@ import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.utils.CropType;
 import com.songoda.epicfarming.utils.Debugger;
-import org.bukkit.CropState;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import com.songoda.epicfarming.utils.Methods;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
+import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Crops;
@@ -40,6 +40,7 @@ public class FarmTask extends BukkitRunnable {
     public void run() {
         for (Farm farm : plugin.getFarmManager().getFarms().values()) {
             if (farm.getLocation() == null) continue;
+
             for (Block block : getCrops(farm, true)) {
                 Crops crop = (Crops) block.getState().getData();
 
@@ -70,15 +71,13 @@ public class FarmTask extends BukkitRunnable {
 
         if (material == null || farm == null || cropTypeData == null) return false;
 
-
-
-
         BoostData boostData = plugin.getBoostManager().getBoost(farm.getPlacedBy());
 
         ItemStack stack = new ItemStack(cropTypeData.getYieldMaterial(), (useBoneMeal(farm) ? random.nextInt(2) + 2 : 1) * (boostData == null ? 1 : boostData.getMultiplier()));
         ItemStack seedStack = new ItemStack(cropTypeData.getSeedMaterial(), random.nextInt(3) + 1 + (useBoneMeal(farm) ? 1 : 0));
 
         if (!canMove(farm.getInventory(), stack)) return false;
+        Methods.animate(farm.getLocation(), cropTypeData.getYieldMaterial());
         farm.getInventory().addItem(stack);
         farm.getInventory().addItem(seedStack);
         return true;
