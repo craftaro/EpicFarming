@@ -40,7 +40,14 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
@@ -105,10 +112,14 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         console.sendMessage(Arconix.pl().getApi().format().formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Brianna <3&7!"));
         console.sendMessage(Arconix.pl().getApi().format().formatText("&7Action: &aEnabling&7..."));
 
-        // Locales
+        String langMode = getConfig().getString("System.Language Mode");
         Locale.init(this);
         Locale.saveDefaultLocale("en_US");
-        this.locale = Locale.getLocale(this.getConfig().getString("Locale", "en_US"));
+        this.locale = Locale.getLocale(getConfig().getString("System.Language Mode", langMode));
+
+        if (getConfig().getBoolean("System.Download Needed Data Files")) {
+            this.update();
+        }
 
         this.settingsManager = new SettingsManager(this);
         setupConfig();
@@ -260,6 +271,39 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         //Save to file
         dataFile.saveConfig();
 
+    }
+
+    private void update() {
+        try {
+            URL url = new URL("http://update.songoda.com/index.php?plugin=" + getDescription().getName() + "&version=" + getDescription().getVersion());
+            URLConnection urlConnection = url.openConnection();
+            InputStream is = urlConnection.getInputStream();
+            InputStreamReader isr = new InputStreamReader(is);
+
+            int numCharsRead;
+            char[] charArray = new char[1024];
+            StringBuffer sb = new StringBuffer();
+            while ((numCharsRead = isr.read(charArray)) > 0) {
+                sb.append(charArray, 0, numCharsRead);
+            }
+            String jsonString = sb.toString();
+            JSONObject json = (JSONObject) new JSONParser().parse(jsonString);
+
+            JSONArray files = (JSONArray) json.get("neededFiles");
+            for (Object o : files) {
+                JSONObject file = (JSONObject) o;
+
+                switch ((String)file.get("type")) {
+                    case "locale":
+                        InputStream in = new URL((String) file.get("link")).openStream();
+                        Locale.saveDefaultLocale(in, (String) file.get("name"));
+                        break;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("Failed to update.");
+            //e.printStackTrace();
+        }
     }
 
     public void reload() {
