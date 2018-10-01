@@ -6,3 +6,7 @@ out/
 EpicFarming\.iml
 /src/main/resources/META-INF/MANIFEST.MF
 /target/
+
+EpicFarming-API/src/main/EpicFarming-API\.iml
+
+EpicFarming-Plugin/src/main/EpicFarming-Plugin\.iml

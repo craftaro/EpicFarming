@@ -272,9 +272,10 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
     private void setupConfig() {
         settingsManager.updateSettings();
 
-        ConfigurationSection levels = getConfig().createSection("settings.levels");
+        if (!getConfig().contains("settings.levels.Level-1")) {
+            ConfigurationSection levels =
+                    getConfig().createSection("settings.levels");
 
-        if (!levels.contains("Level-1")) {
             levels.set("Level-1.Radius", 1);
             levels.set("Level-1.Speed-Multiplier", 1);
             levels.set("Level-1.Cost-xp", 20);
