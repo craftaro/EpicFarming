@@ -200,6 +200,7 @@ public class SettingsManager implements Listener {
         o9("Main.Allow Non Command Issued Farm Items", false),
         o10("Main.Auto Breeding Cap", 15),
         o11("Main.Animate", true),
+        o123("Main.Disable Auto Til Land", false),
 
         o12("Interfaces.Economy Icon", "SUNFLOWER"),
         o13("Interfaces.XP Icon", "EXPERIENCE_BOTTLE"),

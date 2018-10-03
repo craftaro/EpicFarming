@@ -243,6 +243,7 @@ public class EFarm implements Farm {
 
     public boolean tillLand(Location location) {
         EpicFarmingPlugin instance = EpicFarmingPlugin.getInstance();
+        if (!instance.getConfig().getBoolean("Main.Disable Auto Til Land")) return true;
         Block block = location.getBlock();
         int radius = level.getRadius();
         int bx = block.getX();
