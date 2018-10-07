@@ -76,7 +76,7 @@ public class FarmTask extends BukkitRunnable {
         ItemStack stack = new ItemStack(cropTypeData.getYieldMaterial(), (useBoneMeal(farm) ? random.nextInt(2) + 2 : 1) * (boostData == null ? 1 : boostData.getMultiplier()));
         ItemStack seedStack = new ItemStack(cropTypeData.getSeedMaterial(), random.nextInt(3) + 1 + (useBoneMeal(farm) ? 1 : 0));
 
-        if (!canMove(farm.getInventory(), stack)) return false;
+        if (!canMove(farm.getInventory(), stack) || !canMove(farm.getInventory(), seedStack)) return false;
         Methods.animate(farm.getLocation(), cropTypeData.getYieldMaterial());
         farm.getInventory().addItem(stack);
         farm.getInventory().addItem(seedStack);
