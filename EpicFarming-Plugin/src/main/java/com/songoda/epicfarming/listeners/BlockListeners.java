@@ -25,6 +25,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.SheepRegrowWoolEvent;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.Collection;
 import java.util.List;
@@ -76,6 +77,22 @@ public class BlockListeners implements Listener {
                     || instance.getLevelFromItem(e.getItemInHand()) == 0 && !allowNonCommandIssued) return;
 
             if (e.getBlockAgainst().getType() == farmBlock) e.setCancelled(true);
+
+            int amt = 0;
+            for (Farm farmm : instance.getFarmManager().getFarms().values()) {
+                if (!farmm.getPlacedBy().equals(e.getPlayer().getUniqueId())) continue;
+                amt ++;
+            }
+            int limit = -1;
+            for (PermissionAttachmentInfo permissionAttachmentInfo : e.getPlayer().getEffectivePermissions()) {
+                if (!permissionAttachmentInfo.getPermission().toLowerCase().startsWith("epicfarming.limit")) continue;
+                limit = Integer.parseInt(permissionAttachmentInfo.getPermission().split("\\.")[2]);
+            }
+            if (limit != -1 && amt >= limit) {
+                e.setCancelled(true);
+                Bukkit.broadcastMessage(instance.getReferences().getPrefix() + instance.getLocale().getMessage("event.limit.hit", limit));
+                return;
+            }
 
             Location location = e.getBlock().getLocation();
 
