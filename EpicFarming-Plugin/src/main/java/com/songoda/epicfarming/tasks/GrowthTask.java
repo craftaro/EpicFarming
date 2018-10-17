@@ -5,11 +5,7 @@ import com.songoda.epicfarming.farming.Crop;
 import org.bukkit.CropState;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
-import org.bukkit.block.Hopper;
-import org.bukkit.inventory.Inventory;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Crops;
 import org.bukkit.scheduler.BukkitRunnable;
 

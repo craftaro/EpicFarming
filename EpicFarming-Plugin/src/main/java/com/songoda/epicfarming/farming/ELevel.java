@@ -16,7 +16,7 @@ public class ELevel implements Level {
 
     private List<String> description = new ArrayList<>();
 
-    public ELevel(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant, boolean autoBreeding) {
+    ELevel(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant, boolean autoBreeding) {
         this.level = level;
         this.costExperiance = costExperiance;
         this.costEconomy = costEconomy;

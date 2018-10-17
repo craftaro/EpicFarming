@@ -2,7 +2,6 @@ package com.songoda.epicfarming.utils;
 
 import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.EpicFarmingPlugin;
-import com.songoda.epicfarming.api.EpicFarming;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;

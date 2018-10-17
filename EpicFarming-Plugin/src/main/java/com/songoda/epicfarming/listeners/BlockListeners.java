@@ -28,7 +28,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
 import java.util.Collection;
-import java.util.List;
 
 /**
  * Created by songoda on 3/14/2017.

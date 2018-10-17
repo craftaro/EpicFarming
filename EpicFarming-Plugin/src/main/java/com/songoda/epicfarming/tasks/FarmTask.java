@@ -1,30 +1,29 @@
 package com.songoda.epicfarming.tasks;
 
 import com.songoda.epicfarming.EpicFarmingPlugin;
-import com.songoda.epicfarming.api.EpicFarming;
 import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.utils.CropType;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
-import org.bukkit.*;
+import org.bukkit.CropState;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
-import org.bukkit.entity.*;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Crops;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 
 public class FarmTask extends BukkitRunnable {
 
     private static FarmTask instance;
     private static EpicFarmingPlugin plugin;
-
-    private static final Random random = new Random();
 
     public static FarmTask startTask(EpicFarmingPlugin pl) {
         if (instance == null) {

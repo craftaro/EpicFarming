@@ -75,7 +75,6 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
     private BoostManager boostManager;
 
     private GrowthTask growthTask;
-    private HopperTask hopperTask;
     private FarmTask farmTask;
     private EntityTask entityTask;
 
@@ -122,12 +121,12 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         }
 
         this.settingsManager = new SettingsManager(this);
-        setupConfig();
+        this.setupConfig();
 
         dataFile.createNewFile("Loading Data File", "EpicFarming Data File");
-        loadDataFile();
+        this.loadDataFile();
 
-        loadLevelManager();
+        this.loadLevelManager();
 
         this.farmManager = new EFarmManager();
         this.playerActionManager = new PlayerActionManager();
@@ -193,7 +192,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
 
         // Start tasks
         this.growthTask = GrowthTask.startTask(this);
-        this.hopperTask = HopperTask.startTask(this);
+        HopperTask.startTask(this);
         this.farmTask = FarmTask.startTask(this);
         this.entityTask = entityTask.startTask(this);
 

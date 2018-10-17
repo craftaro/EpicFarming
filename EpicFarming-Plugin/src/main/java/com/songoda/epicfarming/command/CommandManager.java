@@ -2,7 +2,6 @@ package com.songoda.epicfarming.command;
 
 import com.songoda.arconix.api.methods.formatting.TextComponent;
 import com.songoda.epicfarming.EpicFarmingPlugin;
-import com.songoda.epicfarming.api.EpicFarming;
 import com.songoda.epicfarming.command.commands.*;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;

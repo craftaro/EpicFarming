@@ -6,7 +6,6 @@ import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.EntityInfo;
 import com.songoda.epicfarming.utils.Methods;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -22,7 +21,7 @@ import java.util.stream.Collectors;
 public class EntityTask extends BukkitRunnable {
 
     private static final Random random = new Random();
-    private Map<Entity, Integer> lastTicksLived = new HashMap<>();
+    private static Map<Entity, Integer> lastTicksLived = new HashMap<>();
     private static final Map<Entity, Integer> ticksLived = new HashMap<>();
     private static EntityTask instance;
     private static EpicFarmingPlugin plugin;

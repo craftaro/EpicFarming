@@ -11,7 +11,7 @@ public class PlayerData {
     private final UUID playerUUID;
     private EFarm farm = null;
 
-    public PlayerData(UUID playerUUID) {
+    PlayerData(UUID playerUUID) {
         this.playerUUID = playerUUID;
     }
 

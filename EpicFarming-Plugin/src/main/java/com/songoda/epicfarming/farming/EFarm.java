@@ -4,6 +4,7 @@ import com.songoda.arconix.api.methods.formatting.TextComponent;
 import com.songoda.arconix.api.methods.formatting.TimeComponent;
 import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.EpicFarmingPlugin;
+import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.api.farming.Level;
 import com.songoda.epicfarming.api.farming.UpgradeType;
 import com.songoda.epicfarming.boost.BoostData;
@@ -12,7 +13,10 @@ import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
 import com.songoda.epicfarming.api.farming.Farm;
 import net.milkbowl.vault.economy.Economy;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -59,7 +63,7 @@ public class EFarm implements Farm {
         }
     }
 
-    private void setupOverview(Player player, String... arg) {
+    private void setupOverview(Player player) {
         Inventory inventory = Bukkit.createInventory(null, 54, Methods.formatName(level.getLevel(),false));
         inventory.setContents(this.inventory.getContents());
         this.inventory = inventory;

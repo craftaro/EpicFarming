@@ -4,7 +4,7 @@ public class References {
 
     private String prefix;
 
-    public References() {
+    References() {
         prefix = EpicFarmingPlugin.getInstance().getLocale().getMessage("general.nametag.prefix") + " ";
     }
 
