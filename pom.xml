@@ -48,10 +48,6 @@
             <id>private</id>
             <url>http://repo.songoda.com/repository/private</url>
         </repository>
-        <repository>
-            <id>vault</id>
-            <url>http://repo.songoda.com/repository/vault</url>
-        </repository>
     </repositories>
     <dependencies>
         <dependency>
@@ -70,9 +66,9 @@
             <version>LATEST</version>
         </dependency>
         <dependency>
-            <groupId>net.milkbowl.vault</groupId>
-            <artifactId>VaultAPI</artifactId>
-            <version>1.6</version>
+            <groupId>net.milkbowl</groupId>
+            <artifactId>vault</artifactId>
+            <version>LATEST</version>
         </dependency>
         <dependency>
             <groupId>me.ryanhamshire</groupId>
