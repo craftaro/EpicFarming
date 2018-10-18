@@ -9,3 +9,4 @@ build:
     name: "EpicFarming"
     paths:
     - "/builds/Songoda/EpicFarming/target/*.jar"
+    - "/builds/Songoda/EpicFarming/Read_this_before_your_first_use.txt"
