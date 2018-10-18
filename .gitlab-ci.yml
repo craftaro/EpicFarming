@@ -6,6 +6,6 @@ build:
   image: maven:3.3.9-jdk-8
   script: "mvn clean package"
   artifacts:
-    name: "EpicDispensers"
+    name: "EpicFarming"
     paths:
-    - "/builds/Songoda/EpicDispensers/target/*.jar"
+    - "/builds/Songoda/EpicFarming/target/*.jar"
