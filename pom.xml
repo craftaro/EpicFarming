@@ -1,15 +1,32 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
     <groupId>com.songoda</groupId>
     <artifactId>EpicFarming</artifactId>
-    <version>1.4</version>
-
-    <packaging>jar</packaging>
+    <modelVersion>4.0.0</modelVersion>
+    <version>2</version>
     <build>
-        <finalName>EpicFarming</finalName>
+        <defaultGoal>clean package</defaultGoal>
         <plugins>
             <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>1.7</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>EpicFarming-API/src/main/java</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <version>3.6.1</version>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <configuration>
@@ -17,175 +34,125 @@
                     <target>1.8</target>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-shade-plugin</artifactId>
-                <version>1.4</version>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>shade</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>EpicFarming-Plugin/src/main/resources</directory>
+                <filtering>true</filtering>
+            </resource>
+        </resources>
+        <sourceDirectory>EpicFarming-Plugin/src/main/java</sourceDirectory>
     </build>
     <repositories>
         <repository>
-            <id>jcenter</id>
-            <url>http://jcenter.bintray.com</url>
-        </repository>
-        <!--Bukkit Repo-->
-        <repository>
-            <id>bukkit-repo</id>
-            <url>https://hub.spigotmc.org/nexus/content/groups/public/</url>
-        </repository>
-        <!--Songoda Repo-->
-        <repository>
-            <id>songoda-public</id>
-            <url>http://repo.songoda.com/repository/songoda-public/</url>
+            <id>private</id>
+            <url>http://repo.songoda.com/repository/private</url>
         </repository>
         <repository>
-            <id>songoda-private</id>
-            <url>http://repo.songoda.com/repository/songoda-private/</url>
-        </repository>
-        <!--WorldGuard Repo-->
-        <repository>
-            <id>sk89q-repo</id>
-            <url>http://maven.sk89q.com/repo/</url>
-        </repository>
-        <!--Vault Repo-->
-        <repository>
-            <id>vault-repo</id>
-            <url>http://nexus.hc.to/content/repositories/pub_releases</url>
-        </repository>
-        <!--uSkyBlock Repo-->
-        <repository>
-            <id>uSkyBlock-mvn-repo</id>
-            <url>https://raw.github.com/rlf/uSkyBlock/mvn-repo/</url>
-            <snapshots>
-                <enabled>true</enabled>
-                <updatePolicy>always</updatePolicy>
-            </snapshots>
-        </repository>
-        <!--aAkyBlock Repo-->
-        <repository>
-            <id>bintray-tastybento-maven-repo</id>
-            <name>bintray</name>
-            <url>http://dl.bintray.com/tastybento/maven-repo</url>
-        </repository>
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
+            <id>vault</id>
+            <url>http://repo.songoda.com/repository/vault</url>
         </repository>
     </repositories>
-
     <dependencies>
-        <!--Bukkit API-->
         <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.12.2-R0.1-SNAPSHOT</version>
-            <type>jar</type>
-            <scope>provided</scope>
-        </dependency>
-        <!--Arconix API-->
-        <dependency>
-            <groupId>com.songoda.arconix</groupId>
-            <artifactId>api</artifactId>
-            <version>2.0.0</version>
-            <scope>provided</scope>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot</artifactId>
+            <version>1.13.1</version>
         </dependency>
         <dependency>
-            <groupId>com.songoda.arconix</groupId>
-            <artifactId>plugin</artifactId>
-            <version>2.0.0</version>
-            <scope>provided</scope>
+            <groupId>com.songoda</groupId>
+            <artifactId>arconix</artifactId>
+            <version>LATEST</version>
         </dependency>
-        <!--WorldGuard API-->
         <dependency>
-            <groupId>com.sk89q</groupId>
-            <artifactId>worldguard</artifactId>
-            <version>6.1.1-SNAPSHOT</version>
-            <scope>provided</scope>
+            <groupId>org</groupId>
+            <artifactId>kingdoms</artifactId>
+            <version>LATEST</version>
         </dependency>
-        <!--Vault API-->
         <dependency>
             <groupId>net.milkbowl.vault</groupId>
             <artifactId>VaultAPI</artifactId>
-            <version>1.6</version>
-            <scope>provided</scope>
+            <version>1.7</version>
         </dependency>
-        <!--Towny API-->
         <dependency>
-            <groupId>com.palmergames</groupId>
-            <artifactId>Towny</artifactId>
-            <version>0.92.0.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--uSkyBlock API-->
-        <dependency>
-            <groupId>com.github.rlf</groupId>
-            <artifactId>uSkyBlock-API</artifactId>
-            <version>2.6.4</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--RedProtect API-->
-        <dependency>
-            <groupId>br.net.fabiozumbi12</groupId>
-            <artifactId>RedProtect</artifactId>
-            <version>7.3.0</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--PlotSquared API-->
-        <dependency>
-            <groupId>com.intellectualcrafters</groupId>
-            <artifactId>PlotSquared</artifactId>
-            <version>18.05.01</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--Kingdoms API-->
-        <dependency>
-            <groupId>org.kingdoms</groupId>
-            <artifactId>Kingdoms</artifactId>
-            <version>13.3.40</version>
-            <scope>provided</scope>
-        </dependency>
-        <!--GriefPrevention API-->
-        <dependency>
-            <groupId>com.github.TechFortress</groupId>
+            <groupId>me.ryanhamshire</groupId>
             <artifactId>GriefPrevention</artifactId>
-            <version>16.7.1</version>
-            <scope>provided</scope>
+            <version>LATEST</version>
         </dependency>
-        <!--FactionsFramework API-->
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldedit</artifactId>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sk89q</groupId>
+            <artifactId>worldguard</artifactId>
+            <version>7.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com</groupId>
+            <artifactId>plotsquared</artifactId>
+            <version>RELEASE</version>
+        </dependency>
+        <dependency>
+            <groupId>com.palmergames.bukkit</groupId>
+            <artifactId>towny</artifactId>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>com.wasteofplastic</groupId>
+            <artifactId>askyblock</artifactId>
+            <version>3.0.6.8</version>
+        </dependency>
+        <dependency>
+            <groupId>us.talabrek</groupId>
+            <artifactId>ultimateskyblock</artifactId>
+            <version>LATEST</version>
+        </dependency>
         <dependency>
             <groupId>me.markeh</groupId>
             <artifactId>factionsframework</artifactId>
             <version>1.2.0</version>
-            <scope>provided</scope>
         </dependency>
-        <!--aSkyBlock API-->
         <dependency>
-            <groupId>com.wasteofplastic</groupId>
-            <artifactId>askyblock</artifactId>
-            <version>3.0.8.2</version>
-            <scope>provided</scope>
+            <groupId>br.net.fabiozumbi12</groupId>
+            <artifactId>RedProtect</artifactId>
+            <version>7.3.0</version>
         </dependency>
-        <!--https://mvnrepository.com/artifact/commons-lang/commons-lang -->
         <dependency>
-            <groupId>commons-lang</groupId>
-            <artifactId>commons-lang</artifactId>
-            <version>2.6</version>
-            <scope>compile</scope>
+            <groupId>com.songoda</groupId>
+            <artifactId>epicspawners</artifactId>
+            <version>LATEST</version>
         </dependency>
-        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
-            <groupId>commons-io</groupId>
-            <artifactId>commons-io</artifactId>
-            <version>2.6</version>
+            <groupId>com.gmail.nossr50</groupId>
+            <artifactId>mcmmo</artifactId>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>com.gamingmesh</groupId>
+            <artifactId>jobs</artifactId>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>me.botsko</groupId>
+            <artifactId>prism</artifactId>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>de.diddiz</groupId>
+            <artifactId>logblock</artifactId>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>net</groupId>
+            <artifactId>coreprotect</artifactId>
+            <version>LATEST</version>
+        </dependency>
+        <dependency>
+            <groupId>uk.antiperson</groupId>
+            <artifactId>stackmob</artifactId>
+            <version>LATEST</version>
         </dependency>
     </dependencies>
 </project>
