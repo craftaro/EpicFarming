@@ -33,6 +33,14 @@ public class GrowthTask extends BukkitRunnable {
         List<Crop> toRemove =  new ArrayList<>();
 
         for (Crop crop : liveCrops.values()) {
+            Location cropLocation = crop.getLocation();
+
+            int x = cropLocation.getBlockX() >> 4;
+            int z = cropLocation.getBlockZ() >> 4;
+
+            if (!cropLocation.getWorld().isChunkLoaded(x, z)) {
+                continue;
+            }
 
             if (!(crop.getLocation().getBlock().getState().getData() instanceof Crops)) {
                 toRemove.add(crop);

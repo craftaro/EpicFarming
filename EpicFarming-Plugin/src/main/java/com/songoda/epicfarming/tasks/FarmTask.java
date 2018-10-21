@@ -8,6 +8,7 @@ import com.songoda.epicfarming.utils.CropType;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.CropState;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockState;
@@ -39,6 +40,14 @@ public class FarmTask extends BukkitRunnable {
     public void run() {
         for (Farm farm : plugin.getFarmManager().getFarms().values()) {
             if (farm.getLocation() == null) continue;
+            Location farmLocation = farm.getLocation();
+
+            int x = farmLocation.getBlockX() >> 4;
+            int z = farmLocation.getBlockZ() >> 4;
+
+            if (!farmLocation.getWorld().isChunkLoaded(x, z)) {
+                continue;
+            }
 
             for (Block block : getCrops(farm, true)) {
                 Crops crop = (Crops) block.getState().getData();
