@@ -1,7 +1,6 @@
 package com.songoda.epicfarming;
 
 import com.google.common.base.Preconditions;
-import com.songoda.arconix.api.mcupdate.MCUpdate;
 import com.songoda.arconix.api.utils.ConfigWrapper;
 import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.api.EpicFarming;
@@ -194,11 +193,9 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         this.growthTask = GrowthTask.startTask(this);
         HopperTask.startTask(this);
         this.farmTask = FarmTask.startTask(this);
-        this.entityTask = entityTask.startTask(this);
+        this.entityTask = EntityTask.startTask(this);
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
-
-        new MCUpdate(this, true);
 
         console.sendMessage(Arconix.pl().getApi().format().formatText("&a============================="));
     }
