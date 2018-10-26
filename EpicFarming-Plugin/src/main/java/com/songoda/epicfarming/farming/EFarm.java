@@ -25,10 +25,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class EFarm implements Farm {
 
@@ -36,6 +33,9 @@ public class EFarm implements Farm {
     private Level level;
     private Inventory inventory;
     private UUID placedBy;
+
+    private long lastCached = 0;
+    private final List<Block> cachedCrops = new ArrayList<>();
 
     public EFarm(Location location, Level level, UUID placedBy) {
         this.location = location;
@@ -282,6 +282,27 @@ public class EFarm implements Farm {
             }
         }
         return false;
+    }
+
+    public void addCachedCrop(Block block) {
+        cachedCrops.add(block);
+    }
+
+    @Override
+    public List<Block> getCachedCrops() {
+        return new ArrayList<>(cachedCrops);
+    }
+
+    public void clearCache() {
+        cachedCrops.clear();
+    }
+
+    public long getLastCached() {
+        return lastCached;
+    }
+
+    public void setLastCached(long lastCached) {
+        this.lastCached = lastCached;
     }
 
     @Override

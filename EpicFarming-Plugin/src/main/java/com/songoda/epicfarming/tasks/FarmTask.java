@@ -4,6 +4,7 @@ import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Crop;
+import com.songoda.epicfarming.farming.EFarm;
 import com.songoda.epicfarming.utils.CropType;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
@@ -17,9 +18,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Crops;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 public class FarmTask extends BukkitRunnable {
 
@@ -115,30 +114,31 @@ public class FarmTask extends BukkitRunnable {
     }
 
     public List<Block> getCrops(Farm farm, boolean add) {
-        List<Block> crops = new ArrayList<>();
+        if (System.currentTimeMillis() - ((EFarm)farm).getLastCached() > 30 * 1000) {
+            ((EFarm)farm).setLastCached(System.currentTimeMillis());
+            Block block = farm.getLocation().getBlock();
+            int radius = farm.getLevel().getRadius();
+            int bx = block.getX();
+            int by = block.getY();
+            int bz = block.getZ();
+            for (int fx = -radius; fx <= radius; fx++) {
+                for (int fy = -2; fy <= 1; fy++) {
+                    for (int fz = -radius; fz <= radius; fz++) {
+                        Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
 
-        Block block = farm.getLocation().getBlock();
-        int radius = farm.getLevel().getRadius();
-        int bx = block.getX();
-        int by = block.getY();
-        int bz = block.getZ();
-        for (int fx = -radius; fx <= radius; fx++) {
-            for (int fy = -2; fy <= 1; fy++) {
-                for (int fz = -radius; fz <= radius; fz++) {
-                    Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
+                        if (!(b2.getState().getData() instanceof Crops)) continue;
 
-                    if (!(b2.getState().getData() instanceof Crops)) continue;
+                        if (add) {
+                            ((EFarm)farm).addCachedCrop(b2);
+                            continue;
+                        }
+                        plugin.getGrowthTask().removeCropByLocation(b2.getLocation());
 
-                    if (add) {
-                        crops.add(b2);
-                        continue;
                     }
-                    plugin.getGrowthTask().removeCropByLocation(b2.getLocation());
-
                 }
             }
         }
-        return crops;
+        return farm.getCachedCrops();
     }
 
     private boolean canMove(Inventory inventory, ItemStack item) {
