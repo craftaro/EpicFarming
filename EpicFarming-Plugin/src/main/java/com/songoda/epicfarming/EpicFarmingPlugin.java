@@ -1,6 +1,7 @@
 package com.songoda.epicfarming;
 
 import com.google.common.base.Preconditions;
+import com.songoda.arconix.api.methods.serialize.Serialize;
 import com.songoda.arconix.api.utils.ConfigWrapper;
 import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.api.EpicFarming;
@@ -20,6 +21,11 @@ import com.songoda.epicfarming.listeners.InteractListeners;
 import com.songoda.epicfarming.listeners.InventoryListeners;
 import com.songoda.epicfarming.player.PlayerActionManager;
 import com.songoda.epicfarming.player.PlayerData;
+import com.songoda.epicfarming.storage.Storage;
+import com.songoda.epicfarming.storage.StorageItem;
+import com.songoda.epicfarming.storage.StorageRow;
+import com.songoda.epicfarming.storage.types.StorageMysql;
+import com.songoda.epicfarming.storage.types.StorageYaml;
 import com.songoda.epicfarming.tasks.EntityTask;
 import com.songoda.epicfarming.tasks.FarmTask;
 import com.songoda.epicfarming.tasks.GrowthTask;
@@ -77,6 +83,8 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
     private FarmTask farmTask;
     private EntityTask entityTask;
 
+    private Storage storage;
+
     public static EpicFarmingPlugin getInstance() {
         return INSTANCE;
     }
@@ -101,7 +109,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
     public void onEnable() {
         // Check to make sure the Bukkit version is compatible.
         if (!checkVersion()) return;
-
+        checkStorage();
         INSTANCE = this;
         Arconix.pl().hook(this);
 
@@ -136,37 +144,68 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
          * Register Farms into FarmManger from configuration
          */
         Bukkit.getScheduler().runTaskLater(this, () -> {
-            if (dataFile.getConfig().contains("Farms")) {
-                for (String locationStr : dataFile.getConfig().getConfigurationSection("Farms").getKeys(false)) {
-                    Location location = Arconix.pl().getApi().serialize().unserializeLocation(locationStr);
-                    if (location == null || location.getWorld() == null) continue;
-                    int level = dataFile.getConfig().getInt("Farms." + locationStr + ".level");
+//            if (dataFile.getConfig().contains("Farms")) {
+//                for (String locationStr : dataFile.getConfig().getConfigurationSection("Farms").getKeys(false)) {
+//                    Location location = Arconix.pl().getApi().serialize().unserializeLocation(locationStr);
+//                    if (location == null || location.getWorld() == null) continue;
+//                    int level = dataFile.getConfig().getInt("Farms." + locationStr + ".level");
+//
+//                    List<ItemStack> items = (List<ItemStack>) dataFile.getConfig().getList("Farms." + locationStr + ".Contents");
+//
+//                    String placedByStr = dataFile.getConfig().getString("Farms." + locationStr + ".placedBy");
+//
+//                    UUID placedBy = placedByStr == null ? null : UUID.fromString(placedByStr);
+//
+//                    EFarm farm = new EFarm(location, levelManager.getLevel(level), placedBy);
+//                    farm.loadInventory(items);
+//
+//                    farmManager.addFarm(location, farm);
+//                }
+//            }
+//
+//            // Adding in Boosts
+//            if (dataFile.getConfig().contains("data.boosts")) {
+//                for (String key : dataFile.getConfig().getConfigurationSection("data.boosts").getKeys(false)) {
+//                    if (!dataFile.getConfig().contains("data.boosts." + key + ".Player")) continue;
+//                    BoostData boostData = new BoostData(
+//                            dataFile.getConfig().getInt("data.boosts." + key + ".Amount"),
+//                            Long.parseLong(key),
+//                            UUID.fromString(dataFile.getConfig().getString("data.boosts." + key + ".Player")));
+//
+//                    this.boostManager.addBoostToPlayer(boostData);
+//                }
+//            }
+            if (storage.containsGroup("farms")) {
+                for (StorageRow row : storage.getRowsByGroup("farms")) {
+                    Location location = Serialize.getInstance().unserializeLocation(row.getKey());
+                    if (location == null || location.getBlock() == null) return;
 
-                    List<ItemStack> items = (List<ItemStack>) dataFile.getConfig().getList("Farms." + locationStr + ".Contents");
-
-                    String placedByStr = dataFile.getConfig().getString("Farms." + locationStr + ".placedBy");
-
-                    UUID placedBy = placedByStr == null ? null : UUID.fromString(placedByStr);
-
-                    EFarm farm = new EFarm(location, levelManager.getLevel(level), placedBy);
+                    int level = row.get("level").asInt();
+                    Location loc = Arconix.pl().getApi().serialize().unserializeLocation(row.get("location").asString());
+                    List<ItemStack> items =row.get("contents").asItemStackList();
+                    UUID placedBY = UUID.fromString(row.get("placedby").asString());
+                    EFarm farm = new EFarm(location,levelManager.getLevel(level),placedBY);
                     farm.loadInventory(items);
-
-                    farmManager.addFarm(location, farm);
+                    farmManager.addFarm(location,farm);
                 }
             }
 
             // Adding in Boosts
-            if (dataFile.getConfig().contains("data.boosts")) {
-                for (String key : dataFile.getConfig().getConfigurationSection("data.boosts").getKeys(false)) {
-                    if (!dataFile.getConfig().contains("data.boosts." + key + ".Player")) continue;
+            if (storage.containsGroup("boosts")) {
+                for (StorageRow row : storage.getRowsByGroup("boosts")) {
+                    if (row.getItems().get("uuid").asObject() != null)
+                        continue;
+
                     BoostData boostData = new BoostData(
-                            dataFile.getConfig().getInt("data.boosts." + key + ".Amount"),
-                            Long.parseLong(key),
-                            UUID.fromString(dataFile.getConfig().getString("data.boosts." + key + ".Player")));
+                            row.get("amount").asInt(),
+                            Long.parseLong(row.getKey()),
+                            UUID.fromString(row.get("player").asString()));
 
                     this.boostManager.addBoostToPlayer(boostData);
                 }
             }
+
+
         }, 10);
 
         this.references = new References();
@@ -198,6 +237,14 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
 
         console.sendMessage(Arconix.pl().getApi().format().formatText("&a============================="));
+    }
+
+    private void checkStorage() {
+        if (getConfig().getBoolean("Database.Activate Mysql Support")) {
+            this.storage = new StorageMysql(this);
+        } else {
+            this.storage = new StorageYaml(this);
+        }
     }
 
     public void onDisable() {
@@ -239,20 +286,25 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
      * Saves registered farms to file.
      */
     private void saveToFile() {
-
+        this.storage.closeConnection();
+        checkStorage();
         // Wipe old kit information
-        dataFile.getConfig().set("Farms", null);
-
+        storage.clearFile();
         /*
          * Dump FarmManager to file.
          */
         for (Farm farm : farmManager.getFarms().values()) {
             if (farm.getLocation() == null
                     || farm.getLocation().getWorld() == null) continue;
-            String locationStr = Arconix.pl().getApi().serialize().serializeLocation(farm.getLocation());
-            dataFile.getConfig().set("Farms." + locationStr + ".level", farm.getLevel().getLevel());
-            dataFile.getConfig().set("Farms." + locationStr + ".placedBy", farm.getPlacedBy() == null ? null : farm.getPlacedBy().toString());
-            dataFile.getConfig().set("Farms." + locationStr + ".Contents", ((EFarm) farm).dumpInventory());
+//            String locationStr = Arconix.pl().getApi().serialize().serializeLocation(farm.getLocation());
+//            dataFile.getConfig().set("Farms." + locationStr + ".level", farm.getLevel().getLevel());
+//            dataFile.getConfig().set("Farms." + locationStr + ".placedBy", farm.getPlacedBy() == null ? null : farm.getPlacedBy().toString());
+//            dataFile.getConfig().set("Farms." + locationStr + ".Contents", ((EFarm) farm).dumpInventory());
+            String locstr = Arconix.pl().getApi().serialize().serializeLocation(farm.getLocation());
+            storage.saveItem("farms",new StorageItem("location",locstr),
+                    new StorageItem("level",farm.getLevel().getLevel()),
+                    new StorageItem("placedby",farm.getPlacedBy().toString()),
+                    new StorageItem("contents",((EFarm)farm).dumpInventory()));
         }
 
         /*
@@ -260,8 +312,11 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
          */
         for (BoostData boostData : boostManager.getBoosts()) {
             String endTime = String.valueOf(boostData.getEndTime());
-            dataFile.getConfig().set("data.boosts." + endTime + ".Player", boostData.getPlayer().toString());
-            dataFile.getConfig().set("data.boosts." + endTime + ".Amount", boostData.getMultiplier());
+//            dataFile.getConfig().set("data.boosts." + endTime + ".Player", boostData.getPlayer().toString());
+//            dataFile.getConfig().set("data.boosts." + endTime + ".Amount", boostData.getMultiplier());
+            storage.saveItem("boosts",new StorageItem("endtime",endTime),
+                    new StorageItem("amount",boostData.getMultiplier()),
+                    new StorageItem("player",boostData.getPlayer()));
         }
 
         //Save to file
