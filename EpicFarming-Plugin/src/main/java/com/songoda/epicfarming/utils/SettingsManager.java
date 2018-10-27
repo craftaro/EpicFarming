@@ -201,6 +201,13 @@ public class SettingsManager implements Listener {
         o10("Main.Auto Breeding Cap", 15),
         o11("Main.Animate", true),
         o123("Main.Disable Auto Til Land", false),
+        d1("Database.Activate Mysql Support",false),
+        d6("Database.IP","127.0.0.1"),
+        d7("Database.Port",3306),
+        d2("Database.Username","root"),
+        d3("Database.Password","password"),
+        d4("Database.Database Name","EpicFarming"),
+        d5("Database.Prefix","EF-"),
 
         o12("Interfaces.Economy Icon", "SUNFLOWER"),
         o13("Interfaces.XP Icon", "EXPERIENCE_BOTTLE"),
