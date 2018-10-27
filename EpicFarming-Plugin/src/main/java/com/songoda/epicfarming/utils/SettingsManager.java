@@ -207,7 +207,7 @@ public class SettingsManager implements Listener {
         d2("Database.Username","root"),
         d3("Database.Password","password"),
         d4("Database.Database Name","EpicFarming"),
-        d5("Database.Prefix","EF-"),
+        d5("Database.Prefix","EFA-"),
 
         o12("Interfaces.Economy Icon", "SUNFLOWER"),
         o13("Interfaces.XP Icon", "EXPERIENCE_BOTTLE"),

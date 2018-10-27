@@ -66,7 +66,7 @@ public class StorageMysql extends Storage {
     @Override
     public void clearFile() {
         try {
-            database.getConnection().createStatement().execute("TRUNCATE `" + instance.getConfig().getString("Database.Prefix") + "sync`");
+            database.getConnection().createStatement().execute("TRUNCATE `" + instance.getConfig().getString("Database.Prefix") + "farms`");
             database.getConnection().createStatement().execute("TRUNCATE `" + instance.getConfig().getString("Database.Prefix") + "boosts`");
         } catch (SQLException e) {
             e.printStackTrace();

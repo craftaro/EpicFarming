@@ -27,7 +27,7 @@ public class MySQLDatabase {
                     "\t`location` TEXT NULL,\n" +
                     "\t`level` INT NULL,\n" +
                     "\t`placedby` TEXT NULL,\n" +
-                    "\t`contents` TEXT NULL, \n"+
+                    "\t`contents` TEXT NULL \n"+
                     ")");
 
             connection.createStatement().execute("CREATE TABLE IF NOT EXISTS `" + instance.getConfig().getString("Database.Prefix") + "boosts` (\n" +

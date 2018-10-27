@@ -151,8 +151,6 @@ public class BlockListeners implements Listener {
             Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
 
             if (farm == null) {
-                if (event.getBlock().getType() == Material.END_ROD)
-                    event.getBlock().getLocation().getWorld().dropItemNaturally(event.getBlock().getLocation().add(.5,.5,.5), new ItemStack(Material.END_ROD));
                 return;
             }
             instance.getFarmTask().getCrops(farm, false);

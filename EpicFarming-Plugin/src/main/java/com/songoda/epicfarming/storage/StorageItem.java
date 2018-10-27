@@ -10,7 +10,7 @@ public class StorageItem {
 
     private String key = null;
 
-    private final Object object;
+    private Object object;
 
     public StorageItem(Object object) {
         this.object = object;
@@ -22,8 +22,10 @@ public class StorageItem {
     }
 
     public StorageItem(String key, List<ItemStack> material) {
+        if (material == null || material.isEmpty()) return;
         StringBuilder object = new StringBuilder();
         for (ItemStack m : material) {
+            if (m == null) continue;
             object.append(Serializers.serialize(m));
             object.append(";;");
         }
