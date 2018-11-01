@@ -14,7 +14,7 @@ public abstract class Storage {
     public Storage(EpicFarmingPlugin instance) {
         this.instance = instance;
         this.dataFile = new ConfigWrapper(instance, "", "data.yml");
-        this.dataFile.createNewFile(null, "EpicHoppers Data File");
+        this.dataFile.createNewFile(null, "EpicFarming Data File");
         this.dataFile.getConfig().options().copyDefaults(true);
         this.dataFile.saveConfig();
     }
@@ -23,9 +23,9 @@ public abstract class Storage {
 
     public abstract List<StorageRow> getRowsByGroup(String group);
 
-    public abstract void clearFile();
+    public abstract void prepareSaveItem(String group, StorageItem... items);
 
-    public abstract void saveItem(String group, StorageItem... items);
+    public abstract void doSave();
 
     public abstract void closeConnection();
 

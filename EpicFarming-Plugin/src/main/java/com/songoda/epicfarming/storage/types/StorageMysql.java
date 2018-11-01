@@ -10,6 +10,7 @@ import com.songoda.epicfarming.utils.MySQLDatabase;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -18,6 +19,7 @@ import java.util.Map;
 public class StorageMysql extends Storage {
 
     private MySQLDatabase database;
+    private static List<String> toSave = new ArrayList<>();
 
     public StorageMysql(EpicFarmingPlugin instance) {
         super(instance);
@@ -28,13 +30,12 @@ public class StorageMysql extends Storage {
     public boolean containsGroup(String group) {
         try {
             DatabaseMetaData dbm = database.getConnection().getMetaData();
-            ResultSet rs = dbm.getTables(null, null, instance.getConfig().getString("Database.Prefix")+group, null);
+            ResultSet rs = dbm.getTables(null, null, instance.getConfig().getString("Database.Prefix") + group, null);
             if (rs.next()) {
                 return true;
             }
         } catch (SQLException e) {
             e.printStackTrace();
-            instance.getServer().getPluginManager().disablePlugin(instance);
         }
         return false;
 
@@ -64,43 +65,49 @@ public class StorageMysql extends Storage {
     }
 
     @Override
-    public void clearFile() {
-        try {
-            database.getConnection().createStatement().execute("TRUNCATE `" + instance.getConfig().getString("Database.Prefix") + "farms`");
-            database.getConnection().createStatement().execute("TRUNCATE `" + instance.getConfig().getString("Database.Prefix") + "boosts`");
-        } catch (SQLException e) {
-            e.printStackTrace();
+    public void prepareSaveItem(String group, StorageItem... items) {
+        StringBuilder sql = new StringBuilder(String.format("INSERT INTO `" + instance.getConfig().getString("Database.Prefix") + "%s`", group));
+
+        sql.append(" (");
+
+        for (StorageItem item : items) {
+            if (item == null || item.asObject() == null) continue;
+            sql.append(String.format("`%s`, ", item.getKey()));
         }
+
+        sql = new StringBuilder(sql.substring(0, sql.length() - 2));
+
+        sql.append(") VALUES (");
+
+        for (StorageItem item : items) {
+            if (item == null || item.asObject() == null) continue;
+            sql.append(String.format("'%s', ", item.asObject().toString()));
+        }
+
+        sql = new StringBuilder(sql.substring(0, sql.length() - 2));
+
+        sql.append(");");
+
+        toSave.add(sql.toString());
     }
 
     @Override
-    public void saveItem(String group, StorageItem... items) {
+    public void doSave() {
         try {
-            StringBuilder sql = new StringBuilder(String.format("INSERT INTO `" + instance.getConfig().getString("Database.Prefix") + "%s`", group));
+            // Clear database
+            database.getConnection().createStatement().execute("TRUNCATE `" + instance.getConfig().getString("Database.Prefix") + "farms`");
+            database.getConnection().createStatement().execute("TRUNCATE `" + instance.getConfig().getString("Database.Prefix") + "boosts`");
 
-            sql.append(" (");
+            Statement stmt = database.getConnection().createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, ResultSet.CONCUR_UPDATABLE);
 
-            for (StorageItem item : items) {
-                if (item == null || item.asObject() == null) continue;
-                sql.append(String.format("`%s`, ", item.getKey()));
+            for (String line : toSave) {
+                stmt.addBatch(line);
             }
 
-            sql = new StringBuilder(sql.substring(0, sql.length() - 2));
+            stmt.executeBatch();
 
-            sql.append(")");
+            toSave.clear();
 
-            sql.append(" VALUES (");
-
-            for (StorageItem item : items) {
-                if (item == null || item.asObject() == null) continue;
-                sql.append(String.format("'%s', ", item.asObject().toString()));
-            }
-
-            sql = new StringBuilder(sql.substring(0, sql.length() - 2));
-
-            sql.append(");");
-
-            database.getConnection().createStatement().execute(sql.toString());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -115,4 +122,3 @@ public class StorageMysql extends Storage {
         }
     }
 }
-

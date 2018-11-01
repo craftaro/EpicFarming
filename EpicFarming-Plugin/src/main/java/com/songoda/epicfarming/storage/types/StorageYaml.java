@@ -4,15 +4,19 @@ import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.storage.Storage;
 import com.songoda.epicfarming.storage.StorageItem;
 import com.songoda.epicfarming.storage.StorageRow;
+import com.songoda.epicfarming.utils.Debugger;
+import org.apache.commons.io.FileUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
 
 public class StorageYaml extends Storage {
+
+    private static final Map<String, Object> toSave = new HashMap<>();
 
     public StorageYaml(EpicFarmingPlugin instance) {
         super(instance);
@@ -44,23 +48,53 @@ public class StorageYaml extends Storage {
     }
 
     private String convertToInLineList(String path) {
-        String converted = "";
+        StringBuilder converted = new StringBuilder();
         for (String key : dataFile.getConfig().getConfigurationSection(path).getKeys(false)) {
-            converted += key + ":" + dataFile.getConfig().getInt(path + "." + key) + ";";
+            converted.append(key).append(":").append(dataFile.getConfig().getInt(path + "." + key)).append(";");
         }
-        return converted;
+        return converted.toString();
     }
 
     @Override
-    public void clearFile() {
-        dataFile.getConfig().set("data", null);
+    public void prepareSaveItem(String group, StorageItem... items) {
+        for (StorageItem item : items) {
+            if (item == null || item.asObject() == null) continue;
+            toSave.put("data." + group + "." + items[0].asString() + "." + item.getKey(), item.asObject());
+        }
     }
 
     @Override
-    public void saveItem(String group, StorageItem... items) {
-        for (int i = 0; i < items.length; i++) {
-            if (items[i] == null || items[i].asObject() == null) continue;
-            dataFile.getConfig().set("data." + group + "." + items[0].asString() + "." + items[i].getKey(), items[i].asObject());
+    public void doSave() {
+        try {
+            dataFile.getConfig().set("data", null); // Clear file
+
+            File data = new File(instance.getDataFolder() + "/data.yml");
+            File dataClone = new File(instance.getDataFolder() + "/data-backup-" + System.currentTimeMillis() + ".yml");
+            try {
+                FileUtils.copyFile(data, dataClone);
+            } catch (IOException e) {
+                Debugger.runReport(e);
+            }
+            Deque<File> backups = new ArrayDeque<>();
+            for (File file : Objects.requireNonNull(instance.getDataFolder().listFiles())) {
+                if (file.getName().toLowerCase().contains("data-backup")) {
+                    backups.add(file);
+                }
+            }
+            if (backups.size() > 5) {
+                backups.getFirst().delete();
+            }
+
+
+            for (Map.Entry<String, Object> entry : toSave.entrySet()) {
+                dataFile.getConfig().set(entry.getKey(), entry.getValue());
+            }
+
+            dataFile.saveConfig();
+
+            toSave.clear();
+        } catch (NullPointerException e) {
+            Debugger.runReport(e);
         }
     }
 
