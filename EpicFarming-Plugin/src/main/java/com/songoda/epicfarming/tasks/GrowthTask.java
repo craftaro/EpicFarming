@@ -64,7 +64,7 @@ public class GrowthTask extends BukkitRunnable {
 
             switch(cropData.getState()) {
                 case SEEDED:
-                    if (material == Material.BEETROOT)
+                    if (material == Material.BEETROOTS)
                         cropData.setState(CropState.VERY_SMALL);
                     else
                         cropData.setState(CropState.GERMINATED);
