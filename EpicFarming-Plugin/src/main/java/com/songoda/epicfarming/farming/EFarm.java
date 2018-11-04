@@ -288,6 +288,10 @@ public class EFarm implements Farm {
         cachedCrops.add(block);
     }
 
+    public void removeCachedCrop(Block block) {
+        cachedCrops.remove(block);
+    }
+
     @Override
     public List<Block> getCachedCrops() {
         return new ArrayList<>(cachedCrops);

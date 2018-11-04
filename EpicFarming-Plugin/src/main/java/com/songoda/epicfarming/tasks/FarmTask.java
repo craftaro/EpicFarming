@@ -114,7 +114,7 @@ public class FarmTask extends BukkitRunnable {
     }
 
     public List<Block> getCrops(Farm farm, boolean add) {
-        if (System.currentTimeMillis() - ((EFarm)farm).getLastCached() > 30 * 1000) {
+        if (System.currentTimeMillis() - ((EFarm)farm).getLastCached() > 30 * 1000 || !add) {
             ((EFarm)farm).setLastCached(System.currentTimeMillis());
             Block block = farm.getLocation().getBlock();
             int radius = farm.getLevel().getRadius();
@@ -132,8 +132,8 @@ public class FarmTask extends BukkitRunnable {
                             ((EFarm)farm).addCachedCrop(b2);
                             continue;
                         }
+                        ((EFarm)farm).removeCachedCrop(b2);
                         plugin.getGrowthTask().removeCropByLocation(b2.getLocation());
-
                     }
                 }
             }
