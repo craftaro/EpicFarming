@@ -49,7 +49,9 @@ public class FarmTask extends BukkitRunnable {
             }
 
             for (Block block : getCrops(farm, true)) {
+                if (!CropType.isCrop(block.getType())) continue;
                 Crops crop = (Crops) block.getState().getData();
+
 
                 // Add to GrowthTask
                 plugin.getGrowthTask().addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
