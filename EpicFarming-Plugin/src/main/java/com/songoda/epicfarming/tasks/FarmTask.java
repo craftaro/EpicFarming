@@ -37,6 +37,7 @@ public class FarmTask extends BukkitRunnable {
 
     @Override
     public void run() {
+        main:
         for (Farm farm : plugin.getFarmManager().getFarms().values()) {
             if (farm.getLocation() == null) continue;
             Location farmLocation = farm.getLocation();
@@ -57,8 +58,9 @@ public class FarmTask extends BukkitRunnable {
                 plugin.getGrowthTask().addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
 
                 if (!farm.getLevel().isAutoHarvest()
-                        || !crop.getState().equals(CropState.RIPE)
-                        || !doDrop(farm, block.getType())) continue;
+                        || !crop.getState().equals(CropState.RIPE)) continue;
+
+                if (!doDrop(farm, block.getType())) continue main;
 
                 if (farm.getLevel().isAutoReplant()) {
                     BlockState cropState = block.getState();
