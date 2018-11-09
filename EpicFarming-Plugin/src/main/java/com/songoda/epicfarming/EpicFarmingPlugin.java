@@ -321,7 +321,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
     public void reload() {
         locale.reloadMessages();
         references = new References();
-        reloadConfig();
+        this.setupConfig();
         saveConfig();
     }
 
