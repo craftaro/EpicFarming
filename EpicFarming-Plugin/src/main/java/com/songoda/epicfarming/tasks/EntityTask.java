@@ -163,8 +163,12 @@ public class EntityTask extends BukkitRunnable {
 
                         ItemStack item = inventory.getItem(i);
 
-                        if (item.getType() != EntityInfo.valueOf(entityType.name()).getMaterial() || item.getAmount() < 2)
+                        try {
+                            if (item.getType() != EntityInfo.valueOf(entityType.name()).getMaterial() || item.getAmount() < 2)
+                                continue;
+                        } catch (IllegalArgumentException e) {
                             continue;
+                        }
 
                         int newAmt = item.getAmount() - 2;
 

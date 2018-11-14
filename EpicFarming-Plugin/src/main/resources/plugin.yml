@@ -1,7 +1,7 @@
 name: EpicFarming
 description: EpicFarming
 main: com.songoda.epicfarming.EpicFarmingPlugin
-version: 2.0.16
+version: 2.0.17
 depend: [Arconix]
 soft-depend: [Multiverse-Core]
 author: Songoda
