@@ -8,5 +8,5 @@ build:
   artifacts:
     name: "EpicFarming"
     paths:
-    - "/builds/Songoda/EpicFarming/target/*.jar"
-    - "/builds/Songoda/EpicFarming/Read_this_before_your_first_use.txt"
+    - "$CI_PROJECT_DIR/target/*.jar"
+    - "$CI_PROJECT_DIR/Read_this_before_your_first_use.txt"
