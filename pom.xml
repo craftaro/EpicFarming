@@ -3,13 +3,13 @@
     <modelVersion>4.0.0</modelVersion>
     
     <groupId>com.songoda</groupId>
-    <artifactId>EpicFurnaces-Parent</artifactId>
+    <artifactId>EpicFarming-Parent</artifactId>
     <packaging>pom</packaging>
     <version>maven-version-number</version>
     
     <modules>
-        <module>EpicFurnaces-API</module>
-        <module>EpicFurnaces-Plugin</module>
+        <module>EpicFarming-API</module>
+        <module>EpicFarming-Plugin</module>
     </modules>
     
     <dependencies>
