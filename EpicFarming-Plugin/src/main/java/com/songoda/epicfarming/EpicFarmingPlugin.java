@@ -54,6 +54,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Supplier;
@@ -442,6 +443,8 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         ItemStack item = new ItemStack(Material.valueOf(EpicFarmingPlugin.getInstance().getConfig().getString("Main.Farm Block Material")), 1);
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(Arconix.pl().getApi().format().formatText(Methods.formatName(level.getLevel(), true)));
+        String line = getLocale().getMessage("general.nametag.lore");
+        if (!line.equals("")) meta.setLore(Arrays.asList(line));
         item.setItemMeta(meta);
         return item;
     }

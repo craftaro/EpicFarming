@@ -2,6 +2,7 @@
 
 general.nametag.prefix = "&8[&6EpicFarming&8]"
 general.nametag.farm = "&eLevel %level% &fFarm"
+general.nametag.lore = ""
 
 #Interface Messages
 
