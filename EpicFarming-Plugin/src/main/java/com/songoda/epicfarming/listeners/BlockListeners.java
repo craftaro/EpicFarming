@@ -65,6 +65,15 @@ public class BlockListeners implements Listener {
         }
     }
 
+    private int maxFarms(Player player) {
+        int limit = -1;
+        for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
+            if (!permissionAttachmentInfo.getPermission().toLowerCase().startsWith("epicfarming.limit")) continue;
+            limit = Integer.parseInt(permissionAttachmentInfo.getPermission().split("\\.")[2]);
+        }
+        return limit;
+    }
+
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e) {
         try {
@@ -84,11 +93,8 @@ public class BlockListeners implements Listener {
                 if (!farmm.getPlacedBy().equals(e.getPlayer().getUniqueId())) continue;
                 amt ++;
             }
-            int limit = -1;
-            for (PermissionAttachmentInfo permissionAttachmentInfo : e.getPlayer().getEffectivePermissions()) {
-                if (!permissionAttachmentInfo.getPermission().toLowerCase().startsWith("epicfarming.limit")) continue;
-                limit = Integer.parseInt(permissionAttachmentInfo.getPermission().split("\\.")[2]);
-            }
+            int limit = maxFarms(e.getPlayer());
+            
             if (limit != -1 && amt >= limit) {
                 e.setCancelled(true);
                 e.getPlayer().sendMessage(instance.getReferences().getPrefix() + instance.getLocale().getMessage("event.limit.hit", limit));
