@@ -246,6 +246,7 @@ public class EFarm implements Farm {
     private static final Random random = new Random();
 
     public boolean tillLand(Location location) {
+        Player player = Bukkit.getPlayer(placedBy);
         EpicFarmingPlugin instance = EpicFarmingPlugin.getInstance();
         if (instance.getConfig().getBoolean("Main.Disable Auto Til Land")) return true;
         Block block = location.getBlock();
@@ -256,6 +257,7 @@ public class EFarm implements Farm {
         for (int fx = -radius; fx <= radius; fx++) {
             for (int fy = -2; fy <= 1; fy++) {
                 for (int fz = -radius; fz <= radius; fz++) {
+                    if (!instance.canBuild(player, location)) continue;
                     Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
 
                     // ToDo: enum for all flowers.

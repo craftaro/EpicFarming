@@ -77,6 +77,8 @@ public class BlockListeners implements Listener {
 
             if (e.getBlockAgainst().getType() == farmBlock) e.setCancelled(true);
 
+            if (!instance.canBuild(e.getPlayer(), e.getBlock().getLocation())) return;
+
             int amt = 0;
             for (Farm farmm : instance.getFarmManager().getFarms().values()) {
                 if (!farmm.getPlacedBy().equals(e.getPlayer().getUniqueId())) continue;
