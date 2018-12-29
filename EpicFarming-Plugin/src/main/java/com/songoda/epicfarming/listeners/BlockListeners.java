@@ -89,7 +89,7 @@ public class BlockListeners implements Listener {
             }
             if (limit != -1 && amt >= limit) {
                 e.setCancelled(true);
-                Bukkit.broadcastMessage(instance.getReferences().getPrefix() + instance.getLocale().getMessage("event.limit.hit", limit));
+                e.getPlayer().sendMessage(instance.getReferences().getPrefix() + instance.getLocale().getMessage("event.limit.hit", limit));
                 return;
             }
 

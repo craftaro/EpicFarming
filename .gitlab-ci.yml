@@ -4,7 +4,7 @@ stages:
 variables:
     name: "EpicFarming"
     path: "/builds/Songoda/$name"
-    version: "2.0.19"
+    version: "2.0.20"
 
 build:
   stage: build
