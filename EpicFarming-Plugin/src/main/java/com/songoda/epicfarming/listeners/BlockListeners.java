@@ -18,10 +18,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockBreakEvent;
-import org.bukkit.event.block.BlockFadeEvent;
-import org.bukkit.event.block.BlockGrowEvent;
-import org.bukkit.event.block.BlockPlaceEvent;
+import org.bukkit.event.block.*;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.SheepRegrowWoolEvent;
 import org.bukkit.inventory.ItemStack;
@@ -32,6 +29,7 @@ import java.util.Collection;
 /**
  * Created by songoda on 3/14/2017.
  */
+@SuppressWarnings("Duplicates")
 public class BlockListeners implements Listener {
 
     private EpicFarmingPlugin instance;
@@ -102,7 +100,11 @@ public class BlockListeners implements Listener {
             }
 
             Location location = e.getBlock().getLocation();
-
+            if (e.getBlockPlaced().getType().equals(Material.MELON_SEEDS)||e.getBlockPlaced().getType().equals(Material.PUMPKIN_SEEDS)){
+                if (checkForFarm(location)){
+                    e.getPlayer().sendMessage(instance.getLocale().getMessage("event.warning.noauto"));
+                }
+            }
             Bukkit.getScheduler().runTaskLater(instance, () -> {
                 int level = 1;
                 if (instance.getLevelFromItem(e.getItemInHand()) != 0) {
@@ -207,6 +209,35 @@ public class BlockListeners implements Listener {
             if (block.getType() == Material.DIRT) {
                 block.setType(Material.GRASS_BLOCK);
             }
+        }
+    }
+
+    @EventHandler(ignoreCancelled = true)
+    public void onBlockExplode(BlockExplodeEvent event) {
+        try {
+            if (event.getBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
+                return;
+
+            Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
+
+            if (farm == null) return;
+            instance.getFarmTask().getCrops(farm, false);
+
+            event.setCancelled(true);
+
+            ItemStack item = instance.makeFarmItem(farm.getLevel());
+
+            Block block = event.getBlock();
+
+            block.setType(Material.AIR);
+            block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
+
+            for (ItemStack itemStack : ((EFarm) farm).dumpInventory()) {
+                if (itemStack == null) continue;
+                farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
+            }
+        } catch (Exception ex) {
+            Debugger.runReport(ex);
         }
     }
 }
