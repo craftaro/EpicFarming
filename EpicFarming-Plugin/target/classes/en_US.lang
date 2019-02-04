@@ -31,3 +31,4 @@ event.upgrade.success = "&7You successfully upgraded this farm to &6level %level
 event.upgrade.maxed = "&6This farm is maxed out."
 event.upgrade.successmaxed = "&7You maxed out this farm at &6%level%x&7."
 event.limit.hit = "&7You can only have &6%limit% &7farms at a single time."
+event.warning.noauto = "&6Warning: &cThis item does not get farmed automatically"
