@@ -1,8 +1,5 @@
 package com.songoda.epicfarming.farming;
 
-import com.songoda.arconix.api.methods.formatting.TextComponent;
-import com.songoda.arconix.api.methods.formatting.TimeComponent;
-import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.api.farming.Level;
@@ -11,7 +8,6 @@ import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.player.PlayerData;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
-import com.songoda.epicfarming.api.farming.Farm;
 import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -87,10 +83,10 @@ public class EFarm implements Farm {
 
         BoostData boostData = instance.getBoostManager().getBoost(placedBy);
         if (boostData != null) {
-            String[] parts = instance.getLocale().getMessage("interface.button.boostedstats", Integer.toString(boostData.getMultiplier()), TimeComponent.makeReadable(boostData.getEndTime() - System.currentTimeMillis())).split("\\|");
+            String[] parts = instance.getLocale().getMessage("interface.button.boostedstats", Integer.toString(boostData.getMultiplier()), Methods.makeReadable(boostData.getEndTime() - System.currentTimeMillis())).split("\\|");
             lore.add("");
             for (String line : parts)
-                lore.add(TextComponent.formatText(line));
+                lore.add(Methods.formatText(line));
         }
 
         itemmeta.setLore(lore);
@@ -112,7 +108,7 @@ public class EFarm implements Farm {
         itemmetaECO.setDisplayName(instance.getLocale().getMessage("interface.button.upgradewitheconomy"));
         ArrayList<String> loreECO = new ArrayList<>();
         if (nextLevel != null)
-            loreECO.add(instance.getLocale().getMessage("interface.button.upgradewitheconomylore", Arconix.pl().getApi().format().formatEconomy(nextLevel.getCostEconomy())));
+            loreECO.add(instance.getLocale().getMessage("interface.button.upgradewitheconomylore", Methods.formatEconomy(nextLevel.getCostEconomy())));
         else
             loreECO.add(instance.getLocale().getMessage("event.upgrade.maxed"));
         itemmetaECO.setLore(loreECO);

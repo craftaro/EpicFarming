@@ -1,10 +1,9 @@
 package com.songoda.epicfarming.command.commands;
 
-import com.songoda.arconix.api.methods.formatting.TextComponent;
-import com.songoda.arconix.api.methods.math.AMath;
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.command.AbstractCommand;
+import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
@@ -23,10 +22,10 @@ public class CommandBoost extends AbstractCommand {
             return ReturnType.SYNTAX_ERROR;
         }
             if (Bukkit.getPlayer(args[1]) == null) {
-                sender.sendMessage(TextComponent.formatText(instance.getReferences().getPrefix() + "&cThat player does not exist..."));
+                sender.sendMessage(Methods.formatText(instance.getReferences().getPrefix() + "&cThat player does not exist..."));
                 return ReturnType.FAILURE;
-            } else if (!AMath.isInt(args[2])) {
-                sender.sendMessage(TextComponent.formatText(instance.getReferences().getPrefix() + "&6" + args[2] + " &7is not a number..."));
+            } else if (!Methods.isInt(args[2])) {
+                sender.sendMessage(Methods.formatText(instance.getReferences().getPrefix() + "&6" + args[2] + " &7is not a number..."));
                 return ReturnType.FAILURE;
             } else {
                 Calendar c = Calendar.getInstance();
@@ -53,7 +52,7 @@ public class CommandBoost extends AbstractCommand {
                         c.add(Calendar.YEAR, Integer.parseInt(arr2[1]));
                         time = " &7for &6" + arr2[1] + " years&7.";
                     } else {
-                        sender.sendMessage(TextComponent.formatText(instance.getReferences().getPrefix() + "&7" + args[3] + " &7is invalid."));
+                        sender.sendMessage(Methods.formatText(instance.getReferences().getPrefix() + "&7" + args[3] + " &7is invalid."));
                         return ReturnType.SUCCESS;
                     }
                 } else {
@@ -62,7 +61,7 @@ public class CommandBoost extends AbstractCommand {
 
                 BoostData boostData = new BoostData(Integer.parseInt(args[2]), c.getTime().getTime(), Bukkit.getPlayer(args[1]).getUniqueId());
                 instance.getBoostManager().addBoostToPlayer(boostData);
-                sender.sendMessage(TextComponent.formatText(instance.getReferences().getPrefix() + "&7Successfully boosted &6" + Bukkit.getPlayer(args[1]).getName() + "'s &7farms yield rates by &6" + args[2] + "x" + time));
+                sender.sendMessage(Methods.formatText(instance.getReferences().getPrefix() + "&7Successfully boosted &6" + Bukkit.getPlayer(args[1]).getName() + "'s &7farms yield rates by &6" + args[2] + "x" + time));
             }
         return ReturnType.FAILURE;
     }

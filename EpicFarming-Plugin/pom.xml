@@ -13,7 +13,7 @@
     <repositories>
         <repository>
             <id>private</id>
-            <url>http://repo.songoda.com/repository/private</url>
+            <url>http://repo.songoda.com/artifactory/private</url>
         </repository>
     </repositories>
     <dependencies>
@@ -29,12 +29,6 @@
             <version>LATEST</version>
         </dependency>
         <dependency>
-            <groupId>com.songoda</groupId>
-            <artifactId>arconix</artifactId>
-            <version>LATEST</version>
-            <scope>provided</scope>
-        </dependency>
-        <dependency>
             <groupId>org</groupId>
             <artifactId>kingdoms</artifactId>
             <version>LATEST</version>
@@ -43,7 +37,7 @@
         <dependency>
             <groupId>net.milkbowl</groupId>
             <artifactId>vault</artifactId>
-            <version>LATEST</version>
+            <version>1.7.1</version>
             <scope>provided</scope>
         </dependency>
         <dependency>

@@ -1,8 +1,8 @@
 package com.songoda.epicfarming.storage;
 
-import com.songoda.arconix.api.utils.ConfigWrapper;
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.api.EpicFarming;
+import com.songoda.epicfarming.utils.ConfigWrapper;
 
 import java.util.List;
 

@@ -1,9 +1,9 @@
 package com.songoda.epicfarming.command.commands;
 
-import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.command.AbstractCommand;
 import com.songoda.epicfarming.farming.ELevel;
+import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -21,11 +21,11 @@ public class CommandGiveFarmItem extends AbstractCommand {
             ELevel level = instance.getLevelManager().getLowestLevel();
             Player player;
             if (args.length != 1 && Bukkit.getPlayer(args[1]) == null) {
-                sender.sendMessage(instance.getReferences().getPrefix() + Arconix.pl().getApi().format().formatText("&cThat player does not exist or is currently offline."));
+                sender.sendMessage(instance.getReferences().getPrefix() + Methods.formatText("&cThat player does not exist or is currently offline."));
                 return ReturnType.FAILURE;
             } else if (args.length == 1) {
                 if (!(sender instanceof Player)) {
-                    sender.sendMessage(instance.getReferences().getPrefix() + Arconix.pl().getApi().format().formatText("&cYou need to be a player to give a farm item to yourself."));
+                    sender.sendMessage(instance.getReferences().getPrefix() + Methods.formatText("&cYou need to be a player to give a farm item to yourself."));
                     return ReturnType.FAILURE;
                 }
                 player = (Player)sender;
@@ -35,7 +35,7 @@ public class CommandGiveFarmItem extends AbstractCommand {
 
 
             if (args.length >= 3 && !instance.getLevelManager().isLevel(Integer.parseInt(args[2]))) {
-                sender.sendMessage(instance.getReferences().getPrefix() + Arconix.pl().getApi().format().formatText("&cNot a valid level... The current valid levels are: &4" + instance.getLevelManager().getLowestLevel().getLevel() + "-" + instance.getLevelManager().getHighestLevel().getLevel() + "&c."));
+                sender.sendMessage(instance.getReferences().getPrefix() + Methods.formatText("&cNot a valid level... The current valid levels are: &4" + instance.getLevelManager().getLowestLevel().getLevel() + "-" + instance.getLevelManager().getHighestLevel().getLevel() + "&c."));
                 return ReturnType.FAILURE;
             } else if (args.length != 1){
 

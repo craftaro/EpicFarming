@@ -1,9 +1,6 @@
 package com.songoda.epicfarming;
 
 import com.google.common.base.Preconditions;
-import com.songoda.arconix.api.methods.serialize.Serialize;
-import com.songoda.arconix.api.utils.ConfigWrapper;
-import com.songoda.arconix.plugin.Arconix;
 import com.songoda.epicfarming.api.EpicFarming;
 import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.api.farming.Level;
@@ -30,6 +27,7 @@ import com.songoda.epicfarming.tasks.EntityTask;
 import com.songoda.epicfarming.tasks.FarmTask;
 import com.songoda.epicfarming.tasks.GrowthTask;
 import com.songoda.epicfarming.tasks.HopperTask;
+import com.songoda.epicfarming.utils.ConfigWrapper;
 import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
 import com.songoda.epicfarming.utils.SettingsManager;
@@ -112,12 +110,11 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         if (!checkVersion()) return;
         checkStorage();
         INSTANCE = this;
-        Arconix.pl().hook(this);
 
         CommandSender console = Bukkit.getConsoleSender();
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&a============================="));
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Brianna <3&7!"));
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&7Action: &aEnabling&7..."));
+        console.sendMessage(Methods.formatText("&a============================="));
+        console.sendMessage(Methods.formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Brianna <3&7!"));
+        console.sendMessage(Methods.formatText("&7Action: &aEnabling&7..."));
 
         String langMode = getConfig().getString("System.Language Mode");
         Locale.init(this);
@@ -147,7 +144,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if (storage.containsGroup("farms")) {
                 for (StorageRow row : storage.getRowsByGroup("farms")) {
-                    Location location = Serialize.getInstance().unserializeLocation(row.getKey());
+                    Location location = Methods.unserializeLocation(row.getKey());
                     if (location == null || location.getBlock() == null) return;
 
                     int level = row.get("level").asInt();
@@ -205,7 +202,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
 
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&a============================="));
+        console.sendMessage(Methods.formatText("&a============================="));
     }
 
     private void checkStorage() {
@@ -224,10 +221,10 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
                 playerData.getPlayer().closeInventory();
         }
         CommandSender console = Bukkit.getConsoleSender();
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&a============================="));
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Brianna <3!"));
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&7Action: &cDisabling&7..."));
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&a============================="));
+        console.sendMessage(Methods.formatText("&a============================="));
+        console.sendMessage(Methods.formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Brianna <3!"));
+        console.sendMessage(Methods.formatText("&7Action: &cDisabling&7..."));
+        console.sendMessage(Methods.formatText("&a============================="));
     }
 
     private void loadLevelManager() {
@@ -264,7 +261,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         for (Farm farm : farmManager.getFarms().values()) {
             if (farm.getLocation() == null
                     || farm.getLocation().getWorld() == null) continue;
-            String locstr = Arconix.pl().getApi().serialize().serializeLocation(farm.getLocation());
+            String locstr = Methods.serializeLocation(farm.getLocation());
             storage.prepareSaveItem("farms",new StorageItem("location",locstr),
                     new StorageItem("level",farm.getLevel().getLevel()),
                     new StorageItem("placedby",farm.getPlacedBy().toString()),
@@ -442,7 +439,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
     public ItemStack makeFarmItem(Level level) {
         ItemStack item = new ItemStack(Material.valueOf(EpicFarmingPlugin.getInstance().getConfig().getString("Main.Farm Block Material")), 1);
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(Arconix.pl().getApi().format().formatText(Methods.formatName(level.getLevel(), true)));
+        meta.setDisplayName(Methods.formatText(Methods.formatName(level.getLevel(), true)));
         String line = getLocale().getMessage("general.nametag.lore");
         if (!line.equals("")) meta.setLore(Arrays.asList(line));
         item.setItemMeta(meta);
