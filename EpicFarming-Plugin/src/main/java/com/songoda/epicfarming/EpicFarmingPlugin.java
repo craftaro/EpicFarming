@@ -112,9 +112,9 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         INSTANCE = this;
 
         CommandSender console = Bukkit.getConsoleSender();
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&a============================="));
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Songoda <3&7!"));
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&7Action: &aEnabling&7..."));
+        console.sendMessage(Methods.formatText("&a============================="));
+        console.sendMessage(Methods.formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Songoda <3&7!"));
+        console.sendMessage(Methods.formatText("&7Action: &aEnabling&7..."));
 
         String langMode = getConfig().getString("System.Language Mode");
         Locale.init(this);
@@ -221,10 +221,10 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
                 playerData.getPlayer().closeInventory();
         }
         CommandSender console = Bukkit.getConsoleSender();
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&a============================="));
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Brianna <3!"));
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&7Action: &cDisabling&7..."));
-        console.sendMessage(Arconix.pl().getApi().format().formatText("&a============================="));
+        console.sendMessage(Methods.formatText("&a============================="));
+        console.sendMessage(Methods.formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Brianna <3!"));
+        console.sendMessage(Methods.formatText("&7Action: &cDisabling&7..."));
+        console.sendMessage(Methods.formatText("&a============================="));
     }
 
     private void loadLevelManager() {
