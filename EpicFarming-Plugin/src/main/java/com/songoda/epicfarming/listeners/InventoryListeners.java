@@ -3,6 +3,7 @@ package com.songoda.epicfarming.listeners;
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.api.farming.UpgradeType;
 import com.songoda.epicfarming.farming.EFarm;
+import com.songoda.epicfarming.player.PlayerActionManager;
 import com.songoda.epicfarming.player.PlayerData;
 import com.songoda.epicfarming.utils.Debugger;
 import org.bukkit.entity.Player;
@@ -58,6 +59,12 @@ public class InventoryListeners implements Listener {
     @EventHandler
     public void onClose(InventoryCloseEvent event) {
         try {
+            PlayerData playerData = instance.getPlayerActionManager().getPlayerAction((Player)event.getPlayer());
+
+            if (playerData.getFarm() != null) {
+                playerData.getFarm().setViewing(null);
+            }
+
             instance.getPlayerActionManager().getPlayerAction((Player)event.getPlayer()).setFarm(null);
         } catch (Exception ex) {
             Debugger.runReport(ex);

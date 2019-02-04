@@ -30,6 +30,8 @@ public class EFarm implements Farm {
     private Inventory inventory;
     private UUID placedBy;
 
+    private UUID viewing = null;
+
     private long lastCached = 0;
     private final List<Block> cachedCrops = new ArrayList<>();
 
@@ -45,9 +47,13 @@ public class EFarm implements Farm {
             if (!player.hasPermission("epicfarming.view"))
                 return;
 
+            if (viewing != null) return;
+
             setupOverview(player);
 
             player.openInventory(inventory);
+            this.viewing = player.getUniqueId();
+
             PlayerData playerData = EpicFarmingPlugin.getInstance().getPlayerActionManager().getPlayerAction(player);
 
             playerData.setFarm(this);
@@ -280,6 +286,14 @@ public class EFarm implements Farm {
             }
         }
         return false;
+    }
+
+    public UUID getViewing() {
+        return viewing;
+    }
+
+    public void setViewing(UUID viewing) {
+        this.viewing = viewing;
     }
 
     public void addCachedCrop(Block block) {
