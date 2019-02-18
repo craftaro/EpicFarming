@@ -28,7 +28,10 @@ public class ELevel implements Level {
 
         EpicFarmingPlugin instance = EpicFarmingPlugin.getInstance();
 
-        description.add(instance.getLocale().getMessage("interface.button.radius", radius));
+        description.add(instance
+                .getLocale()
+                .getMessage("interface.button.radius",
+                        radius));
         description.add(instance.getLocale().getMessage("interface.button.speed", speedMultiplier));
 
         if (autoHarvest)

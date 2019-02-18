@@ -172,6 +172,8 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
             }
 
 
+            // Save data initially so that if the person reloads again fast they don't lose all their data.
+            this.saveToFile();
         }, 10);
 
         this.references = new References();
@@ -252,35 +254,9 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
      * Saves registered farms to file.
      */
     private void saveToFile() {
-        this.storage.closeConnection();
         checkStorage();
 
-        /*
-         * Dump FarmManager to file.
-         */
-        for (Farm farm : farmManager.getFarms().values()) {
-            if (farm.getLocation() == null
-                    || farm.getLocation().getWorld() == null) continue;
-            String locstr = Methods.serializeLocation(farm.getLocation());
-            storage.prepareSaveItem("farms",new StorageItem("location",locstr),
-                    new StorageItem("level",farm.getLevel().getLevel()),
-                    new StorageItem("placedby",farm.getPlacedBy().toString()),
-                    new StorageItem("contents",((EFarm)farm).dumpInventory()));
-        }
-
-        /*
-         * Dump BoostManager to file.
-         */
-        for (BoostData boostData : boostManager.getBoosts()) {
-            String endTime = String.valueOf(boostData.getEndTime());
-            storage.prepareSaveItem("boosts",new StorageItem("endtime",endTime),
-                    new StorageItem("amount",boostData.getMultiplier()),
-                    new StorageItem("player",boostData.getPlayer()));
-        }
-
-        //Save to file
         storage.doSave();
-
     }
 
     private void update() {
