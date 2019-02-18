@@ -61,7 +61,7 @@
         <dependency>
             <groupId>com</groupId>
             <artifactId>plotsquared</artifactId>
-            <version>RELEASE</version>
+            <version>BREAKING</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
