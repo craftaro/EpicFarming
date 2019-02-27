@@ -116,6 +116,10 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         console.sendMessage(Methods.formatText("&7EpicFarming " + this.getDescription().getVersion() + " by &5Songoda <3&7!"));
         console.sendMessage(Methods.formatText("&7Action: &aEnabling&7..."));
 
+        this.settingsManager = new SettingsManager(this);
+        this.setupConfig();
+
+        // Setup language
         String langMode = getConfig().getString("System.Language Mode");
         Locale.init(this);
         Locale.saveDefaultLocale("en_US");
@@ -124,9 +128,6 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         if (getConfig().getBoolean("System.Download Needed Data Files")) {
             this.update();
         }
-
-        this.settingsManager = new SettingsManager(this);
-        this.setupConfig();
 
         dataFile.createNewFile("Loading Data File", "EpicFarming Data File");
         this.loadDataFile();
