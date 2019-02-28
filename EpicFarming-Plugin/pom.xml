@@ -27,6 +27,7 @@
             <groupId>net.arcaniax</groupId>
             <artifactId>liquidtanks</artifactId>
             <version>LATEST</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>org</groupId>
@@ -155,7 +156,7 @@
             <scope>provided</scope>
         </dependency>
     </dependencies>
-    
+
     <build>
         <defaultGoal>clean install</defaultGoal>
         <finalName>EpicFarming-${project.version}</finalName>
