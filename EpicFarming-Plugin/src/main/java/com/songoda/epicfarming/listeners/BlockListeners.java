@@ -164,7 +164,7 @@ public class BlockListeners implements Listener {
 
 
             if (!instance.canBuild(event.getPlayer(), event.getBlock().getLocation())) {
-                e.setCancelled(true);
+                event.setCancelled(true);
                 return;
             }
 
