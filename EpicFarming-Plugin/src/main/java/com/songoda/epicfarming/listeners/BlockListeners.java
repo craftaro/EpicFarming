@@ -161,6 +161,13 @@ public class BlockListeners implements Listener {
             Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
 
             if (farm == null) return;
+
+
+            if (!instance.canBuild(event.getPlayer(), event.getBlock().getLocation())) {
+                e.setCancelled(true);
+                return;
+            }
+
             instance.getFarmTask().getCrops(farm, false);
 
             event.setCancelled(true);
