@@ -32,8 +32,8 @@
         <dependency>
             <groupId>org</groupId>
             <artifactId>kingdoms</artifactId>
-            <version>LATEST</version>
-            <scope>13.0.9</scope>
+            <version>13.0.9</version>
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>net.milkbowl</groupId>
