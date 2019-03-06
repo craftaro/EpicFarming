@@ -27,10 +27,7 @@ import com.songoda.epicfarming.tasks.EntityTask;
 import com.songoda.epicfarming.tasks.FarmTask;
 import com.songoda.epicfarming.tasks.GrowthTask;
 import com.songoda.epicfarming.tasks.HopperTask;
-import com.songoda.epicfarming.utils.ConfigWrapper;
-import com.songoda.epicfarming.utils.Debugger;
-import com.songoda.epicfarming.utils.Methods;
-import com.songoda.epicfarming.utils.SettingsManager;
+import com.songoda.epicfarming.utils.*;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -204,6 +201,9 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         this.entityTask = EntityTask.startTask(this);
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
+
+        // Start Metrics
+        new Metrics(this);
 
         console.sendMessage(Methods.formatText("&a============================="));
     }
