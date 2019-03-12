@@ -1,7 +1,7 @@
-package com.songoda.epicspawners.hook.hooks;
+package com.songoda.epicfarming.hook.hooks;
 
-import com.songoda.epicspawners.hook.HookType;
-import com.songoda.epicspawners.hook.ProtectionPluginHook;
+import com.songoda.epicfarming.hook.HookType;
+import com.songoda.epicfarming.hook.ProtectionPluginHook;
 import com.wasteofplastic.askyblock.ASkyBlock;
 import com.wasteofplastic.askyblock.ASkyBlockAPI;
 import com.wasteofplastic.askyblock.Island;
