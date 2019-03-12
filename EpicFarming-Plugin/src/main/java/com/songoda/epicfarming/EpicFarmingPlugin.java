@@ -1,25 +1,20 @@
 package com.songoda.epicfarming;
 
-import com.google.common.base.Preconditions;
 import com.songoda.epicfarming.api.EpicFarming;
-import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.api.farming.Level;
-import com.songoda.epicfarming.api.utils.ClaimableProtectionPluginHook;
-import com.songoda.epicfarming.api.utils.ProtectionPluginHook;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.boost.BoostManager;
 import com.songoda.epicfarming.command.CommandManager;
 import com.songoda.epicfarming.farming.EFarm;
 import com.songoda.epicfarming.farming.EFarmManager;
 import com.songoda.epicfarming.farming.ELevelManager;
-import com.songoda.epicfarming.hooks.*;
+import com.songoda.epicfarming.hook.HookManager;
 import com.songoda.epicfarming.listeners.BlockListeners;
 import com.songoda.epicfarming.listeners.InteractListeners;
 import com.songoda.epicfarming.listeners.InventoryListeners;
 import com.songoda.epicfarming.player.PlayerActionManager;
 import com.songoda.epicfarming.player.PlayerData;
 import com.songoda.epicfarming.storage.Storage;
-import com.songoda.epicfarming.storage.StorageItem;
 import com.songoda.epicfarming.storage.StorageRow;
 import com.songoda.epicfarming.storage.types.StorageMysql;
 import com.songoda.epicfarming.storage.types.StorageYaml;
@@ -35,7 +30,6 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.command.CommandSender;
 import org.bukkit.configuration.ConfigurationSection;
-import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
@@ -48,11 +42,9 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Supplier;
 
 /**
  * Created by songoda on 1/23/2018.
@@ -60,9 +52,6 @@ import java.util.function.Supplier;
 public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
 
     private static EpicFarmingPlugin INSTANCE;
-
-    private List<ProtectionPluginHook> protectionHooks = new ArrayList<>();
-    private ClaimableProtectionPluginHook factionsHook, townyHook, aSkyblockHook, uSkyblockHook;
 
     private SettingsManager settingsManager;
     private References references;
@@ -74,6 +63,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
     private PlayerActionManager playerActionManager;
     private CommandManager commandManager;
     private BoostManager boostManager;
+    private HookManager hookManager;
 
     private GrowthTask growthTask;
     private FarmTask farmTask;
@@ -135,6 +125,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         this.playerActionManager = new PlayerActionManager();
         this.boostManager = new BoostManager();
         this.commandManager = new CommandManager(this);
+        this.hookManager = new HookManager(this);
 
         /*
          * Register Farms into FarmManger from configuration
@@ -182,17 +173,6 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         pluginManager.registerEvents(new BlockListeners(this), this);
         pluginManager.registerEvents(new InteractListeners(this), this);
         pluginManager.registerEvents(new InventoryListeners(this), this);
-
-        // Register default hooks
-        if (pluginManager.isPluginEnabled("ASkyBlock")) this.register(HookASkyBlock::new);
-        if (pluginManager.isPluginEnabled("FactionsFramework")) this.register(HookFactions::new);
-        if (pluginManager.isPluginEnabled("GriefPrevention")) this.register(HookGriefPrevention::new);
-        if (pluginManager.isPluginEnabled("Kingdoms")) this.register(HookKingdoms::new);
-        if (pluginManager.isPluginEnabled("PlotSquared")) this.register(HookPlotSquared::new);
-        if (pluginManager.isPluginEnabled("RedProtect")) this.register(HookRedProtect::new);
-        if (pluginManager.isPluginEnabled("Towny")) this.register(HookTowny::new);
-        if (pluginManager.isPluginEnabled("USkyBlock")) this.register(HookUSkyBlock::new);
-        if (pluginManager.isPluginEnabled("WorldGuard")) this.register(HookWorldGuard::new);
 
         // Start tasks
         this.growthTask = GrowthTask.startTask(this);
@@ -296,6 +276,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
     public void reload() {
         locale.reloadMessages();
         references = new References();
+        this.hookManager = new HookManager(this);
         this.setupConfig();
         saveConfig();
     }
@@ -364,41 +345,6 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
         return locale;
     }
 
-    private void register(Supplier<ProtectionPluginHook> hookSupplier) {
-        this.registerProtectionHook(hookSupplier.get());
-    }
-
-    @Override
-    public void registerProtectionHook(ProtectionPluginHook hook) {
-        Preconditions.checkNotNull(hook, "Cannot register null hook");
-        Preconditions.checkNotNull(hook.getPlugin(), "Protection plugin hook returns null plugin instance (#getPlugin())");
-
-        JavaPlugin hookPlugin = hook.getPlugin();
-        for (ProtectionPluginHook existingHook : protectionHooks) {
-            if (existingHook.getPlugin().equals(hookPlugin)) {
-                throw new IllegalArgumentException("Hook already registered");
-            }
-        }
-
-        this.hooksFile.getConfig().addDefault("hooks." + hookPlugin.getName(), true);
-        if (!hooksFile.getConfig().getBoolean("hooks." + hookPlugin.getName(), true)) return;
-        this.hooksFile.getConfig().options().copyDefaults(true);
-        this.hooksFile.saveConfig();
-
-        this.protectionHooks.add(hook);
-        this.getLogger().info("Registered protection hook for plugin: " + hook.getPlugin().getName());
-    }
-
-    public boolean canBuild(Player player, Location location) {
-        if (player.hasPermission(getDescription().getName() + ".bypass")) {
-            return true;
-        }
-
-        for (ProtectionPluginHook hook : protectionHooks)
-            if (!hook.canBuild(player, location)) return false;
-        return true;
-    }
-
     @Override
     public int getLevelFromItem(ItemStack item) {
         try {
@@ -451,6 +397,10 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
 
     public PlayerActionManager getPlayerActionManager() {
         return playerActionManager;
+    }
+
+    public HookManager getHookManager() {
+        return hookManager;
     }
 
     public GrowthTask getGrowthTask() {

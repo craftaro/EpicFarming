@@ -1,6 +1,7 @@
-package com.songoda.epicfarming.hooks;
+package com.songoda.epicspawners.hook.hooks;
 
-import com.songoda.epicfarming.api.utils.ClaimableProtectionPluginHook;
+import com.songoda.epicspawners.hook.HookType;
+import com.songoda.epicspawners.hook.ProtectionPluginHook;
 import com.wasteofplastic.askyblock.ASkyBlock;
 import com.wasteofplastic.askyblock.ASkyBlockAPI;
 import com.wasteofplastic.askyblock.Island;
@@ -12,7 +13,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
-public class HookASkyBlock implements ClaimableProtectionPluginHook {
+public class HookASkyBlock implements ProtectionPluginHook {
 
     private final ASkyBlockAPI skyblock;
 
@@ -23,6 +24,11 @@ public class HookASkyBlock implements ClaimableProtectionPluginHook {
     @Override
     public JavaPlugin getPlugin() {
         return ASkyBlock.getPlugin();
+    }
+
+    @Override
+    public HookType getHookType() {
+        return HookType.ISLAND;
     }
 
     @Override
@@ -45,6 +51,11 @@ public class HookASkyBlock implements ClaimableProtectionPluginHook {
         }
 
         return false;
+    }
+
+    @Override
+    public boolean isInClaim(Location location) {
+        return skyblock.getIslandAt(location) != null;
     }
 
     @Override

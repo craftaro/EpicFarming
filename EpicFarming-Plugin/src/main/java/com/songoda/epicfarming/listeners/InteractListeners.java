@@ -27,7 +27,7 @@ public class InteractListeners implements Listener {
             if (e.getClickedBlock() == null || e.getClickedBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
                 return;
 
-            if (!instance.canBuild(e.getPlayer(), e.getClickedBlock().getLocation())) {
+            if (!instance.getHookManager().canBuild(e.getPlayer(), e.getClickedBlock().getLocation())) {
                 e.setCancelled(true);
                 return;
             }

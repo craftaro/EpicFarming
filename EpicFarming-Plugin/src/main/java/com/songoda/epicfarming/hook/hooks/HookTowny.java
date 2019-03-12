@@ -1,16 +1,17 @@
-package com.songoda.epicfarming.hooks;
+package com.songoda.epicspawners.hook.hooks;
 
 import com.palmergames.bukkit.towny.Towny;
 import com.palmergames.bukkit.towny.exceptions.NotRegisteredException;
 import com.palmergames.bukkit.towny.object.Resident;
 import com.palmergames.bukkit.towny.object.TownyUniverse;
-import com.songoda.epicfarming.api.utils.ClaimableProtectionPluginHook;
-import com.songoda.epicfarming.utils.Debugger;
+import com.songoda.epicspawners.hook.HookType;
+import com.songoda.epicspawners.hook.ProtectionPluginHook;
+import com.songoda.epicspawners.utils.Debugger;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class HookTowny implements ClaimableProtectionPluginHook {
+public class HookTowny implements ProtectionPluginHook {
 
     private final Towny towny;
 
@@ -24,9 +25,15 @@ public class HookTowny implements ClaimableProtectionPluginHook {
     }
 
     @Override
+    public HookType getHookType() {
+        return HookType.TOWN;
+    }
+
+    @Override
     public boolean canBuild(Player player, Location location) {
-        if (TownyUniverse.isWilderness(location.getBlock()) || !TownyUniverse.getTownBlock(location).hasTown()) return true;
-        
+        if (TownyUniverse.isWilderness(location.getBlock()) || !TownyUniverse.getTownBlock(location).hasTown())
+            return true;
+
         try {
             Resident resident = TownyUniverse.getDataSource().getResident(player.getName());
             return resident.hasTown() && TownyUniverse.getTownName(location).equals(resident.getTown().getName());
@@ -37,9 +44,14 @@ public class HookTowny implements ClaimableProtectionPluginHook {
     }
 
     @Override
+    public boolean isInClaim(Location location) {
+        return !TownyUniverse.isWilderness(location.getBlock());
+    }
+
+    @Override
     public boolean isInClaim(Location location, String id) {
         try {
-            return TownyUniverse.isWilderness(location.getBlock()) && TownyUniverse.getTownBlock(location).getTown().getUID().toString().equals(id);
+            return (!TownyUniverse.isWilderness(location.getBlock())) && TownyUniverse.getTownBlock(location).getTown().getUID().toString().equals(id);
         } catch (NotRegisteredException e) {
             Debugger.runReport(e);
             return false;

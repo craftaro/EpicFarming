@@ -1,6 +1,7 @@
-package com.songoda.epicfarming.hooks;
+package com.songoda.epicspawners.hook.hooks;
 
-import com.songoda.epicfarming.api.utils.ProtectionPluginHook;
+import com.songoda.epicspawners.hook.HookType;
+import com.songoda.epicspawners.hook.ProtectionPluginHook;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,15 +25,38 @@ public class HookKingdoms implements ProtectionPluginHook {
     }
 
     @Override
+    public HookType getHookType() {
+        return HookType.REGULAR;
+    }
+
+    @Override
     public boolean canBuild(Player player, Location location) {
         KingdomPlayer kPlayer = GameManagement.getPlayerManager().getOfflineKingdomPlayer(player).getKingdomPlayer();
         if (kPlayer.getKingdom() == null) return true;
-        
+
         SimpleChunkLocation chunkLocation = new SimpleChunkLocation(location.getChunk());
         Land land = GameManagement.getLandManager().getOrLoadLand(chunkLocation);
         String owner = land.getOwner();
-        
+
         return owner == null || kPlayer.getKingdom().getKingdomName().equals(owner);
+    }
+
+    @Override
+    public boolean isInClaim(Location location) {
+        SimpleChunkLocation chunkLocation = new SimpleChunkLocation(location.getChunk());
+        Land land = GameManagement.getLandManager().getOrLoadLand(chunkLocation);
+        String owner = land.getOwner();
+        return owner != null;
+    }
+
+    @Override
+    public boolean isInClaim(Location location, String id) {
+        return false;
+    }
+
+    @Override
+    public String getClaimID(String name) {
+        return null;
     }
 
 }

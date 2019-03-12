@@ -1,9 +1,10 @@
-package com.songoda.epicfarming.hooks;
+package com.songoda.epicspawners.hook.hooks;
 
 import com.github.intellectualsites.plotsquared.api.PlotAPI;
 import com.github.intellectualsites.plotsquared.bukkit.BukkitMain;
 import com.github.intellectualsites.plotsquared.plot.object.Plot;
-import com.songoda.epicfarming.api.utils.ProtectionPluginHook;
+import com.songoda.epicspawners.hook.HookType;
+import com.songoda.epicspawners.hook.ProtectionPluginHook;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -22,6 +23,11 @@ public class HookPlotSquared implements ProtectionPluginHook {
     }
 
     @Override
+    public HookType getHookType() {
+        return HookType.REGULAR;
+    }
+
+    @Override
     public boolean canBuild(Player player, Location location) {
         com.github.intellectualsites.plotsquared.plot.object.Location plotLocation =
                 new com.github.intellectualsites.plotsquared.plot.object.Location(location.getWorld().getName(),
@@ -32,6 +38,26 @@ public class HookPlotSquared implements ProtectionPluginHook {
         return plot != null
                 && plot.getOwners().contains(player.getUniqueId())
                 && plot.getMembers().contains(player.getUniqueId());
+    }
+
+    @Override
+    public boolean isInClaim(Location location) {
+        com.github.intellectualsites.plotsquared.plot.object.Location plotLocation =
+                new com.github.intellectualsites.plotsquared.plot.object.Location(location.getWorld().getName(),
+                        location.getBlockX(), location.getBlockY(), location.getBlockZ());
+
+        Plot plot = plotLocation.getPlot();
+        return plot != null;
+    }
+
+    @Override
+    public boolean isInClaim(Location location, String id) {
+        return false;
+    }
+
+    @Override
+    public String getClaimID(String name) {
+        return null;
     }
 
 }

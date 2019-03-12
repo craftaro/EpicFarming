@@ -1,6 +1,7 @@
-package com.songoda.epicfarming.hooks;
+package com.songoda.epicspawners.hook.hooks;
 
-import com.songoda.epicfarming.api.utils.ClaimableProtectionPluginHook;
+import com.songoda.epicspawners.hook.HookType;
+import com.songoda.epicspawners.hook.ProtectionPluginHook;
 import me.markeh.factionsframework.FactionsFramework;
 import me.markeh.factionsframework.entities.FPlayer;
 import me.markeh.factionsframework.entities.FPlayers;
@@ -10,7 +11,7 @@ import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class HookFactions implements ClaimableProtectionPluginHook {
+public class HookFactions implements ProtectionPluginHook {
 
     private final FactionsFramework factions;
 
@@ -24,11 +25,21 @@ public class HookFactions implements ClaimableProtectionPluginHook {
     }
 
     @Override
+    public HookType getHookType() {
+        return HookType.FACTION;
+    }
+
+    @Override
     public boolean canBuild(Player player, Location location) {
         FPlayer fPlayer = FPlayers.getBySender(player);
         Faction faction = Factions.getFactionAt(location);
-        
+
         return faction.isNone() || fPlayer.getFaction().equals(faction);
+    }
+
+    @Override
+    public boolean isInClaim(Location location) {
+        return !Factions.getFactionAt(location).isNone();
     }
 
     @Override

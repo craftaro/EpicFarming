@@ -84,7 +84,7 @@ public class BlockListeners implements Listener {
 
             if (e.getBlockAgainst().getType() == farmBlock) e.setCancelled(true);
 
-            if (!instance.canBuild(e.getPlayer(), e.getBlock().getLocation())) return;
+            if (!instance.getHookManager().canBuild(e.getPlayer(), e.getBlock().getLocation())) return;
 
             int amt = 0;
             for (Farm farmm : instance.getFarmManager().getFarms().values()) {
@@ -163,7 +163,7 @@ public class BlockListeners implements Listener {
             if (farm == null) return;
 
 
-            if (!instance.canBuild(event.getPlayer(), event.getBlock().getLocation())) {
+            if (!instance.getHookManager().canBuild(event.getPlayer(), event.getBlock().getLocation())) {
                 event.setCancelled(true);
                 return;
             }

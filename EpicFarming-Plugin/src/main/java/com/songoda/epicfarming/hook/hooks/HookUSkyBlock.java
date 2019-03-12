@@ -1,13 +1,14 @@
-package com.songoda.epicfarming.hooks;
+package com.songoda.epicspawners.hook.hooks;
 
-import com.songoda.epicfarming.api.utils.ClaimableProtectionPluginHook;
+import com.songoda.epicspawners.hook.HookType;
+import com.songoda.epicspawners.hook.ProtectionPluginHook;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import us.talabrek.ultimateskyblock.api.uSkyBlockAPI;
 
-public class HookUSkyBlock implements ClaimableProtectionPluginHook {
+public class HookUSkyBlock implements ProtectionPluginHook {
 
     private final uSkyBlockAPI uSkyblock;
 
@@ -21,8 +22,18 @@ public class HookUSkyBlock implements ClaimableProtectionPluginHook {
     }
 
     @Override
+    public HookType getHookType() {
+        return HookType.ISLAND;
+    }
+
+    @Override
     public boolean canBuild(Player player, Location location) {
         return uSkyblock.getIslandInfo(location).getOnlineMembers().contains(player) || uSkyblock.getIslandInfo(location).isLeader(player);
+    }
+
+    @Override
+    public boolean isInClaim(Location location) {
+        return uSkyblock.getIslandInfo(location) != null;
     }
 
     @Override
