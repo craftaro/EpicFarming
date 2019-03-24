@@ -21,25 +21,27 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.RegisteredServiceProvider;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
 
 public class EFarm implements Farm {
 
+    private static final Random random = new Random();
+    private final List<Block> cachedCrops = new ArrayList<>();
     private Location location;
     private Level level;
     private Inventory inventory;
     private UUID placedBy;
-
     private UUID viewing = null;
-
     private long lastCached = 0;
-    private final List<Block> cachedCrops = new ArrayList<>();
 
     public EFarm(Location location, Level level, UUID placedBy) {
         this.location = location;
         this.level = level;
         this.placedBy = placedBy;
-        this.inventory = Bukkit.createInventory(null, 54, Methods.formatName(level.getLevel(),false));
+        this.inventory = Bukkit.createInventory(null, 54, Methods.formatName(level.getLevel(), false));
     }
 
     public void view(Player player) {
@@ -66,13 +68,13 @@ public class EFarm implements Farm {
     }
 
     private void setupOverview(Player player) {
-        Inventory inventory = Bukkit.createInventory(null, 54, Methods.formatName(level.getLevel(),false));
+        Inventory inventory = Bukkit.createInventory(null, 54, Methods.formatName(level.getLevel(), false));
         inventory.setContents(this.inventory.getContents());
         this.inventory = inventory;
 
         EpicFarmingPlugin instance = EpicFarmingPlugin.getInstance();
 
-        ELevel nextLevel = instance.getLevelManager().getHighestLevel().getLevel() > level.getLevel() ? instance.getLevelManager().getLevel(level.getLevel()+1) : null;
+        ELevel nextLevel = instance.getLevelManager().getHighestLevel().getLevel() > level.getLevel() ? instance.getLevelManager().getLevel(level.getLevel() + 1) : null;
 
         int level = this.level.getLevel();
 
@@ -169,7 +171,7 @@ public class EFarm implements Farm {
     public List<ItemStack> dumpInventory() {
         List<ItemStack> items = new ArrayList<>();
 
-        for(int i=27; i < inventory.getSize(); i++) {
+        for (int i = 27; i < inventory.getSize(); i++) {
             items.add(inventory.getItem(i));
         }
 
@@ -179,9 +181,9 @@ public class EFarm implements Farm {
     public void upgrade(UpgradeType type, Player player) {
         try {
             EpicFarmingPlugin instance = EpicFarmingPlugin.getInstance();
-            if (instance.getLevelManager().getLevels().containsKey(this.level.getLevel()+1)) {
+            if (instance.getLevelManager().getLevels().containsKey(this.level.getLevel() + 1)) {
 
-                com.songoda.epicfarming.api.farming.Level level = instance.getLevelManager().getLevel(this.level.getLevel()+1);
+                com.songoda.epicfarming.api.farming.Level level = instance.getLevelManager().getLevel(this.level.getLevel() + 1);
                 int cost;
                 if (type == UpgradeType.EXPERIENCE) {
                     cost = level.getCostExperiance();
@@ -218,7 +220,6 @@ public class EFarm implements Farm {
         }
     }
 
-
     private void upgradeFinal(Level level, Player player) {
         try {
             EpicFarmingPlugin instance = EpicFarmingPlugin.getInstance();
@@ -229,14 +230,14 @@ public class EFarm implements Farm {
                 player.sendMessage(instance.getLocale().getMessage("event.upgrade.successmaxed", level.getLevel()));
             }
             Location loc = location.clone().add(.5, .5, .5);
-                player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), loc, 200, .5, .5, .5);
+            player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), loc, 200, .5, .5, .5);
 
             if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
                 if (instance.getLevelManager().getHighestLevel() != level) {
-                        player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 0.6F, 15.0F);
+                    player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 0.6F, 15.0F);
 
                 } else {
-                        player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 2F, 25.0F);
+                    player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 2F, 25.0F);
                 }
             }
             tillLand(location);
@@ -244,8 +245,6 @@ public class EFarm implements Farm {
             Debugger.runReport(ex);
         }
     }
-
-    private static final Random random = new Random();
 
     public boolean tillLand(Location location) {
         Player player = Bukkit.getPlayer(placedBy);
@@ -264,12 +263,12 @@ public class EFarm implements Farm {
 
                     // ToDo: enum for all flowers.
                     if (b2.getType() == Material.TALL_GRASS || b2.getType() == Material.GRASS || b2.getType().name().contains("TULIP") || b2.getType() == Material.AZURE_BLUET ||
-                            b2.getType() == Material.BLUE_ORCHID || b2.getType() == Material.ALLIUM ||  b2.getType() == Material.POPPY || b2.getType() == Material.DANDELION) {
+                            b2.getType() == Material.BLUE_ORCHID || b2.getType() == Material.ALLIUM || b2.getType() == Material.POPPY || b2.getType() == Material.DANDELION) {
                         Bukkit.getScheduler().runTaskLater(EpicFarmingPlugin.getInstance(), () -> {
                             b2.getRelative(BlockFace.DOWN).setType(Material.LEGACY_SOIL);
                             b2.breakNaturally();
                             if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
-                                    b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
+                                b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
                             }
                         }, random.nextInt(30) + 1);
                     }
@@ -277,7 +276,7 @@ public class EFarm implements Farm {
                         Bukkit.getScheduler().runTaskLater(EpicFarmingPlugin.getInstance(), () -> {
                             b2.setType(Material.LEGACY_SOIL);
                             if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
-                                    b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
+                                b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
                             }
                         }, random.nextInt(30) + 1);
                     }
@@ -327,13 +326,13 @@ public class EFarm implements Farm {
     }
 
     @Override
-    public UUID getPlacedBy() {
-        return placedBy;
+    public void setLocation(Location location) {
+        this.location = location;
     }
 
     @Override
-    public void setLocation(Location location) {
-        this.location = location;
+    public UUID getPlacedBy() {
+        return placedBy;
     }
 
     @Override

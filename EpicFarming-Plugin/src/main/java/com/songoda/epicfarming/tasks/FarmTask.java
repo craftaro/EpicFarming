@@ -53,7 +53,6 @@ public class FarmTask extends BukkitRunnable {
                 if (!CropType.isCrop(block.getType())) continue;
                 Crops crop = (Crops) block.getState().getData();
 
-
                 // Add to GrowthTask
                 plugin.getGrowthTask().addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
 
@@ -120,6 +119,7 @@ public class FarmTask extends BukkitRunnable {
     public List<Block> getCrops(Farm farm, boolean add) {
         if (System.currentTimeMillis() - ((EFarm)farm).getLastCached() > 30 * 1000 || !add) {
             ((EFarm)farm).setLastCached(System.currentTimeMillis());
+            if (add) ((EFarm)farm).clearCache();
             Block block = farm.getLocation().getBlock();
             int radius = farm.getLevel().getRadius();
             int bx = block.getX();
