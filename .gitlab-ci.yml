@@ -1,10 +1,10 @@
 stages:
-- build
+  - build
 
 variables:
-    name: "EpicFarming"
-    path: "/builds/$CI_PROJECT_PATH"
-    version: "2.1.6"
+  name: "EpicFarming"
+  path: "/builds/$CI_PROJECT_PATH"
+  version: "2.1.6"
 
 build:
   stage: build
@@ -13,9 +13,9 @@ build:
     - find $path/ -type f -name "*.xml" -print0 | xargs -0 sed -i -e s/maven-version-number/$version/g
     - find $path/ -type f -name "*.yml" -print0 | xargs -0 sed -i -e s/maven-version-number/$version/g
     - mvn clean package
-    - find $path/$name-Plugin/ -depth -path '*original*' -delete
-    - mv -v $path/$name-Plugin/target/*.jar $path
+    - find $path/ -depth -path '*original*' -delete
+    - mv $path/$name-Plugin/target/*.jar $path/
   artifacts:
     name: $name-$version
     paths:
-    - "$path/*.jar"
+      - "$path/*.jar"
