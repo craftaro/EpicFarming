@@ -19,6 +19,11 @@
     <dependencies>
         <dependency>
             <groupId>com.songoda</groupId>
+            <artifactId>songodaupdater</artifactId>
+            <version>1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.songoda</groupId>
             <artifactId>EpicFarming-API</artifactId>
             <version>${project.version}</version>
             <scope>compile</scope>
@@ -168,27 +173,37 @@
         <finalName>EpicFarming-${project.version}</finalName>
         <plugins>
             <plugin>
-                <groupId>com.google.code.maven-replacer-plugin</groupId>
-                <artifactId>replacer</artifactId>
-                <version>1.5.3</version>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
-                        <phase>prepare-package</phase>
+                        <id>shaded</id>
+                        <phase>package</phase>
                         <goals>
-                            <goal>replace</goal>
+                            <goal>shade</goal>
                         </goals>
+                        <configuration>
+                            <shadedArtifactAttached>false</shadedArtifactAttached>
+                            <createDependencyReducedPom>false</createDependencyReducedPom>
+                            <artifactSet>
+                                <includes>
+                                    <include>com.songoda:songodaupdater</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
                     </execution>
                 </executions>
-                <configuration>
-                    <file>${project.build.directory}/classes/plugin.yml</file>
-                    <file>${project.basedir}/../.gitlab-ci.yml</file>
-                    <replacements>
-                        <replacement>
-                            <token>maven-version-number</token>
-                            <value>${project.version}</value>
-                        </replacement>
-                    </replacements>
-                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -197,7 +197,6 @@ public class SettingsManager implements Listener {
         o15("Interfaces.Glass Type 2", 11),
         o16("Interfaces.Glass Type 3", 3),
 
-        DOWNLOAD_FILES("System.Download Needed Data Files", true),
         LANGUGE_MODE("System.Language Mode", "en_US"),
         o17("System.Debugger Enabled", false);
 
