@@ -1,22 +1,19 @@
 package com.songoda.epicfarming.storage.types;
 
+import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.storage.Storage;
 import com.songoda.epicfarming.storage.StorageItem;
 import com.songoda.epicfarming.storage.StorageRow;
-import com.songoda.epicfarming.EpicFarmingPlugin;
-import com.songoda.epicfarming.utils.Debugger;
-import org.apache.commons.io.FileUtils;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.util.*;
 
 public class StorageYaml extends Storage {
 
     private static final Map<String, Object> toSave = new HashMap<>();
-    private static final Map<String, Object> lastSave = new HashMap<>();
+    private static Map<String, Object> lastSave = null;
 
     public StorageYaml(EpicFarmingPlugin instance) {
         super(instance);
@@ -66,11 +63,12 @@ public class StorageYaml extends Storage {
     @Override
     public void doSave() {
         this.updateData(instance);
+
+        if (lastSave == null)
+            lastSave = new HashMap<>(toSave);
+
         if (toSave.isEmpty()) return;
         Map<String, Object> nextSave = new HashMap<>(toSave);
-
-        if (lastSave.isEmpty())
-            lastSave.putAll(toSave);
 
         this.makeBackup();
         this.save();
@@ -87,9 +85,9 @@ public class StorageYaml extends Storage {
                 if (toSave.containsKey(entry.getKey())) {
                     Object newValue = toSave.get(entry.getKey());
                     if (!entry.getValue().equals(newValue)) {
-                        dataFile.getConfig().set(entry.getKey(), entry.getValue());
+                        dataFile.getConfig().set(entry.getKey(), newValue);
                     }
-                    toSave.remove(newValue);
+                    toSave.remove(entry.getKey());
                 } else {
                     dataFile.getConfig().set(entry.getKey(), null);
                 }
@@ -101,7 +99,7 @@ public class StorageYaml extends Storage {
 
             dataFile.saveConfig();
         } catch (NullPointerException e) {
-            Debugger.runReport(e);
+            e.printStackTrace();
         }
     }
 
@@ -110,9 +108,9 @@ public class StorageYaml extends Storage {
         File data = new File(instance.getDataFolder(), "data.yml");
         File dataClone = new File(instance.getDataFolder(), "data-backup-" + System.currentTimeMillis() + ".yml");
         try {
-            FileUtils.copyFile(data, dataClone);
+            copyFile(data, dataClone);
         } catch (IOException e) {
-            Debugger.runReport(e);
+            e.printStackTrace();
         }
         Deque<File> backups = new ArrayDeque<>();
         for (File file : Objects.requireNonNull(instance.getDataFolder().listFiles())) {
@@ -128,5 +126,22 @@ public class StorageYaml extends Storage {
     @Override
     public void closeConnection() {
         dataFile.saveConfig();
+    }
+
+    private static void copyFile(File source, File dest) throws IOException {
+        InputStream is = null;
+        OutputStream os = null;
+        try {
+            is = new FileInputStream(source);
+            os = new FileOutputStream(dest);
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = is.read(buffer)) > 0) {
+                os.write(buffer, 0, length);
+            }
+        } finally {
+            is.close();
+            os.close();
+        }
     }
 }
