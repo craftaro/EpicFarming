@@ -38,26 +38,23 @@ public class BlockListeners implements Listener {
         this.instance = instance;
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent e) {
         try {
             if (checkForFarm(e.getBlock().getLocation())) {
                 e.setCancelled(true);
             }
-
         } catch (Exception ex) {
             Debugger.runReport(ex);
         }
     }
 
-    @EventHandler
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onGrow(BlockGrowEvent e) {
         try {
-
             if (checkForFarm(e.getNewState().getLocation())) {
                 e.setCancelled(true);
             }
-
         } catch (Exception ex) {
             Debugger.runReport(ex);
         }
@@ -152,7 +149,7 @@ public class BlockListeners implements Listener {
         return false;
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
         try {
             if (event.getBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
@@ -188,7 +185,7 @@ public class BlockListeners implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSpawn(ItemSpawnEvent event) {
         Item item = event.getEntity();
 
@@ -208,7 +205,7 @@ public class BlockListeners implements Listener {
         }
     }
 
-    @EventHandler(priority = EventPriority.HIGHEST)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSpawn(SheepRegrowWoolEvent event) {
         if (instance.getEntityTask().getTicksLived().containsKey(event.getEntity())) {
             event.setCancelled(true);
@@ -219,7 +216,7 @@ public class BlockListeners implements Listener {
         }
     }
 
-    @EventHandler(ignoreCancelled = true)
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
         try {
             if (event.getBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))

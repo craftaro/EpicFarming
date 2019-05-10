@@ -38,7 +38,7 @@ public class HookManager {
         if (pluginManager.isPluginEnabled("RedProtect")) this.register(HookRedProtect::new);
         if (pluginManager.isPluginEnabled("Towny")) this.register(HookTowny::new);
         if (pluginManager.isPluginEnabled("USkyBlock")) this.register(HookUSkyBlock::new);
-        if (pluginManager.isPluginEnabled("SkyBlock")) this.register(HookSkyBlockEarth::new);
+        if (pluginManager.isPluginEnabled("FabledSkyBlock")) this.register(HookSkyBlockEarth::new);
         if (pluginManager.isPluginEnabled("WorldGuard")) this.register(HookWorldGuard::new);
     }
 
