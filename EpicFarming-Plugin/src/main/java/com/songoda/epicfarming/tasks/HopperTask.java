@@ -33,17 +33,18 @@ public class HopperTask extends BukkitRunnable {
     @Override
     public void run() {
         for (Farm farm : manager.getFarms().values()) {
-            if (farm.getLocation() == null || farm.getLocation().getBlock() == null) {
+            if (farm.getLocation() == null) {
                 manager.removeFarm(farm.getLocation());
                 continue;
             }
-            Block block = farm.getLocation().getBlock();
 
-            if (block.getRelative(BlockFace.DOWN).getType() != Material.HOPPER)
+            Block block = farm.getLocation().getBlock().getRelative(BlockFace.DOWN).getRelative(BlockFace.DOWN);
+
+            if (block.getType() != Material.HOPPER)
                 continue;
 
             Inventory inventory = farm.getInventory();
-            Inventory hopperInventory = ((Hopper) block.getRelative(BlockFace.DOWN).getState()).getInventory();
+            Inventory hopperInventory = ((Hopper) block.getState()).getInventory();
 
             for (int i = 27; i < inventory.getSize(); i++) {
                 if (inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) continue;
