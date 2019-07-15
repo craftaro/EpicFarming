@@ -3,6 +3,7 @@ package com.songoda.epicfarming.tasks;
 import com.songoda.epicfarming.EpicFarmingPlugin;
 import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.api.farming.FarmManager;
+import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -33,12 +34,20 @@ public class HopperTask extends BukkitRunnable {
     @Override
     public void run() {
         for (Farm farm : manager.getFarms().values()) {
-            if (farm.getLocation() == null) {
+            Location farmLocation = farm.getLocation();
+            if (farmLocation == null || farmLocation.getWorld() == null) {
                 manager.removeFarm(farm.getLocation());
                 continue;
             }
 
-            Block block = farm.getLocation().getBlock().getRelative(BlockFace.DOWN).getRelative(BlockFace.DOWN);
+            int x = farmLocation.getBlockX() >> 4;
+            int z = farmLocation.getBlockZ() >> 4;
+
+            if (!farmLocation.getWorld().isChunkLoaded(x, z)) {
+                continue;
+            }
+
+            Block block = farmLocation.getBlock().getRelative(BlockFace.DOWN).getRelative(BlockFace.DOWN);
 
             if (block.getType() != Material.HOPPER)
                 continue;

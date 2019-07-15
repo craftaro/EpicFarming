@@ -180,9 +180,13 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
 
         // Start tasks
         this.growthTask = GrowthTask.startTask(this);
-        HopperTask.startTask(this);
         this.farmTask = FarmTask.startTask(this);
         this.entityTask = EntityTask.startTask(this);
+
+        Bukkit.getScheduler().runTaskLater(this, () -> {
+            if (!Bukkit.getPluginManager().isPluginEnabled("EpicFarming"))
+                HopperTask.startTask(this);
+        }, 20L);
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
 
