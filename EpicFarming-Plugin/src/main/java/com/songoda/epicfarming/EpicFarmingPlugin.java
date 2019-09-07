@@ -138,7 +138,7 @@ public class EpicFarmingPlugin extends JavaPlugin implements EpicFarming {
             if (storage.containsGroup("farms")) {
                 for (StorageRow row : storage.getRowsByGroup("farms")) {
                     Location location = Methods.unserializeLocation(row.getKey());
-                    if (location == null || location.getBlock() == null) return;
+                    if (location == null || location.getWorld() == null) return;
 
                     int level = row.get("level").asInt();
                     List<ItemStack> items =row.get("contents").asItemStackList();
