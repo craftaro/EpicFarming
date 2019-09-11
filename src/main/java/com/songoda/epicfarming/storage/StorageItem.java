@@ -1,16 +1,15 @@
 package com.songoda.epicfarming.storage;
 
-import com.songoda.epicfarming.utils.Serializers;
-import org.bukkit.Material;
-import org.bukkit.inventory.ItemStack;
+import com.songoda.epicFarming.utils.Methods;
+import org.bukkit.Location;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class StorageItem {
 
+    private final Object object;
     private String key = null;
-
-    private Object object;
 
     public StorageItem(Object object) {
         this.object = object;
@@ -21,12 +20,19 @@ public class StorageItem {
         this.object = object;
     }
 
-    public StorageItem(String key, List<ItemStack> material) {
-        if (material == null || material.isEmpty()) return;
+    public StorageItem(String key, List<String> string) {
         StringBuilder object = new StringBuilder();
-        for (ItemStack m : material) {
-            if (m == null) continue;
-            object.append(Serializers.serialize(m));
+        for (String s : string) {
+            object.append(s).append(";");
+        }
+        this.key = key;
+        this.object = object.toString();
+    }
+
+    public StorageItem(String key, boolean type, List<Location> blocks) {
+        StringBuilder object = new StringBuilder();
+        for (Location location : blocks) {
+            object.append(Methods.serializeLocation(location));
             object.append(";;");
         }
         this.key = key;
@@ -39,32 +45,36 @@ public class StorageItem {
 
     public String asString() {
         if (object == null) return null;
-        return (String)object;
+        return (String) object;
     }
 
     public boolean asBoolean() {
         if (object == null) return false;
-        return (boolean)object;
+        if (object instanceof Integer) return (Integer) object == 1;
+        return (boolean) object;
     }
 
     public int asInt() {
         if (object == null) return 0;
-        return (int)object;
+        return (int) object;
     }
 
     public Object asObject() {
+        if (object == null) return null;
+        if (object instanceof Boolean) return (Boolean) object ? 1 : 0;
         return object;
     }
 
-    public List<ItemStack> asItemStackList() {
-        List<ItemStack> list = new ArrayList<>();
+    public List<String> asStringList() {
+        if (object instanceof ArrayList) return new ArrayList<>();
+        List<String> list = new ArrayList<>();
         if (object == null) return list;
-        String obj = (String) object;
-        if (obj.equals("[]"))return list;
-        List<String> sers = new ArrayList<>(Arrays.asList(obj.split(";;")));
-        for (String ser : sers) {
-            list.add(Serializers.deserialize(ser));
+        String[] stack = ((String) object).split(";");
+        for (String item : stack) {
+            if (item.equals("")) continue;
+            list.add(item);
         }
         return list;
     }
+
 }

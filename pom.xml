@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0">
     <groupId>com.songoda</groupId>
-    <artifactId>EpicFurnaces</artifactId>
+    <artifactId>EpicFarming</artifactId>
     <modelVersion>4.0.0</modelVersion>
     <version>maven-version-number</version>
     <build>
         <defaultGoal>clean install</defaultGoal>
-        <finalName>EpicFurnaces-${project.version}</finalName>
+        <finalName>EpicFarming-${project.version}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

@@ -18,7 +18,6 @@ import com.songoda.epicfarming.player.PlayerActionManager;
 import com.songoda.epicfarming.player.PlayerData;
 import com.songoda.epicfarming.storage.Storage;
 import com.songoda.epicfarming.storage.StorageRow;
-import com.songoda.epicfarming.storage.types.StorageMysql;
 import com.songoda.epicfarming.storage.types.StorageYaml;
 import com.songoda.epicfarming.tasks.EntityTask;
 import com.songoda.epicfarming.tasks.FarmTask;
@@ -29,7 +28,6 @@ import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
@@ -164,19 +162,28 @@ public class EpicFarming extends SongodaPlugin {
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
     }
 
+    @Override
+    public void onConfigReload() {
+        this.setLocale(getConfig().getString("System.Language Mode"), true);
+        this.locale.reloadMessages();
+        this.blacklistHandler.reload();
+        loadLevelManager();
+    }
+
+    @Override
+    public List<Config> getExtraConfig() {
+        return Arrays.asList(levelsFile);
+    }
+
     private void checkStorage() {
-        if (getConfig().getBoolean("Database.Activate Mysql Support")) {
-            this.storage = new StorageMysql(this);
-        } else {
-            this.storage = new StorageYaml(this);
-        }
+        this.storage = new StorageYaml(this);
     }
 
     private void loadLevelManager() {
         if (!levelsFile.getFile().exists())
             this.saveResource("levels.yml", false);
         levelsFile.load();
-        
+
         // Load an instance of LevelManager
         levelManager = new LevelManager();
 
@@ -204,14 +211,6 @@ public class EpicFarming extends SongodaPlugin {
         checkStorage();
 
         storage.doSave();
-    }
-
-    public void reload() {
-        locale.reloadMessages();
-        references = new References();
-        this.hookManager = new HookManager(this);
-        this.setupConfig();
-        saveConfig();
     }
 
     private void loadDataFile() {
