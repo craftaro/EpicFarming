@@ -1,9 +1,8 @@
 package com.songoda.epicfarming.tasks;
 
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.boost.BoostData;
-import com.songoda.epicfarming.utils.Debugger;
+import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.utils.EntityInfo;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Location;
@@ -138,7 +137,7 @@ public class EntityTask extends BukkitRunnable {
 
         List<Entity> entities = new ArrayList<>(entities1);
         Collections.shuffle(entities);
-        entities.removeIf(e -> lastBreed.containsKey(e) || !(e instanceof Ageable) || !((Ageable)e).isAdult());
+        entities.removeIf(e -> lastBreed.containsKey(e) || !(e instanceof Ageable) || !((Ageable) e).isAdult());
 
         Map<EntityType, Long> counts =
                 entities.stream().collect(Collectors.groupingBy(Entity::getType, Collectors.counting()));
@@ -200,16 +199,12 @@ public class EntityTask extends BukkitRunnable {
     }
 
     private boolean canMove(Inventory inventory, ItemStack item) {
-        try {
-            if (inventory.firstEmpty() != -1) return true;
+        if (inventory.firstEmpty() != -1) return true;
 
-            for (ItemStack stack : inventory.getContents()) {
-                if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {
-                    return true;
-                }
+        for (ItemStack stack : inventory.getContents()) {
+            if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {
+                return true;
             }
-        } catch (Exception e) {
-            Debugger.runReport(e);
         }
         return false;
     }

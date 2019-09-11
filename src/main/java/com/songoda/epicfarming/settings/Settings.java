@@ -42,8 +42,8 @@ public class Settings {
     public static final ConfigSetting ANIMATE = new ConfigSetting(config, "Main.Animate", true,
             "Should the processed farm item be animated above the farm item?");
 
-    public static final ConfigSetting AUTO_TIL_LAND = new ConfigSetting(config, "Main.Disable Auto Til Land", false,
-            "Should farms auto til land around them?");
+    public static final ConfigSetting DISABLE_AUTO_TIL_LAND = new ConfigSetting(config, "Main.Disable Auto Til Land", false,
+            "Should farms not auto til land around them?");
 
     public static final ConfigSetting ECONOMY_PLUGIN = new ConfigSetting(config, "Main.Economy", EconomyManager.getEconomy() == null ? "Vault" : EconomyManager.getEconomy().getName(),
             "Which economy plugin should be used?",

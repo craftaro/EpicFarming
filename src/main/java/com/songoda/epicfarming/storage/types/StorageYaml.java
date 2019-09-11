@@ -1,9 +1,9 @@
 package com.songoda.epicfarming.storage.types;
 
-import com.songoda.epicFarming.EpicFarming;
-import com.songoda.epicFarming.storage.Storage;
-import com.songoda.epicFarming.storage.StorageItem;
-import com.songoda.epicFarming.storage.StorageRow;
+import com.songoda.epicfarming.EpicFarming;
+import com.songoda.epicfarming.storage.Storage;
+import com.songoda.epicfarming.storage.StorageItem;
+import com.songoda.epicfarming.storage.StorageRow;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.MemorySection;
 

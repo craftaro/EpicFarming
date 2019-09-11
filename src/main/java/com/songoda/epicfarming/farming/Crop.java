@@ -1,6 +1,5 @@
 package com.songoda.epicfarming.farming;
 
-import com.songoda.epicfarming.api.farming.Farm;
 import org.bukkit.Location;
 
 public class Crop {

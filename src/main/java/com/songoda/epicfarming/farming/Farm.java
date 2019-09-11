@@ -4,6 +4,7 @@ import com.songoda.core.hooks.EconomyManager;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.player.PlayerData;
+import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
@@ -70,18 +71,23 @@ public class Farm {
 
         ItemStack item = new ItemStack(Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")), 1);
         ItemMeta itemmeta = item.getItemMeta();
-        itemmeta.setDisplayName(instance.getLocale().getMessage("general.nametag.farm", level));
+        itemmeta.setDisplayName(instance.getLocale().getMessage("general.nametag.farm")
+                .processPlaceholder("level", level).getMessage());
         List<String> lore = this.level.getDescription();
         lore.add("");
-        if (nextLevel == null) lore.add(instance.getLocale().getMessage("event.upgrade.maxed"));
+        if (nextLevel == null) lore.add(instance.getLocale().getMessage("event.upgrade.maxed").getMessage());
         else {
-            lore.add(instance.getLocale().getMessage("interface.button.level", nextLevel.getLevel()));
+            lore.add(instance.getLocale().getMessage("interface.button.level")
+                    .processPlaceholder("level", nextLevel.getLevel()).getMessage());
             lore.addAll(nextLevel.getDescription());
         }
 
         BoostData boostData = instance.getBoostManager().getBoost(placedBy);
         if (boostData != null) {
-            String[] parts = instance.getLocale().getMessage("interface.button.boostedstats", Integer.toString(boostData.getMultiplier()), Methods.makeReadable(boostData.getEndTime() - System.currentTimeMillis())).split("\\|");
+            String[] parts = instance.getLocale().getMessage("interface.button.boostedstats")
+                    .processPlaceholder("amount", Integer.toString(boostData.getMultiplier()))
+                    .processPlaceholder("time", Methods.makeReadable(boostData.getEndTime() - System.currentTimeMillis()))
+                    .getMessage().split("\\|");
             lore.add("");
             for (String line : parts)
                 lore.add(Methods.formatText(line));
@@ -92,31 +98,29 @@ public class Farm {
 
         ItemStack itemXP = new ItemStack(Material.valueOf(instance.getConfig().getString("Interfaces.XP Icon")), 1);
         ItemMeta itemmetaXP = itemXP.getItemMeta();
-        itemmetaXP.setDisplayName(instance.getLocale().getMessage("interface.button.upgradewithxp"));
+        itemmetaXP.setDisplayName(instance.getLocale().getMessage("interface.button.upgradewithxp").getMessage());
         ArrayList<String> loreXP = new ArrayList<>();
         if (nextLevel != null)
-            loreXP.add(instance.getLocale().getMessage("interface.button.upgradewithxplore", nextLevel.getCostExperiance()));
+            loreXP.add(instance.getLocale().getMessage("interface.button.upgradewithxplore")
+                    .processPlaceholder("cost", nextLevel.getCostExperiance()).getMessage());
         else
-            loreXP.add(instance.getLocale().getMessage("event.upgrade.maxed"));
+            loreXP.add(instance.getLocale().getMessage("event.upgrade.maxed").getMessage());
         itemmetaXP.setLore(loreXP);
         itemXP.setItemMeta(itemmetaXP);
 
         ItemStack itemECO = new ItemStack(Material.valueOf(instance.getConfig().getString("Interfaces.Economy Icon")), 1);
         ItemMeta itemmetaECO = itemECO.getItemMeta();
-        itemmetaECO.setDisplayName(instance.getLocale().getMessage("interface.button.upgradewitheconomy"));
+        itemmetaECO.setDisplayName(instance.getLocale().getMessage("interface.button.upgradewitheconomy").getMessage());
         ArrayList<String> loreECO = new ArrayList<>();
         if (nextLevel != null)
-            loreECO.add(instance.getLocale().getMessage("interface.button.upgradewitheconomylore", Methods.formatEconomy(nextLevel.getCostEconomy())));
+            loreECO.add(instance.getLocale().getMessage("interface.button.upgradewitheconomylore")
+                    .processPlaceholder("cost", Methods.formatEconomy(nextLevel.getCostEconomy()))
+                    .getMessage());
         else
-            loreECO.add(instance.getLocale().getMessage("event.upgrade.maxed"));
+            loreECO.add(instance.getLocale().getMessage("event.upgrade.maxed").getMessage());
         itemmetaECO.setLore(loreECO);
         itemECO.setItemMeta(itemmetaECO);
 
-        int nu = 0;
-        while (nu != 27) {
-            inventory.setItem(nu, Methods.getGlass());
-            nu++;
-        }
         if (instance.getConfig().getBoolean("Main.Upgrade With XP") && player != null && player.hasPermission("EpicFarming.Upgrade.XP")) {
             inventory.setItem(11, itemXP);
         }
@@ -126,7 +130,7 @@ public class Farm {
         if (instance.getConfig().getBoolean("Main.Upgrade With Economy") && player != null && player.hasPermission("EpicFarming.Upgrade.ECO")) {
             inventory.setItem(15, itemECO);
         }
-
+/*
         inventory.setItem(0, Methods.getBackgroundGlass(true));
         inventory.setItem(1, Methods.getBackgroundGlass(true));
         inventory.setItem(2, Methods.getBackgroundGlass(false));
@@ -142,7 +146,7 @@ public class Farm {
         inventory.setItem(20, Methods.getBackgroundGlass(false));
         inventory.setItem(24, Methods.getBackgroundGlass(false));
         inventory.setItem(25, Methods.getBackgroundGlass(true));
-        inventory.setItem(26, Methods.getBackgroundGlass(true));
+        inventory.setItem(26, Methods.getBackgroundGlass(true)); */
     }
 
     public Inventory getInventory() {
@@ -206,9 +210,11 @@ public class Farm {
         EpicFarming instance = EpicFarming.getInstance();
         this.level = level;
         if (instance.getLevelManager().getHighestLevel() != level) {
-            player.sendMessage(instance.getLocale().getMessage("event.upgrade.success", level.getLevel()));
+            instance.getLocale().getMessage("event.upgrade.success")
+                    .processPlaceholder("level", level.getLevel()).sendPrefixedMessage(player);
         } else {
-            player.sendMessage(instance.getLocale().getMessage("event.upgrade.successmaxed", level.getLevel()));
+            instance.getLocale().getMessage("event.upgrade.successmaxed")
+                    .processPlaceholder("level", level.getLevel()).sendPrefixedMessage(player);
         }
         Location loc = location.clone().add(.5, .5, .5);
         player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), loc, 200, .5, .5, .5);
@@ -225,7 +231,7 @@ public class Farm {
     public boolean tillLand(Location location) {
         Player player = Bukkit.getPlayer(placedBy);
         EpicFarming instance = EpicFarming.getInstance();
-        if (instance.getConfig().getBoolean("Main.Disable Auto Til Land")) return true;
+        if (Settings.DISABLE_AUTO_TIL_LAND.getBoolean()) return true;
         Block block = location.getBlock();
         int radius = level.getRadius();
         int bx = block.getX();
@@ -234,7 +240,6 @@ public class Farm {
         for (int fx = -radius; fx <= radius; fx++) {
             for (int fy = -2; fy <= 1; fy++) {
                 for (int fz = -radius; fz <= radius; fz++) {
-                    if (!instance.getHookManager().canBuild(player, location)) continue;
                     Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
 
                     // ToDo: enum for all flowers.

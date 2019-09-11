@@ -1,12 +1,10 @@
 package com.songoda.epicfarming.tasks;
 
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.api.farming.Farm;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.utils.CropType;
-import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.CropState;
 import org.bukkit.Location;
@@ -18,7 +16,8 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Crops;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.List;
+import java.util.Random;
 
 public class FarmTask extends BukkitRunnable {
 
@@ -117,9 +116,9 @@ public class FarmTask extends BukkitRunnable {
     }
 
     public List<Block> getCrops(Farm farm, boolean add) {
-        if (System.currentTimeMillis() - ((Farm)farm).getLastCached() > 30 * 1000 || !add) {
-            ((Farm)farm).setLastCached(System.currentTimeMillis());
-            if (add) ((Farm)farm).clearCache();
+        if (System.currentTimeMillis() - ((Farm) farm).getLastCached() > 30 * 1000 || !add) {
+            ((Farm) farm).setLastCached(System.currentTimeMillis());
+            if (add) ((Farm) farm).clearCache();
             Block block = farm.getLocation().getBlock();
             int radius = farm.getLevel().getRadius();
             int bx = block.getX();
@@ -133,10 +132,10 @@ public class FarmTask extends BukkitRunnable {
                         if (!(b2.getState().getData() instanceof Crops)) continue;
 
                         if (add) {
-                            ((Farm)farm).addCachedCrop(b2);
+                            ((Farm) farm).addCachedCrop(b2);
                             continue;
                         }
-                        ((Farm)farm).removeCachedCrop(b2);
+                        ((Farm) farm).removeCachedCrop(b2);
                         plugin.getGrowthTask().removeCropByLocation(b2.getLocation());
                     }
                 }
@@ -146,16 +145,12 @@ public class FarmTask extends BukkitRunnable {
     }
 
     private boolean canMove(Inventory inventory, ItemStack item) {
-        try {
-            if (inventory.firstEmpty() != -1) return true;
+        if (inventory.firstEmpty() != -1) return true;
 
-            for (ItemStack stack : inventory.getContents()) {
-                if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {
-                    return true;
-                }
+        for (ItemStack stack : inventory.getContents()) {
+            if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {
+                return true;
             }
-        } catch (Exception e) {
-            Debugger.runReport(e);
         }
         return false;
     }

@@ -1,11 +1,10 @@
 package com.songoda.epicfarming.listeners;
 
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.api.farming.Farm;
-import com.songoda.epicfarming.api.farming.Level;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmManager;
-import com.songoda.epicfarming.utils.Debugger;
+import com.songoda.epicfarming.farming.Level;
+import com.songoda.epicfarming.settings.Settings;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -40,24 +39,14 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent e) {
-        try {
-            if (checkForFarm(e.getBlock().getLocation())) {
-                e.setCancelled(true);
-            }
-        } catch (Exception ex) {
-            Debugger.runReport(ex);
-        }
+        if (checkForFarm(e.getBlock().getLocation()))
+            e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onGrow(BlockGrowEvent e) {
-        try {
-            if (checkForFarm(e.getNewState().getLocation())) {
-                e.setCancelled(true);
-            }
-        } catch (Exception ex) {
-            Debugger.runReport(ex);
-        }
+        if (checkForFarm(e.getNewState().getLocation()))
+            e.setCancelled(true);
     }
 
     private int maxFarms(Player player) {
@@ -71,54 +60,48 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e) {
-        try {
-            Material farmBlock = Material.valueOf(instance.getConfig().getString("Main.Farm Block Material"));
+        Material farmBlock = Material.valueOf(instance.getConfig().getString("Main.Farm Block Material"));
 
-            boolean allowNonCommandIssued = instance.getConfig().getBoolean("Main.Allow Non Command Issued Farm Items");
+        boolean allowNonCommandIssued = instance.getConfig().getBoolean("Main.Allow Non Command Issued Farm Items");
 
-            if (e.getPlayer().getItemInHand().getType() != farmBlock
-                    || instance.getLevelFromItem(e.getItemInHand()) == 0 && !allowNonCommandIssued) return;
+        if (e.getPlayer().getItemInHand().getType() != farmBlock
+                || instance.getLevelFromItem(e.getItemInHand()) == 0 && !allowNonCommandIssued) return;
 
-            if (e.getBlockAgainst().getType() == farmBlock) e.setCancelled(true);
+        if (e.getBlockAgainst().getType() == farmBlock) e.setCancelled(true);
 
-            if (!instance.getHookManager().canBuild(e.getPlayer(), e.getBlock().getLocation())) return;
-
-            int amt = 0;
-            for (Farm farmm : instance.getFarmManager().getFarms().values()) {
-                if (!farmm.getPlacedBy().equals(e.getPlayer().getUniqueId())) continue;
-                amt ++;
-            }
-            int limit = maxFarms(e.getPlayer());
-            
-            if (limit != -1 && amt >= limit) {
-                e.setCancelled(true);
-                e.getPlayer().sendMessage(instance.getReferences().getPrefix() + instance.getLocale().getMessage("event.limit.hit", limit));
-                return;
-            }
-
-            Location location = e.getBlock().getLocation();
-            if (e.getBlockPlaced().getType().equals(Material.MELON_SEEDS)||e.getBlockPlaced().getType().equals(Material.PUMPKIN_SEEDS)){
-                if (checkForFarm(location)){
-                    e.getPlayer().sendMessage(instance.getLocale().getMessage("event.warning.noauto"));
-                }
-            }
-            Bukkit.getScheduler().runTaskLater(instance, () -> {
-                int level = 1;
-                if (instance.getLevelFromItem(e.getItemInHand()) != 0) {
-                    level = instance.getLevelFromItem(e.getItemInHand());
-                }
-
-                if (location.getBlock().getType() != farmBlock) return;
-
-                Farm farm = new Farm(location, instance.getLevelManager().getLevel(level), e.getPlayer().getUniqueId());
-                instance.getFarmManager().addFarm(location, farm);
-
-                farm.tillLand(e.getBlock().getLocation());
-            }, 1);
-
-        } catch (Exception ex) {
-            Debugger.runReport(ex);
+        int amt = 0;
+        for (Farm farmm : instance.getFarmManager().getFarms().values()) {
+            if (!farmm.getPlacedBy().equals(e.getPlayer().getUniqueId())) continue;
+            amt++;
         }
+        int limit = maxFarms(e.getPlayer());
+
+        if (limit != -1 && amt >= limit) {
+            e.setCancelled(true);
+            instance.getLocale().getMessage("event.limit.hit")
+                    .processPlaceholder("limit", limit).sendPrefixedMessage(e.getPlayer());
+            return;
+        }
+
+        Location location = e.getBlock().getLocation();
+        if (e.getBlockPlaced().getType().equals(Material.MELON_SEEDS) || e.getBlockPlaced().getType().equals(Material.PUMPKIN_SEEDS)) {
+            if (checkForFarm(location)) {
+                instance.getLocale().getMessage("event.warning.noauto").sendPrefixedMessage(e.getPlayer());
+            }
+        }
+        Bukkit.getScheduler().runTaskLater(instance, () -> {
+            int level = 1;
+            if (instance.getLevelFromItem(e.getItemInHand()) != 0) {
+                level = instance.getLevelFromItem(e.getItemInHand());
+            }
+
+            if (location.getBlock().getType() != farmBlock) return;
+
+            Farm farm = new Farm(location, instance.getLevelManager().getLevel(level), e.getPlayer().getUniqueId());
+            instance.getFarmManager().addFarm(location, farm);
+
+            farm.tillLand(e.getBlock().getLocation());
+        }, 1);
     }
 
     private boolean checkForFarm(Location location) {
@@ -151,37 +134,27 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        try {
-            if (event.getBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
-                return;
+        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial())
+            return;
 
-            Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
+        Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
 
-            if (farm == null) return;
+        if (farm == null) return;
 
+        instance.getFarmTask().getCrops(farm, false);
 
-            if (!instance.getHookManager().canBuild(event.getPlayer(), event.getBlock().getLocation())) {
-                event.setCancelled(true);
-                return;
-            }
+        event.setCancelled(true);
 
-            instance.getFarmTask().getCrops(farm, false);
+        ItemStack item = instance.makeFarmItem(farm.getLevel());
 
-            event.setCancelled(true);
+        Block block = event.getBlock();
 
-            ItemStack item = instance.makeFarmItem(farm.getLevel());
+        block.setType(Material.AIR);
+        block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
 
-            Block block = event.getBlock();
-
-            block.setType(Material.AIR);
-            block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
-
-            for (ItemStack itemStack : ((Farm) farm).dumpInventory()) {
-                if (itemStack == null) continue;
-                farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
-            }
-        } catch (Exception ex) {
-            Debugger.runReport(ex);
+        for (ItemStack itemStack : farm.dumpInventory()) {
+            if (itemStack == null) continue;
+            farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
         }
     }
 
@@ -218,30 +191,26 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
-        try {
-            if (event.getBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
-                return;
+        if (event.getBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
+            return;
 
-            Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
+        Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
 
-            if (farm == null) return;
-            instance.getFarmTask().getCrops(farm, false);
+        if (farm == null) return;
+        instance.getFarmTask().getCrops(farm, false);
 
-            event.setCancelled(true);
+        event.setCancelled(true);
 
-            ItemStack item = instance.makeFarmItem(farm.getLevel());
+        ItemStack item = instance.makeFarmItem(farm.getLevel());
 
-            Block block = event.getBlock();
+        Block block = event.getBlock();
 
-            block.setType(Material.AIR);
-            block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
+        block.setType(Material.AIR);
+        block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
 
-            for (ItemStack itemStack : ((Farm) farm).dumpInventory()) {
-                if (itemStack == null) continue;
-                farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
-            }
-        } catch (Exception ex) {
-            Debugger.runReport(ex);
+        for (ItemStack itemStack : ((Farm) farm).dumpInventory()) {
+            if (itemStack == null) continue;
+            farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
         }
     }
 }

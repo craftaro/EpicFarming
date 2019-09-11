@@ -4,10 +4,6 @@ import com.songoda.core.configuration.Config;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;
-import com.songoda.epicFarming.EpicFarming;
-import com.songoda.epicFarming.boost.BoostData;
-import com.songoda.epicFarming.furnace.Furnace;
-import com.songoda.epicFarming.utils.Methods;
 import com.songoda.epicfarming.utils.Methods;
 
 import java.util.List;
@@ -37,10 +33,10 @@ public abstract class Storage {
             if (farm.getLocation() == null
                     || farm.getLocation().getWorld() == null) continue;
             String locstr = Methods.serializeLocation(farm.getLocation());
-            prepareSaveItem("farms",new StorageItem("location",locstr),
-                    new StorageItem("level",farm.getLevel().getLevel()),
-                    new StorageItem("placedby",farm.getPlacedBy().toString()),
-                    new StorageItem("contents",((Farm)farm).dumpInventory()));
+            prepareSaveItem("farms", new StorageItem("location", locstr),
+                    new StorageItem("level", farm.getLevel().getLevel()),
+                    new StorageItem("placedby", farm.getPlacedBy().toString()),
+                    new StorageItem("contents", ((Farm) farm).dumpInventory()));
         }
 
         /*
@@ -48,9 +44,9 @@ public abstract class Storage {
          */
         for (BoostData boostData : instance.getBoostManager().getBoosts()) {
             String endTime = String.valueOf(boostData.getEndTime());
-            prepareSaveItem("boosts",new StorageItem("endtime",endTime),
-                    new StorageItem("amount",boostData.getMultiplier()),
-                    new StorageItem("player",boostData.getPlayer()));
+            prepareSaveItem("boosts", new StorageItem("endtime", endTime),
+                    new StorageItem("amount", boostData.getMultiplier()),
+                    new StorageItem("player", boostData.getPlayer()));
         }
     }
 

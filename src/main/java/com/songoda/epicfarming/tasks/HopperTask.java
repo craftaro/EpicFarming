@@ -1,8 +1,8 @@
 package com.songoda.epicfarming.tasks;
 
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.api.farming.Farm;
-import com.songoda.epicfarming.api.farming.FarmManager;
+import com.songoda.epicfarming.farming.Farm;
+import com.songoda.epicfarming.farming.FarmManager;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -16,7 +16,7 @@ public class HopperTask extends BukkitRunnable {
 
     private static HopperTask instance;
     private final FarmManager manager;
-    
+
     private HopperTask(EpicFarming plugin) {
         this.manager = plugin.getFarmManager();
     }

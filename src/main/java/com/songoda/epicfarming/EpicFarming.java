@@ -5,8 +5,11 @@ import com.songoda.core.SongodaPlugin;
 import com.songoda.core.commands.CommandManager;
 import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.core.configuration.Config;
+import com.songoda.core.gui.GuiManager;
+import com.songoda.core.hooks.EconomyManager;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.boost.BoostManager;
+import com.songoda.epicfarming.commands.*;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmManager;
 import com.songoda.epicfarming.farming.Level;
@@ -16,6 +19,7 @@ import com.songoda.epicfarming.listeners.InteractListeners;
 import com.songoda.epicfarming.listeners.InventoryListeners;
 import com.songoda.epicfarming.player.PlayerActionManager;
 import com.songoda.epicfarming.player.PlayerData;
+import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.storage.Storage;
 import com.songoda.epicfarming.storage.StorageRow;
 import com.songoda.epicfarming.storage.types.StorageYaml;
@@ -27,7 +31,6 @@ import com.songoda.epicfarming.utils.Methods;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
@@ -46,6 +49,7 @@ public class EpicFarming extends SongodaPlugin {
     private final Config dataConfig = new Config(this, "data.yml");
     private final Config levelsFile = new Config(this, "levels.yml");
 
+    private final GuiManager guiManager = new GuiManager(this);
     private FarmManager farmManager;
     private LevelManager levelManager;
     private PlayerActionManager playerActionManager;
@@ -82,18 +86,29 @@ public class EpicFarming extends SongodaPlugin {
         // Run Songoda Updater
         SongodaCore.registerPlugin(this, 21, CompatibleMaterial.WHEAT);
 
-        checkStorage();
+        // Load Economy
+        EconomyManager.load();
 
-        this.setupConfig();
+        // Setup Config
+        Settings.setupConfig();
+        this.setLocale(Settings.LANGUGE_MODE.getString(), false);
 
-        // Setup language
-        String langMode = getConfig().getString("System.Language Mode");
-        Locale.init(this);
-        Locale.saveDefaultLocale("en_US");
-        this.locale = Locale.getLocale(getConfig().getString("System.Language Mode", langMode));
+        // Set economy preference
+        EconomyManager.getManager().setPreferredHook(Settings.ECONOMY_PLUGIN.getString());
 
-        dataFile.createNewFile("Loading Data File", "EpicFarming Data File");
-        this.loadDataFile();
+        // Register commands
+        this.commandManager = new CommandManager(this);
+        this.commandManager.addCommand(new CommandEpicFarming(this))
+                .addSubCommands(
+                        new CommandBoost(this),
+                        new CommandGiveFarmItem(this),
+                        new CommandReload(this),
+                        new CommandSettings(this)
+                );
+
+        dataConfig.load();
+
+        this.storage = new StorageYaml(this);
 
         this.loadLevelManager();
 
@@ -135,16 +150,14 @@ public class EpicFarming extends SongodaPlugin {
                 }
             }
 
-
             // Save data initially so that if the person reloads again fast they don't lose all their data.
             this.saveToFile();
         }, 10);
 
-        this.references = new References();
-
-        PluginManager pluginManager = Bukkit.getPluginManager();
 
         // Register Listeners
+        guiManager.init();
+        PluginManager pluginManager = Bukkit.getPluginManager();
         pluginManager.registerEvents(new BlockListeners(this), this);
         pluginManager.registerEvents(new InteractListeners(this), this);
         pluginManager.registerEvents(new InventoryListeners(this), this);
@@ -159,6 +172,7 @@ public class EpicFarming extends SongodaPlugin {
                 HopperTask.startTask(this);
         }, 20L);
 
+        // Start auto save
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
     }
 
@@ -166,17 +180,12 @@ public class EpicFarming extends SongodaPlugin {
     public void onConfigReload() {
         this.setLocale(getConfig().getString("System.Language Mode"), true);
         this.locale.reloadMessages();
-        this.blacklistHandler.reload();
         loadLevelManager();
     }
 
     @Override
     public List<Config> getExtraConfig() {
         return Arrays.asList(levelsFile);
-    }
-
-    private void checkStorage() {
-        this.storage = new StorageYaml(this);
     }
 
     private void loadLevelManager() {
@@ -208,18 +217,7 @@ public class EpicFarming extends SongodaPlugin {
      * Saves registered farms to file.
      */
     private void saveToFile() {
-        checkStorage();
-
         storage.doSave();
-    }
-
-    private void loadDataFile() {
-        dataFile.getConfig().options().copyDefaults(true);
-        dataFile.saveConfig();
-    }
-
-    public Locale getLocale() {
-        return locale;
     }
 
     public int getLevelFromItem(ItemStack item) {
@@ -231,10 +229,10 @@ public class EpicFarming extends SongodaPlugin {
     }
 
     public ItemStack makeFarmItem(Level level) {
-        ItemStack item = new ItemStack(Material.valueOf(EpicFarming.getInstance().getConfig().getString("Main.Farm Block Material")), 1);
+        ItemStack item = Settings.FARM_BLOCK_MATERIAL.getMaterial().getItem();
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(Methods.formatText(Methods.formatName(level.getLevel(), true)));
-        String line = getLocale().getMessage("general.nametag.lore");
+        String line = getLocale().getMessage("general.nametag.lore").getMessage();
         if (!line.equals("")) meta.setLore(Arrays.asList(line));
         item.setItemMeta(meta);
         return item;
@@ -270,5 +268,9 @@ public class EpicFarming extends SongodaPlugin {
 
     public EntityTask getEntityTask() {
         return entityTask;
+    }
+
+    public GuiManager getGuiManager() {
+        return guiManager;
     }
 }

@@ -1,31 +1,35 @@
 package com.songoda.epicfarming.commands;
 
+import com.songoda.core.commands.AbstractCommand;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
-import com.songoda.epicfarming.command.AbstractCommand;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
 public class CommandBoost extends AbstractCommand {
 
-    public CommandBoost(AbstractCommand parent) {
-        super("boost", parent, false);
+    final EpicFarming instance;
+
+    public CommandBoost(EpicFarming instance) {
+        super(false, "boost");
+        this.instance = instance;
     }
 
     @Override
-    protected ReturnType runCommand(EpicFarming instance, CommandSender sender, String... args) {
+    protected ReturnType runCommand(CommandSender sender, String... args) {
         if (args.length < 3) {
             return ReturnType.SYNTAX_ERROR;
         }
             if (Bukkit.getPlayer(args[1]) == null) {
-                sender.sendMessage(Methods.formatText(instance.getReferences().getPrefix() + "&cThat player does not exist..."));
+                instance.getLocale().newMessage("&cThat player does not exist...").sendPrefixedMessage(sender);
                 return ReturnType.FAILURE;
-            } else if (!Methods.isInt(args[2])) {
-                sender.sendMessage(Methods.formatText(instance.getReferences().getPrefix() + "&6" + args[2] + " &7is not a number..."));
+            } else if (!Methods.isInt(args[1])) {
+                instance.getLocale().newMessage("&6" + args[1] + " &7is not a number...").sendPrefixedMessage(sender);
                 return ReturnType.FAILURE;
             } else {
                 Calendar c = Calendar.getInstance();
@@ -52,7 +56,7 @@ public class CommandBoost extends AbstractCommand {
                         c.add(Calendar.YEAR, Integer.parseInt(arr2[1]));
                         time = " &7for &6" + arr2[1] + " years&7.";
                     } else {
-                        sender.sendMessage(Methods.formatText(instance.getReferences().getPrefix() + "&7" + args[3] + " &7is invalid."));
+                        instance.getLocale().newMessage("&7" + args[2] + " &7is invalid.").sendPrefixedMessage(sender);
                         return ReturnType.SUCCESS;
                     }
                 } else {
@@ -61,9 +65,15 @@ public class CommandBoost extends AbstractCommand {
 
                 BoostData boostData = new BoostData(Integer.parseInt(args[2]), c.getTime().getTime(), Bukkit.getPlayer(args[1]).getUniqueId());
                 instance.getBoostManager().addBoostToPlayer(boostData);
-                sender.sendMessage(Methods.formatText(instance.getReferences().getPrefix() + "&7Successfully boosted &6" + Bukkit.getPlayer(args[1]).getName() + "'s &7farms yield rates by &6" + args[2] + "x" + time));
+                instance.getLocale().newMessage("&7Successfully boosted &6" + Bukkit.getPlayer(args[0]).getName()
+                        + "'s &7furnaces reward amounts by &6" + args[2] + "x" + time).sendPrefixedMessage(sender);
             }
         return ReturnType.FAILURE;
+    }
+
+    @Override
+    protected List<String> onTab(CommandSender commandSender, String... strings) {
+        return null;
     }
 
     @Override

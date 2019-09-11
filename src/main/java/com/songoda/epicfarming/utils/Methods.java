@@ -5,7 +5,6 @@ import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.util.Vector;
 
@@ -20,79 +19,34 @@ public class Methods {
 
     private static Map<String, Location> serializeCache = new HashMap<>();
 
-    public static ItemStack getGlass() {
-        try {
-            EpicFarming instance = EpicFarming.getInstance();
-            return getGlass(instance.getConfig().getBoolean("Interfaces.Replace Glass Type 1 With Rainbow Glass"), instance.getConfig().getInt("Interfaces.Glass Type 1"));
-        } catch (Exception e) {
-            Debugger.runReport(e);
-        }
-        return null;
-    }
-
-    public static ItemStack getBackgroundGlass(boolean type) {
-        try {
-            EpicFarming instance = EpicFarming.getInstance();
-            if (type)
-                return getGlass(false, instance.getConfig().getInt("Interfaces.Glass Type 2"));
-            else
-                return getGlass(false, instance.getConfig().getInt("Interfaces.Glass Type 3"));
-        } catch (Exception e) {
-            Debugger.runReport(e);
-        }
-        return null;
-    }
-
-    private static ItemStack getGlass(Boolean rainbow, int type) {
-        int randomNum = 1 + (int) (Math.random() * 6);
-        ItemStack glass;
-        if (rainbow) {
-            glass = new ItemStack(Material.LEGACY_STAINED_GLASS_PANE, 1, (short) randomNum);
-        } else {
-            glass = new ItemStack(Material.LEGACY_STAINED_GLASS_PANE, 1, (short) type);
-        }
-        ItemMeta glassmeta = glass.getItemMeta();
-        glassmeta.setDisplayName("§l");
-        glass.setItemMeta(glassmeta);
-        return glass;
-    }
-
     public static String formatName(int level, boolean full) {
-        try {
-            String name = EpicFarming.getInstance().getLocale().getMessage("general.nametag.farm", level);
+        String name = EpicFarming.getInstance().getLocale().getMessage("general.nametag.farm")
+                .processPlaceholder("level", level).getMessage();
 
-            String info = "";
-            if (full) {
-                info += Methods.convertToInvisibleString(level + ":");
-            }
-
-            return info + Methods.formatText(name);
-        } catch (Exception ex) {
-            Debugger.runReport(ex);
+        String info = "";
+        if (full) {
+            info += Methods.convertToInvisibleString(level + ":");
         }
-        return null;
+
+        return info + Methods.formatText(name);
     }
 
     public static void animate(Location location, Material mat) {
-        try {
-            if (!EpicFarming.getInstance().getConfig().getBoolean("Main.Animate")) return;
-            Block block = location.getBlock();
-            if (block.getRelative(0, 1, 0).getType() != Material.AIR && EpicFarming.getInstance().getConfig().getBoolean("Main.Do Dispenser Animation"))
-                return;
-            Item i = block.getWorld().dropItem(block.getLocation().add(0.5, 1, 0.5), new ItemStack(mat));
+        if (!EpicFarming.getInstance().getConfig().getBoolean("Main.Animate")) return;
+        Block block = location.getBlock();
+        if (block.getRelative(0, 1, 0).getType() != Material.AIR && EpicFarming.getInstance().getConfig().getBoolean("Main.Do Dispenser Animation"))
+            return;
+        Item i = block.getWorld().dropItem(block.getLocation().add(0.5, 1, 0.5), new ItemStack(mat));
 
-            // Support for EpicHoppers suction.
-            i.setMetadata("grabbed", new FixedMetadataValue(EpicFarming.getInstance(), "true"));
+        // Support for EpicHoppers suction.
+        i.setMetadata("grabbed", new FixedMetadataValue(EpicFarming.getInstance(), "true"));
 
-            i.setMetadata("betterdrops_ignore", new FixedMetadataValue(EpicFarming.getInstance(), true));
-            i.setPickupDelay(3600);
+        i.setMetadata("betterdrops_ignore", new FixedMetadataValue(EpicFarming.getInstance(), true));
+        i.setPickupDelay(3600);
 
-            i.setVelocity(new Vector(0, .3, 0));
+        i.setVelocity(new Vector(0, .3, 0));
 
-            Bukkit.getScheduler().scheduleSyncDelayedTask(EpicFarming.getInstance(), i::remove, 10);
-        } catch (Exception ex) {
-            Debugger.runReport(ex);
-        }
+        Bukkit.getScheduler().scheduleSyncDelayedTask(EpicFarming.getInstance(), i::remove, 10);
     }
 
     public static String formatText(String text) {
@@ -136,14 +90,14 @@ public class Methods {
      * @return The serialized data.
      */
     public static String serializeLocation(Location location) {
-        if (location == null)
+        if (location == null || location.getWorld() == null)
             return "";
         String w = location.getWorld().getName();
         double x = location.getX();
         double y = location.getY();
         double z = location.getZ();
         String str = w + ":" + x + ":" + y + ":" + z;
-        str = str.replace(".0", "").replace("/", "");
+        str = str.replace(".0", "").replace(".", "/");
         return str;
     }
 

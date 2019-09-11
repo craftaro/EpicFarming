@@ -1,21 +1,30 @@
 package com.songoda.epicfarming.commands;
 
+import com.songoda.core.commands.AbstractCommand;
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.command.AbstractCommand;
-import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.command.CommandSender;
+
+import java.util.List;
 
 public class CommandReload extends AbstractCommand {
 
-    public CommandReload(AbstractCommand parent) {
-        super("reload", parent, false);
+    final EpicFarming instance;
+
+    public CommandReload(EpicFarming instance) {
+        super(false, "reload");
+        this.instance = instance;
     }
 
     @Override
-    protected ReturnType runCommand(EpicFarming instance, CommandSender sender, String... args) {
-        instance.reload();
-        sender.sendMessage(Methods.formatText(instance.getReferences().getPrefix() + "&7Configuration and Language files reloaded."));
-        return ReturnType.SUCCESS;
+    protected ReturnType runCommand(CommandSender sender, String... args) {
+        instance.reloadConfig();
+        instance.getLocale().getMessage("&7Configuration and Language files reloaded.").sendPrefixedMessage(sender);
+        return AbstractCommand.ReturnType.SUCCESS;
+    }
+
+    @Override
+    protected List<String> onTab(CommandSender commandSender, String... strings) {
+        return null;
     }
 
     @Override

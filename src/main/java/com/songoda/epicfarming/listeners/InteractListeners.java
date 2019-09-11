@@ -1,8 +1,6 @@
 package com.songoda.epicfarming.listeners;
 
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.farming.Farm;
-import com.songoda.epicfarming.utils.Debugger;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -24,25 +22,16 @@ public class InteractListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockInteract(PlayerInteractEvent e) {
-        try {
-            if (e.getClickedBlock() == null || e.getClickedBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
-                return;
+        if (e.getClickedBlock() == null || e.getClickedBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
+            return;
 
-            if (!instance.getHookManager().canBuild(e.getPlayer(), e.getClickedBlock().getLocation())) {
-                e.setCancelled(true);
-                return;
-            }
+        if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
 
-            if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
+        Location location = e.getClickedBlock().getLocation();
 
-            Location location = e.getClickedBlock().getLocation();
-
-            if (instance.getFarmManager().getFarms().containsKey(location)) {
-                e.setCancelled(true);
-                ((Farm)instance.getFarmManager().getFarm(location)).view(e.getPlayer());
-            }
-        } catch (Exception ex) {
-            Debugger.runReport(ex);
+        if (instance.getFarmManager().getFarms().containsKey(location)) {
+            e.setCancelled(true);
+            instance.getFarmManager().getFarm(location).view(e.getPlayer());
         }
     }
 }

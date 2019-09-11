@@ -1,14 +1,15 @@
 package com.songoda.epicfarming.storage;
 
-import com.songoda.epicFarming.utils.Methods;
-import org.bukkit.Location;
+import com.songoda.epicfarming.utils.Serializers;
+import org.bukkit.inventory.ItemStack;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class StorageItem {
 
-    private final Object object;
+    private Object object;
     private String key = null;
 
     public StorageItem(Object object) {
@@ -24,16 +25,6 @@ public class StorageItem {
         StringBuilder object = new StringBuilder();
         for (String s : string) {
             object.append(s).append(";");
-        }
-        this.key = key;
-        this.object = object.toString();
-    }
-
-    public StorageItem(String key, boolean type, List<Location> blocks) {
-        StringBuilder object = new StringBuilder();
-        for (Location location : blocks) {
-            object.append(Methods.serializeLocation(location));
-            object.append(";;");
         }
         this.key = key;
         this.object = object.toString();
@@ -76,5 +67,18 @@ public class StorageItem {
         }
         return list;
     }
+
+    public List<ItemStack> asItemStackList() {
+        List<ItemStack> list = new ArrayList<>();
+        if (object == null) return list;
+        String obj = (String) object;
+        if (obj.equals("[]")) return list;
+        List<String> sers = new ArrayList<>(Arrays.asList(obj.split(";;")));
+        for (String ser : sers) {
+            list.add(Serializers.deserialize(ser));
+        }
+        return list;
+    }
+
 
 }

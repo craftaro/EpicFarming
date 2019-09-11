@@ -27,20 +27,23 @@ public class Level {
 
         EpicFarming instance = EpicFarming.getInstance();
 
-        description.add(instance
-                .getLocale()
-                .getMessage("interface.button.radius",
-                        radius));
-        description.add(instance.getLocale().getMessage("interface.button.speed", speedMultiplier));
+        description.add(instance.getLocale().getMessage("interface.button.radius")
+                .processPlaceholder("radius", radius).getMessage());
+
+        description.add(instance.getLocale().getMessage("interface.button.speed")
+                .processPlaceholder("speed", speedMultiplier).getMessage());
 
         if (autoHarvest)
-            description.add(instance.getLocale().getMessage("interface.button.autoharvest", autoHarvest));
+            description.add(instance.getLocale().getMessage("interface.button.autoharvest")
+                    .processPlaceholder("status", autoHarvest).getMessage());
 
         if (autoReplant)
-            description.add(instance.getLocale().getMessage("interface.button.autoreplant", autoReplant));
+            description.add(instance.getLocale().getMessage("interface.button.autoreplant")
+                    .processPlaceholder("status", autoReplant).getMessage());
 
         if (autoBreeding)
-            description.add(instance.getLocale().getMessage("interface.button.autobreeding", autoBreeding));
+            description.add(instance.getLocale().getMessage("interface.button.autobreeding")
+                    .processPlaceholder("status", autoBreeding).getMessage());
 
     }
 
