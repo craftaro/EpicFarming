@@ -1,4 +1,4 @@
-package com.songoda.epicfarming.command.commands;
+package com.songoda.epicfarming.commands;
 
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
