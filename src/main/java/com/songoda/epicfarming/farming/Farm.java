@@ -1,13 +1,10 @@
 package com.songoda.epicfarming.farming;
 
+import com.songoda.core.hooks.EconomyManager;
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.api.farming.Level;
-import com.songoda.epicfarming.api.farming.UpgradeType;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.player.PlayerData;
-import com.songoda.epicfarming.utils.Debugger;
 import com.songoda.epicfarming.utils.Methods;
-import net.milkbowl.vault.economy.Economy;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Location;
@@ -18,7 +15,6 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.RegisteredServiceProvider;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -172,71 +168,58 @@ public class Farm {
     }
 
     public void upgrade(UpgradeType type, Player player) {
-        try {
-            EpicFarming instance = EpicFarming.getInstance();
-            if (instance.getLevelManager().getLevels().containsKey(this.level.getLevel() + 1)) {
+        EpicFarming instance = EpicFarming.getInstance();
+        if (instance.getLevelManager().getLevels().containsKey(this.level.getLevel() + 1)) {
+            Level level = instance.getLevelManager().getLevel(this.level.getLevel() + 1);
+            int cost;
+            if (type == UpgradeType.EXPERIENCE) {
+                cost = level.getCostExperiance();
+            } else {
+                cost = level.getCostEconomy();
+            }
 
-                com.songoda.epicfarming.api.farming.Level level = instance.getLevelManager().getLevel(this.level.getLevel() + 1);
-                int cost;
-                if (type == UpgradeType.EXPERIENCE) {
-                    cost = level.getCostExperiance();
-                } else {
-                    cost = level.getCostEconomy();
-                }
-
-                if (type == UpgradeType.ECONOMY) {
-                    if (instance.getServer().getPluginManager().getPlugin("Vault") != null) {
-                        RegisteredServiceProvider<Economy> rsp = instance.getServer().getServicesManager().getRegistration(net.milkbowl.vault.economy.Economy.class);
-                        net.milkbowl.vault.economy.Economy econ = rsp.getProvider();
-                        if (econ.has(player, cost)) {
-                            econ.withdrawPlayer(player, cost);
-                            upgradeFinal(level, player);
-                        } else {
-                            player.sendMessage(instance.getLocale().getMessage("event.upgrade.cannotafford"));
-                        }
-                    } else {
-                        player.sendMessage("Vault is not installed.");
-                    }
-                } else if (type == UpgradeType.EXPERIENCE) {
-                    if (player.getLevel() >= cost || player.getGameMode() == GameMode.CREATIVE) {
-                        if (player.getGameMode() != GameMode.CREATIVE) {
-                            player.setLevel(player.getLevel() - cost);
-                        }
+            if (type == UpgradeType.ECONOMY) {
+                if (EconomyManager.isEnabled()) {
+                    if (EconomyManager.hasBalance(player, cost)) {
+                        EconomyManager.withdrawBalance(player, cost);
                         upgradeFinal(level, player);
                     } else {
-                        player.sendMessage(instance.getLocale().getMessage("event.upgrade.cannotafford"));
+                        instance.getLocale().getMessage("event.upgrade.cannotafford").sendPrefixedMessage(player);
                     }
+                } else {
+                    player.sendMessage("Vault is not installed.");
+                }
+            } else if (type == UpgradeType.EXPERIENCE) {
+                if (player.getLevel() >= cost || player.getGameMode() == GameMode.CREATIVE) {
+                    if (player.getGameMode() != GameMode.CREATIVE) {
+                        player.setLevel(player.getLevel() - cost);
+                    }
+                    upgradeFinal(level, player);
+                } else {
+                    instance.getLocale().getMessage("event.upgrade.cannotafford").sendPrefixedMessage(player);
                 }
             }
-        } catch (Exception ex) {
-            Debugger.runReport(ex);
         }
     }
 
     private void upgradeFinal(Level level, Player player) {
-        try {
-            EpicFarming instance = EpicFarming.getInstance();
-            this.level = level;
-            if (instance.getLevelManager().getHighestLevel() != level) {
-                player.sendMessage(instance.getLocale().getMessage("event.upgrade.success", level.getLevel()));
-            } else {
-                player.sendMessage(instance.getLocale().getMessage("event.upgrade.successmaxed", level.getLevel()));
-            }
-            Location loc = location.clone().add(.5, .5, .5);
-            player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), loc, 200, .5, .5, .5);
-
-            if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
-                if (instance.getLevelManager().getHighestLevel() != level) {
-                    player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 0.6F, 15.0F);
-
-                } else {
-                    player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 2F, 25.0F);
-                }
-            }
-            tillLand(location);
-        } catch (Exception ex) {
-            Debugger.runReport(ex);
+        EpicFarming instance = EpicFarming.getInstance();
+        this.level = level;
+        if (instance.getLevelManager().getHighestLevel() != level) {
+            player.sendMessage(instance.getLocale().getMessage("event.upgrade.success", level.getLevel()));
+        } else {
+            player.sendMessage(instance.getLocale().getMessage("event.upgrade.successmaxed", level.getLevel()));
         }
+        Location loc = location.clone().add(.5, .5, .5);
+        player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), loc, 200, .5, .5, .5);
+
+        if (instance.getLevelManager().getHighestLevel() != level) {
+            player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 0.6F, 15.0F);
+
+        } else {
+            player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 2F, 25.0F);
+        }
+        tillLand(location);
     }
 
     public boolean tillLand(Location location) {
@@ -260,17 +243,13 @@ public class Farm {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
                             b2.getRelative(BlockFace.DOWN).setType(Material.LEGACY_SOIL);
                             b2.breakNaturally();
-                            if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
-                                b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
-                            }
+                            b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
                         }, random.nextInt(30) + 1);
                     }
                     if ((b2.getType() == Material.GRASS_BLOCK || b2.getType() == Material.DIRT) && b2.getRelative(BlockFace.UP).getType() == Material.AIR) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
                             b2.setType(Material.LEGACY_SOIL);
-                            if (instance.getConfig().getBoolean("Main.Sounds Enabled")) {
-                                b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
-                            }
+                            b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
                         }, random.nextInt(30) + 1);
                     }
 
