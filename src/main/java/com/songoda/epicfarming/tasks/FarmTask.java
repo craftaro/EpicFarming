@@ -1,19 +1,18 @@
 package com.songoda.epicfarming.tasks;
 
+import com.songoda.core.compatibility.CompatibleMaterial;
+import com.songoda.core.utils.BlockUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.utils.CropType;
 import com.songoda.epicfarming.utils.Methods;
-import org.bukkit.CropState;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.material.Crops;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.List;
@@ -50,18 +49,16 @@ public class FarmTask extends BukkitRunnable {
 
             for (Block block : getCrops(farm, true)) {
                 if (!CropType.isCrop(block.getType())) continue;
-                Crops crop = (Crops) block.getState().getData();
 
                 // Add to GrowthTask
                 plugin.getGrowthTask().addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
 
-                if (!farm.getLevel().isAutoHarvest()
-                        || !crop.getState().equals(CropState.RIPE)) continue;
+                if (!farm.getLevel().isAutoHarvest() || BlockUtils.isCropFullyGrown(block)) continue;
 
                 if (!doDrop(farm, block.getType())) continue main;
 
                 if (farm.getLevel().isAutoReplant()) {
-                    CropType.replant(block);
+                    BlockUtils.resetGrowthStage(block);
                     continue;
                 }
                 block.setType(Material.AIR);
@@ -124,8 +121,9 @@ public class FarmTask extends BukkitRunnable {
                 for (int fy = -2; fy <= 1; fy++) {
                     for (int fz = -radius; fz <= radius; fz++) {
                         Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
+                        CompatibleMaterial mat = CompatibleMaterial.getMaterial(b2.getType());
 
-                        if (!(b2.getState().getData() instanceof Crops)) continue;
+                        if (!mat.isCrop()) continue;
 
                         if (add) {
                             farm.addCachedCrop(b2);

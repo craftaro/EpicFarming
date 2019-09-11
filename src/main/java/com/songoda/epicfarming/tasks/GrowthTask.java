@@ -1,14 +1,10 @@
 package com.songoda.epicfarming.tasks;
 
+import com.songoda.core.utils.BlockUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Crop;
-import com.songoda.epicfarming.utils.CropHandler;
 import com.songoda.epicfarming.utils.CropType;
-import org.bukkit.CropState;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.BlockState;
-import org.bukkit.material.Crops;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -58,8 +54,7 @@ public class GrowthTask extends BukkitRunnable {
                 if (rand != cap - 1 && crop.getTicksLived() != cap / 2) continue;
             }
 
-            CropType.grow(crop);
-
+            BlockUtils.incrementGrowthStage(crop.getLocation().getBlock());
             crop.setTicksLived(1);
         }
 

@@ -1,13 +1,7 @@
 package com.songoda.epicfarming.utils;
 
 import com.songoda.core.compatibility.CompatibleMaterial;
-import com.songoda.core.compatibility.ServerVersion;
-import com.songoda.epicfarming.farming.Crop;
-import org.bukkit.CropState;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.BlockState;
-import org.bukkit.material.Crops;
 
 public enum CropType {
 
@@ -23,18 +17,17 @@ public enum CropType {
 
     PUMPKIN_STEM("Pumpkin", CompatibleMaterial.PUMPKIN_STEM, CompatibleMaterial.PUMPKIN, CompatibleMaterial.PUMPKIN_SEEDS),
 
-    NETHER_WARTS("Nether Wart", CompatibleMaterial.NETHER_WART_BLOCK, CompatibleMaterial.NETHER_WART, CompatibleMaterial.NETHER_WART);
+    NETHER_WARTS("Nether Wart", CompatibleMaterial.NETHER_WART, CompatibleMaterial.NETHER_WART, CompatibleMaterial.NETHER_WART);
 
     private final String name;
-    private final CompatibleMaterial yieldMaterial, blockMaterial, seedMaterial;
+    private final Material yieldMaterial, blockMaterial, seedMaterial;
 
     CropType(String name, CompatibleMaterial blockMaterial, CompatibleMaterial yieldMaterial, CompatibleMaterial seedMaterial) {
         this.name = name;
-        this.blockMaterial = blockMaterial;
-        this.seedMaterial = seedMaterial;
-        this.yieldMaterial = yieldMaterial;
+        this.blockMaterial = blockMaterial.getBlockMaterial();
+        this.seedMaterial = seedMaterial.getMaterial();
+        this.yieldMaterial = yieldMaterial.getMaterial();
     }
-
 
     /**
      * Get the friendly name of the crop
@@ -51,7 +44,7 @@ public enum CropType {
      * @return the represented blockMaterial
      */
     public Material getBlockMaterial() {
-        return blockMaterial.getMaterial();
+        return blockMaterial;
     }
 
     /**
@@ -60,7 +53,7 @@ public enum CropType {
      * @return the represented yieldMaterial
      */
     public Material getYieldMaterial() {
-        return yieldMaterial.getMaterial();
+        return yieldMaterial;
     }
 
     /**
@@ -69,7 +62,7 @@ public enum CropType {
      * @return the represented seed blockMaterial
      */
     public Material getSeedMaterial() {
-        return seedMaterial.getMaterial();
+        return seedMaterial;
     }
 
     /**
@@ -118,111 +111,4 @@ public enum CropType {
         return CropType.isCrop(material);
     }
 
-    /**
-     * Checks if a crop is at its max growth stage
-     *
-     * @param block The crop block to check
-     * @return True if the crop is at its max growth stage, otherwise false
-     */
-    public static boolean isMaxGrowthStage(Block block) {
-        if (!isGrowableCrop(block.getType()))
-            throw new IllegalArgumentException("Block given was not a valid crop");
-
-        return block.getData() >= getMaxGrowthStage(block.getType());
-    }
-
-    /**
-     * Gets the max growth stage for the given material
-     *
-     * @param material The material of the crop
-     * @return The max growth stage of the given crop type
-     */
-    public static int getMaxGrowthStage(Material material) {
-        if (!isGrowableCrop(material))
-            throw new IllegalArgumentException("Block given was not a valid crop");
-
-        if (material.equals(CompatibleMaterial.BEETROOTS.getMaterial()))
-            return 3;
-
-        return 7;
-    }
-
-    /**
-     * Grows a crop by 1 growth stage
-     *
-     * @param crop The crop to grow
-     */
-    public static void grow(Crop crop) {
-        if (ServerVersion.isServerVersionAtLeast(ServerVersion.V1_13)) {
-            BlockState cropState = crop.getLocation().getBlock().getState();
-            Crops cropData = (Crops) cropState.getData();
-
-            Material material = crop.getLocation().getBlock().getType();
-
-            switch (cropData.getState()) {
-                case SEEDED:
-                    if (material == Material.BEETROOTS)
-                        cropData.setState(CropState.VERY_SMALL);
-                    else
-                        cropData.setState(CropState.GERMINATED);
-                    break;
-                case GERMINATED:
-                    cropData.setState(CropState.VERY_SMALL);
-                    break;
-                case VERY_SMALL:
-                    cropData.setState(CropState.SMALL);
-                    break;
-                case SMALL:
-                    cropData.setState(CropState.MEDIUM);
-                    break;
-                case MEDIUM:
-                    cropData.setState(CropState.TALL);
-                    break;
-                case TALL:
-                    cropData.setState(CropState.VERY_TALL);
-                    break;
-                case VERY_TALL:
-                    cropData.setState(CropState.RIPE);
-                    break;
-                case RIPE:
-                    break;
-            }
-            cropState.setData(cropData);
-            cropState.update();
-            crop.setTicksLived(1);
-            return;
-        }
-
-        Block block = crop.getLocation().getBlock();
-
-        if (!isGrowableCrop(block.getType()))
-            throw new IllegalArgumentException("Block given was not a valid crop");
-
-        byte data = block.getData();
-
-        if (isMaxGrowthStage(block))
-            return;
-
-        block.setData((byte) (data + 1));
-    }
-
-    /**
-     * Sets a crop's growth back to stage 0
-     *
-     * @param block The crop block to set
-     */
-    public static void replant(Block block) {
-        if (ServerVersion.isServerVersionAtLeast(ServerVersion.V1_13)) {
-            BlockState cropState = block.getState();
-            Crops cropData = (Crops) cropState.getData();
-            cropData.setState(CropState.SEEDED);
-            cropState.setData(cropData);
-            cropState.update();
-            return;
-        }
-        if (!isGrowableCrop(block.getType()))
-            throw new IllegalArgumentException("Block given was not a valid crop");
-
-        block.setData((byte) 0);
-    }
 }
