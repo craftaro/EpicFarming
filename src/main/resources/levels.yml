@@ -1,37 +1,43 @@
-Level-1.Radius: 1
-Level-1.Speed-Multiplier: 1
-Level-1.Cost-xp: 20
-Level-1.Cost-eco: 5000
-Level-2.Radius: 2
-Level-2.Speed-Multiplier: 1.5
-Level-2.Auto-Harvest: true
-Level-2.Cost-xp: 20
-Level-2.Cost-eco: 5000
-Level-3.Radius: 3
-Level-3.Speed-Multiplier: 1.5
-Level-3.Auto-Harvest: true
-Level-3.Auto-Replant: true
-Level-3.Auto-Breeding: true
-Level-3.Cost-xp: 25
-Level-3.Cost-eco: 7500
-Level-4.Radius: 3
-Level-4.Speed-Multiplier: 2
-Level-4.Auto-Harvest: true
-Level-4.Auto-Replant: true
-Level-4.Auto-Breeding: true
-Level-4.Cost-xp: 30
-Level-4.Cost-eco: 10000
-Level-5.Radius: 3
-Level-5.Speed-Multiplier: 2.5
-Level-5.Auto-Harvest: true
-Level-5.Auto-Replant: true
-Level-5.Auto-Breeding: true
-Level-5.Cost-xp: 35
-Level-5.Cost-eco: 12000
-Level-6.Radius: 4
-Level-6.Speed-Multiplier: 3
-Level-6.Auto-Harvest: true
-Level-6.Auto-Replant: true
-Level-6.Auto-Breeding: true
-Level-6.Cost-xp: 40
-Level-6.Cost-eco: 25000
+Level-1:
+  Radius: 1
+  Speed-Multiplier: 1
+  Cost-xp: 20
+  Cost-eco: 5000
+Level-2:
+  Radius: 2
+  Speed-Multiplier: 1.5
+  Auto-Harvest: true
+  Cost-xp: 20
+  Cost-eco: 5000
+Level-3:
+  Radius: 3
+  Speed-Multiplier: 1.5
+  Auto-Harvest: true
+  Auto-Replant: true
+  Auto-Breeding: true
+  Cost-xp: 25
+  Cost-eco: 7500
+Level-4:
+  Radius: 3
+  Speed-Multiplier: 2
+  Auto-Harvest: true
+  Auto-Replant: true
+  Auto-Breeding: true
+  Cost-xp: 30
+  Cost-eco: 10000
+Level-5:
+  Radius: 3
+  Speed-Multiplier: 2.5
+  Auto-Harvest: true
+  Auto-Replant: true
+  Auto-Breeding: true
+  Cost-xp: 35
+  Cost-eco: 12000
+Level-6:
+  Radius: 4
+  Speed-Multiplier: 3
+  Auto-Harvest: true
+  Auto-Replant: true
+  Auto-Breeding: true
+  Cost-xp: 40
+  Cost-eco: 25000

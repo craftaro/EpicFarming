@@ -31,6 +31,7 @@ import com.songoda.epicfarming.utils.Methods;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
@@ -199,16 +200,17 @@ public class EpicFarming extends SongodaPlugin {
         /*
          * Register Levels into LevelManager from configuration.
          */
-        levelManager.clear();
-        for (String levelName : getConfig().getConfigurationSection("settings.levels").getKeys(false)) {
+        for (String levelName : levelsFile.getKeys(false)) {
+            ConfigurationSection levels = levelsFile.getConfigurationSection(levelName);
+            
             int level = Integer.valueOf(levelName.split("-")[1]);
-            int costExperiance = getConfig().getInt("settings.levels." + levelName + ".Cost-xp");
-            int costEconomy = getConfig().getInt("settings.levels." + levelName + ".Cost-eco");
-            int radius = getConfig().getInt("settings.levels." + levelName + ".Radius");
-            double speedMultiplier = getConfig().getDouble("settings.levels." + levelName + ".Speed-Multiplier");
-            boolean autoHarvest = getConfig().getBoolean("settings.levels." + levelName + ".Auto-Harvest");
-            boolean autoReplant = getConfig().getBoolean("settings.levels." + levelName + ".Auto-Replant");
-            boolean autoBreeding = getConfig().getBoolean("settings.levels." + levelName + ".Auto-Breeding");
+            int costExperiance = levels.getInt("Cost-xp");
+            int costEconomy = levels.getInt("Cost-eco");
+            int radius = levels.getInt("Radius");
+            double speedMultiplier = levels.getDouble("Speed-Multiplier");
+            boolean autoHarvest = levels.getBoolean("Auto-Harvest");
+            boolean autoReplant = levels.getBoolean("Auto-Replant");
+            boolean autoBreeding = levels.getBoolean("Auto-Breeding");
             levelManager.addLevel(level, costExperiance, costEconomy, speedMultiplier, radius, autoHarvest, autoReplant, autoBreeding);
         }
     }

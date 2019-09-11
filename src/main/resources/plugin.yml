@@ -1,6 +1,6 @@
 name: EpicFarming
 description: EpicFarming
-main: com.songoda.epicfarming.EpicFarmingPlugin
+main: com.songoda.epicfarming.EpicFarming
 version: maven-version-number
 softdepend: [Arconix, SkyBlock, Towny, RedProtect, Kingdoms, PlotSquared, GriefPrevention, USkyBlock, ASkyBlock, WorldGuard, Factions, PlaceholderAPI]
 author: Songoda
