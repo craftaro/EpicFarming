@@ -61,11 +61,7 @@ public class FarmTask extends BukkitRunnable {
                 if (!doDrop(farm, block.getType())) continue main;
 
                 if (farm.getLevel().isAutoReplant()) {
-                    BlockState cropState = block.getState();
-                    Crops cropData = (Crops) cropState.getData();
-                    cropData.setState(CropState.VERY_SMALL);
-                    cropState.setData(cropData);
-                    cropState.update();
+                    CropType.replant(block);
                     continue;
                 }
                 block.setType(Material.AIR);
@@ -116,9 +112,9 @@ public class FarmTask extends BukkitRunnable {
     }
 
     public List<Block> getCrops(Farm farm, boolean add) {
-        if (System.currentTimeMillis() - ((Farm) farm).getLastCached() > 30 * 1000 || !add) {
-            ((Farm) farm).setLastCached(System.currentTimeMillis());
-            if (add) ((Farm) farm).clearCache();
+        if (((System.currentTimeMillis() - farm.getLastCached()) > (30 * 1000)) || !add) {
+            farm.setLastCached(System.currentTimeMillis());
+            if (add) farm.clearCache();
             Block block = farm.getLocation().getBlock();
             int radius = farm.getLevel().getRadius();
             int bx = block.getX();
@@ -132,10 +128,10 @@ public class FarmTask extends BukkitRunnable {
                         if (!(b2.getState().getData() instanceof Crops)) continue;
 
                         if (add) {
-                            ((Farm) farm).addCachedCrop(b2);
+                            farm.addCachedCrop(b2);
                             continue;
                         }
-                        ((Farm) farm).removeCachedCrop(b2);
+                        farm.removeCachedCrop(b2);
                         plugin.getGrowthTask().removeCropByLocation(b2.getLocation());
                     }
                 }

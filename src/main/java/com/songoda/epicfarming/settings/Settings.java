@@ -1,6 +1,7 @@
 package com.songoda.epicfarming.settings;
 
 import com.songoda.core.compatibility.CompatibleMaterial;
+import com.songoda.core.compatibility.ServerVersion;
 import com.songoda.core.configuration.Config;
 import com.songoda.core.configuration.ConfigSetting;
 import com.songoda.core.hooks.EconomyManager;
@@ -30,7 +31,7 @@ public class Settings {
     public static final ConfigSetting GROWTH_TICK_SPEED = new ConfigSetting(config, "Main.Growth Tick Speed", 20,
             "The delay in ticks between each farm entity event.");
 
-    public static final ConfigSetting FARM_BLOCK_MATERIAL = new ConfigSetting(config, "Main.Farm Block Material", "END_ROD",
+    public static final ConfigSetting FARM_BLOCK_MATERIAL = new ConfigSetting(config, "Main.Farm Block Material", ServerVersion.isServerVersionAtLeast(ServerVersion.V1_9) ? "END_ROD" : "TORCH",
             "What material should be used as a farm item?");
 
     public static final ConfigSetting NON_COMMAND_FARMS = new ConfigSetting(config, "Main.Allow Non Command Issued Farm Items", false,

@@ -1,15 +1,16 @@
 package com.songoda.epicfarming.farming;
 
+import com.songoda.core.compatibility.CompatibleMaterial;
+import com.songoda.core.compatibility.CompatibleParticleHandler;
+import com.songoda.core.compatibility.CompatibleSound;
+import com.songoda.core.compatibility.ServerVersion;
 import com.songoda.core.hooks.EconomyManager;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.player.PlayerData;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.utils.Methods;
-import org.bukkit.Bukkit;
-import org.bukkit.GameMode;
-import org.bukkit.Location;
-import org.bukkit.Material;
+import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -96,7 +97,7 @@ public class Farm {
         itemmeta.setLore(lore);
         item.setItemMeta(itemmeta);
 
-        ItemStack itemXP = new ItemStack(Material.valueOf(instance.getConfig().getString("Interfaces.XP Icon")), 1);
+        ItemStack itemXP = Settings.XP_ICON.getMaterial().getItem();
         ItemMeta itemmetaXP = itemXP.getItemMeta();
         itemmetaXP.setDisplayName(instance.getLocale().getMessage("interface.button.upgradewithxp").getMessage());
         ArrayList<String> loreXP = new ArrayList<>();
@@ -108,7 +109,7 @@ public class Farm {
         itemmetaXP.setLore(loreXP);
         itemXP.setItemMeta(itemmetaXP);
 
-        ItemStack itemECO = new ItemStack(Material.valueOf(instance.getConfig().getString("Interfaces.Economy Icon")), 1);
+        ItemStack itemECO = Settings.ECO_ICON.getMaterial().getItem();
         ItemMeta itemmetaECO = itemECO.getItemMeta();
         itemmetaECO.setDisplayName(instance.getLocale().getMessage("interface.button.upgradewitheconomy").getMessage());
         ArrayList<String> loreECO = new ArrayList<>();
@@ -217,20 +218,25 @@ public class Farm {
                     .processPlaceholder("level", level.getLevel()).sendPrefixedMessage(player);
         }
         Location loc = location.clone().add(.5, .5, .5);
+        tillLand(location);
+        if (!ServerVersion.isServerVersionAtLeast(ServerVersion.V1_12)) return;
+
         player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), loc, 200, .5, .5, .5);
 
         if (instance.getLevelManager().getHighestLevel() != level) {
-            player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 0.6F, 15.0F);
-
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.6F, 15.0F);
         } else {
-            player.playSound(player.getLocation(), org.bukkit.Sound.ENTITY_PLAYER_LEVELUP, 2F, 25.0F);
+            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2F, 25.0F);
+
+            if (!ServerVersion.isServerVersionAtLeast(ServerVersion.V1_13)) return;
+
+            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 2F, 25.0F);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1.2F, 35.0F), 5L);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1.8F, 35.0F), 10L);
         }
-        tillLand(location);
     }
 
     public boolean tillLand(Location location) {
-        Player player = Bukkit.getPlayer(placedBy);
-        EpicFarming instance = EpicFarming.getInstance();
         if (Settings.DISABLE_AUTO_TIL_LAND.getBoolean()) return true;
         Block block = location.getBlock();
         int radius = level.getRadius();
@@ -243,18 +249,25 @@ public class Farm {
                     Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
 
                     // ToDo: enum for all flowers.
-                    if (b2.getType() == Material.TALL_GRASS || b2.getType() == Material.GRASS || b2.getType().name().contains("TULIP") || b2.getType() == Material.AZURE_BLUET ||
-                            b2.getType() == Material.BLUE_ORCHID || b2.getType() == Material.ALLIUM || b2.getType() == Material.POPPY || b2.getType() == Material.DANDELION) {
+                    if (b2.getType() == CompatibleMaterial.TALL_GRASS.getMaterial()
+                            || b2.getType() == CompatibleMaterial.GRASS.getMaterial()
+                            || b2.getType().name().contains("TULIP")
+                            || b2.getType().name().contains("ORCHID")
+                            || b2.getType() == CompatibleMaterial.AZURE_BLUET.getMaterial()
+                            || b2.getType() == CompatibleMaterial.ALLIUM.getMaterial()
+                            || b2.getType() == CompatibleMaterial.POPPY.getMaterial()
+                            || b2.getType() == CompatibleMaterial.DANDELION.getMaterial()) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
-                            b2.getRelative(BlockFace.DOWN).setType(Material.LEGACY_SOIL);
+                            b2.getRelative(BlockFace.DOWN).setType(CompatibleMaterial.FARMLAND.getMaterial());
                             b2.breakNaturally();
-                            b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
+                            b2.getWorld().playSound(b2.getLocation(), CompatibleSound.BLOCK_GRASS_BREAK.getSound(), 10, 15);
                         }, random.nextInt(30) + 1);
                     }
-                    if ((b2.getType() == Material.GRASS_BLOCK || b2.getType() == Material.DIRT) && b2.getRelative(BlockFace.UP).getType() == Material.AIR) {
+                    if ((b2.getType() == CompatibleMaterial.GRASS_BLOCK.getMaterial()
+                            || b2.getType() == Material.DIRT) && b2.getRelative(BlockFace.UP).getType() == Material.AIR) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
-                            b2.setType(Material.LEGACY_SOIL);
-                            b2.getWorld().playSound(b2.getLocation(), org.bukkit.Sound.BLOCK_GRASS_BREAK, 10, 15);
+                            b2.setType(CompatibleMaterial.FARMLAND.getMaterial());
+                            b2.getWorld().playSound(b2.getLocation(), CompatibleSound.BLOCK_GRASS_BREAK.getSound(), 10, 15);
                         }, random.nextInt(30) + 1);
                     }
 

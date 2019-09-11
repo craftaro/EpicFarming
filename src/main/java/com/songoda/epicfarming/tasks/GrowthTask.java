@@ -2,6 +2,8 @@ package com.songoda.epicfarming.tasks;
 
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Crop;
+import com.songoda.epicfarming.utils.CropHandler;
+import com.songoda.epicfarming.utils.CropType;
 import org.bukkit.CropState;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -42,62 +44,29 @@ public class GrowthTask extends BukkitRunnable {
                 continue;
             }
 
-            if (!(crop.getLocation().getBlock().getState().getData() instanceof Crops)) {
+            if (!CropType.isGrowableCrop(crop.getLocation().getBlock().getType())) {
                 toRemove.add(crop);
                 continue;
             }
 
-            //ToDO: This should be in config.
+            // TODO: This should be in config.
             int cap = (int)Math.ceil(60 / crop.getFarm().getLevel().getSpeedMultiplier()) - crop.getTicksLived();
             if (cap > 2) {
                 int rand = random.nextInt(cap) + 1;
 
                 crop.setTicksLived(crop.getTicksLived() + 1);
                 if (rand != cap - 1 && crop.getTicksLived() != cap / 2) continue;
-
             }
 
-            BlockState cropState = crop.getLocation().getBlock().getState();
-            Crops cropData = (Crops) cropState.getData();
+            CropType.grow(crop);
 
-            Material material = crop.getLocation().getBlock().getType();
-
-            switch(cropData.getState()) {
-                case SEEDED:
-                    if (material == Material.BEETROOTS)
-                        cropData.setState(CropState.VERY_SMALL);
-                    else
-                        cropData.setState(CropState.GERMINATED);
-                    break;
-                case GERMINATED:
-                    cropData.setState(CropState.VERY_SMALL);
-                    break;
-                case VERY_SMALL:
-                    cropData.setState(CropState.SMALL);
-                    break;
-                case SMALL:
-                    cropData.setState(CropState.MEDIUM);
-                    break;
-                case MEDIUM:
-                    cropData.setState(CropState.TALL);
-                    break;
-                case TALL:
-                    cropData.setState(CropState.VERY_TALL);
-                    break;
-                case VERY_TALL:
-                    cropData.setState(CropState.RIPE);
-                    break;
-                case RIPE:
-                    break;
-            }
-            cropState.setData(cropData);
-            cropState.update();
             crop.setTicksLived(1);
-
         }
+
         for (Crop crop : toRemove)
-            liveCrops.remove(crop);
+            liveCrops.remove(crop.getLocation());
     }
+
 
     public void addLiveCrop(Location location, Crop crop) {
         if (!liveCrops.containsKey(location))

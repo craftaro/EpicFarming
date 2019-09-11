@@ -1,6 +1,7 @@
 package com.songoda.epicfarming.listeners;
 
 import com.songoda.epicfarming.EpicFarming;
+import com.songoda.epicfarming.settings.Settings;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
@@ -22,7 +23,8 @@ public class InteractListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockInteract(PlayerInteractEvent e) {
-        if (e.getClickedBlock() == null || e.getClickedBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
+        if (e.getClickedBlock() == null
+                || e.getClickedBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial())
             return;
 
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
