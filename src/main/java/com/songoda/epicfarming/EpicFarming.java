@@ -116,7 +116,6 @@ public class EpicFarming extends SongodaPlugin {
         this.farmManager = new FarmManager();
         this.playerActionManager = new PlayerActionManager();
         this.boostManager = new BoostManager();
-        this.commandManager = new CommandManager(this);
 
         /*
          * Register Farms into FarmManger from configuration
