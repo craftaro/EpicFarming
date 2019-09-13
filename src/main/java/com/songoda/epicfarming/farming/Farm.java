@@ -309,6 +309,10 @@ public class Farm {
         this.lastCached = lastCached;
     }
 
+    public boolean isInLoadedChunk() {
+        return location != null && location.getWorld() != null && location.getWorld().isChunkLoaded(((int) location.getX()) >> 4, ((int) location.getZ()) >> 4);
+    }
+
     public Location getLocation() {
         return location.clone();
     }

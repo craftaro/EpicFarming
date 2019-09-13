@@ -8,6 +8,7 @@ import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.utils.CropType;
 import com.songoda.epicfarming.utils.Methods;
+import java.util.HashMap;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -22,6 +23,7 @@ public class FarmTask extends BukkitRunnable {
 
     private static FarmTask instance;
     private static EpicFarming plugin;
+    Random random = new Random();
 
     public static FarmTask startTask(EpicFarming pl) {
         if (instance == null) {
@@ -35,40 +37,33 @@ public class FarmTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        main:
+        HashMap<Material, Boolean> hasDropped = new HashMap();
         for (Farm farm : plugin.getFarmManager().getFarms().values()) {
-            if (farm.getLocation() == null) continue;
-            Location farmLocation = farm.getLocation();
+            if (!farm.isInLoadedChunk()) continue;
 
-            int x = farmLocation.getBlockX() >> 4;
-            int z = farmLocation.getBlockZ() >> 4;
-
-            if (!farmLocation.getWorld().isChunkLoaded(x, z)) {
-                continue;
-            }
+            hasDropped.clear();
 
             for (Block block : getCrops(farm, true)) {
-                if (!CropType.isCrop(block.getType())) continue;
+                Material mat = block.getType();
+                if (!CropType.isCrop(mat)) continue;
 
-                // Add to GrowthTask
-                plugin.getGrowthTask().addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
+                if (!BlockUtils.isCropFullyGrown(block)) {
+                    // Add to GrowthTask
+                    plugin.getGrowthTask().addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
+                } else if (farm.getLevel().isAutoHarvest() && !hasDropped.getOrDefault(mat, false) && doDrop(farm, mat)) {
+                    hasDropped.put(mat, true);
 
-                if (!farm.getLevel().isAutoHarvest() || BlockUtils.isCropFullyGrown(block)) continue;
-
-                if (!doDrop(farm, block.getType())) continue main;
-
-                if (farm.getLevel().isAutoReplant()) {
-                    BlockUtils.resetGrowthStage(block);
-                    continue;
+                    if (farm.getLevel().isAutoReplant()) {
+                        BlockUtils.resetGrowthStage(block);
+                        continue;
+                    }
+                    block.setType(Material.AIR);
                 }
-                block.setType(Material.AIR);
             }
         }
     }
 
     private boolean doDrop(Farm farm, Material material) {
-        Random random = new Random();
-
         CropType cropTypeData = CropType.getCropType(material);
 
         if (material == null || farm == null || cropTypeData == null) return false;
