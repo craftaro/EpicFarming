@@ -200,7 +200,8 @@ public class EpicFarming extends SongodaPlugin {
             boolean autoHarvest = levels.getBoolean("Auto-Harvest");
             boolean autoReplant = levels.getBoolean("Auto-Replant");
             boolean autoBreeding = levels.getBoolean("Auto-Breeding");
-            levelManager.addLevel(level, costExperiance, costEconomy, speedMultiplier, radius, autoHarvest, autoReplant, autoBreeding);
+            int pages = levels.getInt("Pages", 1);
+            levelManager.addLevel(level, costExperiance, costEconomy, speedMultiplier, radius, autoHarvest, autoReplant, autoBreeding, pages);
         }
     }
 

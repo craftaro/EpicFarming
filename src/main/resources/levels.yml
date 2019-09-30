@@ -23,6 +23,7 @@ Level-4:
   Auto-Harvest: true
   Auto-Replant: true
   Auto-Breeding: true
+  Pages: 2
   Cost-xp: 30
   Cost-eco: 10000
 Level-5:
@@ -31,6 +32,7 @@ Level-5:
   Auto-Harvest: true
   Auto-Replant: true
   Auto-Breeding: true
+  Pages: 2
   Cost-xp: 35
   Cost-eco: 12000
 Level-6:
@@ -39,5 +41,6 @@ Level-6:
   Auto-Harvest: true
   Auto-Replant: true
   Auto-Breeding: true
+  Pages: 2
   Cost-xp: 40
   Cost-eco: 25000
