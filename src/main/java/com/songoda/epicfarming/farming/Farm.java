@@ -183,7 +183,7 @@ public class Farm {
     }
 
     public boolean willFit(ItemStack item) {
-        if (items.size() < 27) return true;
+        if (items.size() < 27 * level.getPages()) return true;
 
         for (ItemStack stack : items) {
             if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {

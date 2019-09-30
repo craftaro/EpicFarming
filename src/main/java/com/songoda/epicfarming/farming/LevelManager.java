@@ -9,8 +9,8 @@ public class LevelManager {
 
     private final NavigableMap<Integer, Level> registeredLevels = new TreeMap<>();
 
-    public void addLevel(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant, boolean autobreeding) {
-        registeredLevels.put(level, new Level(level, costExperiance, costEconomy, speedMultiplier, radius, autoHarvest, autoReplant, autobreeding));
+    public void addLevel(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant, boolean autobreeding, int pages) {
+        registeredLevels.put(level, new Level(level, costExperiance, costEconomy, speedMultiplier, radius, autoHarvest, autoReplant, autobreeding, pages));
     }
 
     public Level getLevel(int level) {

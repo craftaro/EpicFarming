@@ -3,6 +3,8 @@
 general.nametag.prefix = "&8[&6EpicFarming&8]"
 general.nametag.farm = "&eLevel %level% &fFarm"
 general.nametag.lore = ""
+general.interface.next = "Next"
+general.interface.previous = "Previous"
 
 #Interface Messages
 
@@ -16,6 +18,7 @@ interface.button.speed = "&7Speed: &6%speed%x"
 interface.button.autoharvest =  "&7Auto Harvest: &6%status%"
 interface.button.autoreplant = "&7Auto Replant: &6%status%"
 interface.button.autobreeding = "&7Auto Breeding: &6%status%"
+interface.button.pages = "&7Pages: &6%amount%"
 interface.button.boostedstats = "&a&lCurrently boosted!|&7Yield rate multiplied by &6%amount%x&7.|&7Expires in &6%time%&7."
 
 #Command Messages

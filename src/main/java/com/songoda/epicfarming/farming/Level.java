@@ -7,7 +7,7 @@ import java.util.List;
 
 public class Level {
 
-    private int level, costExperiance, costEconomy, radius;
+    private int level, costExperiance, costEconomy, radius, pages;
 
     private double speedMultiplier;
 
@@ -15,7 +15,7 @@ public class Level {
 
     private List<String> description = new ArrayList<>();
 
-    Level(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant, boolean autoBreeding) {
+    Level(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant, boolean autoBreeding, int pages) {
         this.level = level;
         this.costExperiance = costExperiance;
         this.costEconomy = costEconomy;
@@ -24,6 +24,7 @@ public class Level {
         this.autoHarvest = autoHarvest;
         this.autoReplant = autoReplant;
         this.autoBreeding = autoBreeding;
+        this.pages = pages;
 
         EpicFarming instance = EpicFarming.getInstance();
 
@@ -44,6 +45,10 @@ public class Level {
         if (autoBreeding)
             description.add(instance.getLocale().getMessage("interface.button.autobreeding")
                     .processPlaceholder("status", autoBreeding).getMessage());
+
+        if (pages > 1)
+            description.add(instance.getLocale().getMessage("interface.button.pages")
+                    .processPlaceholder("amount", pages).getMessage());
 
     }
 
@@ -69,6 +74,10 @@ public class Level {
 
     public boolean isAutoBreeding() {
         return autoBreeding;
+    }
+
+    public int getPages() {
+        return pages;
     }
 
     public double getSpeedMultiplier() {

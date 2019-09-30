@@ -1,5 +1,6 @@
 package com.songoda.epicfarming.gui;
 
+import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.core.gui.Gui;
 import com.songoda.core.gui.GuiUtils;
 import com.songoda.epicfarming.EpicFarming;
@@ -12,7 +13,6 @@ import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -36,10 +36,6 @@ public class OverviewGui extends Gui {
         this.setAcceptsItems(true);
         this.setUnlockedRange(3, 0, 5, 8);
 
-        constructGUI();
-    }
-
-    private void constructGUI() {
         ItemStack glass1 = GuiUtils.getBorderItem(Setting.GLASS_TYPE_1.getMaterial());
         ItemStack glass2 = GuiUtils.getBorderItem(Setting.GLASS_TYPE_2.getMaterial());
         ItemStack glass3 = GuiUtils.getBorderItem(Setting.GLASS_TYPE_3.getMaterial());
@@ -62,8 +58,20 @@ public class OverviewGui extends Gui {
         GuiUtils.mirrorFill(this, 2, 3, false, true, glass1);
         GuiUtils.mirrorFill(this, 2, 4, false, false, glass1);
 
-        Level nextLevel = plugin.getLevelManager().getHighestLevel().getLevel() > level.getLevel() ? plugin.getLevelManager().getLevel(level.getLevel() + 1) : null;
+        // enable page events
+        if (level.getPages() > 1) {
+            this.pages = level.getPages();
+            setPrevPage(2, 0, GuiUtils.createButtonItem(CompatibleMaterial.ARROW, plugin.getLocale().getMessage("general.interface.previous").getMessage()));
+            setNextPage(2, 8, GuiUtils.createButtonItem(CompatibleMaterial.ARROW, plugin.getLocale().getMessage("general.interface.next").getMessage()));
+            setOnPage((event) -> updateInventory());
+        }
 
+        showPage();
+    }
+
+    private void showPage() {
+
+        Level nextLevel = plugin.getLevelManager().getHighestLevel().getLevel() > level.getLevel() ? plugin.getLevelManager().getLevel(level.getLevel() + 1) : null;
 
         ItemStack item = new ItemStack(Material.valueOf(plugin.getConfig().getString("Main.Farm Block Material")), 1);
         ItemMeta itemmeta = item.getItemMeta();
@@ -132,35 +140,42 @@ public class OverviewGui extends Gui {
                 farm.view(player, true);
             });
         }
+
         // events
         this.setOnOpen((event) -> updateInventory());
         this.setDefaultAction((event) ->
                 Bukkit.getScheduler().runTaskLater(plugin, this::updateFarm, 0L));
         this.setOnClose((event) -> farm.close());
 
-        updateInventory();
     }
 
     public void updateInventory() {
+        int j = (page - 1) * 27;
         for (int i = 27; i <= 54; i++) {
-            if (farm.getItems().size() <= (i - 27))
+            if (farm.getItems().size() <= (j))
                 setItem(i, null);
             else
-                setItem(i, farm.getItems().get(i - 27));
+                setItem(i, farm.getItems().get(j));
+            j++;
         }
     }
 
     public void updateFarm() {
         List<ItemStack> items = new ArrayList<>();
-        for (int i = 27; i <= 54; i++) {
-            ItemStack item = getItem(i);
-            if (item == null || item.getType() == Material.AIR) continue;
-            items.add(item);
+        int start = 27 * (page - 1);
+        int j = 27;
+        for (int i = 0; i <= 27 * pages; i++) {
+            if (i > start && i < start + 27) {
+                ItemStack item = getItem(j);
+                j ++;
+                if (item != null && item.getType() != Material.AIR)
+                    items.add(item);
+            } else {
+                if (i > farm.getItems().size())
+                    continue;
+                items.add(farm.getItems().get(i));
+            }
         }
         farm.setItems(items);
-    }
-
-    public Inventory getInventory() {
-        return inventory;
     }
 }
