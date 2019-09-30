@@ -60,7 +60,7 @@ public class OverviewGui extends Gui {
 
         // enable page events
         if (level.getPages() > 1) {
-            this.pages = level.getPages();
+            setPages(level.getPages());
             setPrevPage(2, 0, GuiUtils.createButtonItem(CompatibleMaterial.ARROW, plugin.getLocale().getMessage("general.interface.previous").getMessage()));
             setNextPage(2, 8, GuiUtils.createButtonItem(CompatibleMaterial.ARROW, plugin.getLocale().getMessage("general.interface.next").getMessage()));
             setOnPage((event) -> updateInventory());
@@ -171,7 +171,7 @@ public class OverviewGui extends Gui {
                 if (item != null && item.getType() != Material.AIR)
                     items.add(item);
             } else {
-                if (i > farm.getItems().size())
+                if (i >= farm.getItems().size())
                     continue;
                 items.add(farm.getItems().get(i));
             }
