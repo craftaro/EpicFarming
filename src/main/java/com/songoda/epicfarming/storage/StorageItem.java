@@ -9,8 +9,9 @@ import java.util.List;
 
 public class StorageItem {
 
-    private Object object;
     private String key = null;
+
+    private Object object;
 
     public StorageItem(Object object) {
         this.object = object;
@@ -21,10 +22,13 @@ public class StorageItem {
         this.object = object;
     }
 
-    public StorageItem(String key, List<String> string) {
+    public StorageItem(String key, List<ItemStack> material) {
+        if (material == null || material.isEmpty()) return;
         StringBuilder object = new StringBuilder();
-        for (String s : string) {
-            object.append(s).append(";");
+        for (ItemStack m : material) {
+            if (m == null) continue;
+            object.append(Serializers.serialize(m));
+            object.append(";;");
         }
         this.key = key;
         this.object = object.toString();
@@ -36,49 +40,32 @@ public class StorageItem {
 
     public String asString() {
         if (object == null) return null;
-        return (String) object;
+        return (String)object;
     }
 
     public boolean asBoolean() {
         if (object == null) return false;
-        if (object instanceof Integer) return (Integer) object == 1;
-        return (boolean) object;
+        return (boolean)object;
     }
 
     public int asInt() {
         if (object == null) return 0;
-        return (int) object;
+        return (int)object;
     }
 
     public Object asObject() {
-        if (object == null) return null;
-        if (object instanceof Boolean) return (Boolean) object ? 1 : 0;
         return object;
-    }
-
-    public List<String> asStringList() {
-        if (object instanceof ArrayList) return new ArrayList<>();
-        List<String> list = new ArrayList<>();
-        if (object == null) return list;
-        String[] stack = ((String) object).split(";");
-        for (String item : stack) {
-            if (item.equals("")) continue;
-            list.add(item);
-        }
-        return list;
     }
 
     public List<ItemStack> asItemStackList() {
         List<ItemStack> list = new ArrayList<>();
         if (object == null) return list;
         String obj = (String) object;
-        if (obj.equals("[]")) return list;
+        if (obj.equals("[]"))return list;
         List<String> sers = new ArrayList<>(Arrays.asList(obj.split(";;")));
         for (String ser : sers) {
             list.add(Serializers.deserialize(ser));
         }
         return list;
     }
-
-
 }

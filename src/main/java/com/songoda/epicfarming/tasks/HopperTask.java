@@ -52,27 +52,16 @@ public class HopperTask extends BukkitRunnable {
             if (block.getType() != Material.HOPPER)
                 continue;
 
-            Inventory inventory = farm.getInventory();
             Inventory hopperInventory = ((Hopper) block.getState()).getInventory();
 
-            for (int i = 27; i < inventory.getSize(); i++) {
-                if (inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) continue;
-
-                int amtToMove = 1;
-
-                ItemStack item = inventory.getItem(i);
+            for (ItemStack item : farm.getItems()) {
                 if (item.getType() == Material.BONE_MEAL) continue;
 
                 ItemStack toMove = item.clone();
-                toMove.setAmount(amtToMove);
-
-                int newAmt = item.getAmount() - amtToMove;
+                toMove.setAmount(1);
 
                 if (canHop(hopperInventory, toMove)) {
-                    if (newAmt <= 0)
-                        inventory.setItem(i, null);
-                    else
-                        item.setAmount(newAmt);
+                    farm.removeMaterial(toMove.getType(), 1);
                     hopperInventory.addItem(toMove);
                 }
                 break;

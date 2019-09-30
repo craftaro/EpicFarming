@@ -36,7 +36,7 @@ public abstract class Storage {
             prepareSaveItem("farms", new StorageItem("location", locstr),
                     new StorageItem("level", farm.getLevel().getLevel()),
                     new StorageItem("placedby", farm.getPlacedBy().toString()),
-                    new StorageItem("contents", ((Farm) farm).dumpInventory()));
+                    new StorageItem("contents", farm.getItems()));
         }
 
         /*
