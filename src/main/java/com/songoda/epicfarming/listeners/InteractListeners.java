@@ -1,9 +1,8 @@
 package com.songoda.epicfarming.listeners;
 
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.settings.Settings;
+import com.songoda.epicfarming.settings.Setting;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
@@ -24,7 +23,7 @@ public class InteractListeners implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockInteract(PlayerInteractEvent e) {
         if (e.getClickedBlock() == null
-                || e.getClickedBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial())
+                || e.getClickedBlock().getType() != Setting.FARM_BLOCK_MATERIAL.getMaterial().getMaterial())
             return;
 
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
@@ -33,7 +32,7 @@ public class InteractListeners implements Listener {
 
         if (instance.getFarmManager().getFarms().containsKey(location)) {
             e.setCancelled(true);
-            instance.getFarmManager().getFarm(location).view(e.getPlayer());
+            instance.getFarmManager().getFarm(location).view(e.getPlayer(), false);
         }
     }
 }

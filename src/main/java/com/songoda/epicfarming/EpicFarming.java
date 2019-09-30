@@ -16,10 +16,7 @@ import com.songoda.epicfarming.farming.Level;
 import com.songoda.epicfarming.farming.LevelManager;
 import com.songoda.epicfarming.listeners.BlockListeners;
 import com.songoda.epicfarming.listeners.InteractListeners;
-import com.songoda.epicfarming.listeners.InventoryListeners;
-import com.songoda.epicfarming.player.PlayerActionManager;
-import com.songoda.epicfarming.player.PlayerData;
-import com.songoda.epicfarming.settings.Settings;
+import com.songoda.epicfarming.settings.Setting;
 import com.songoda.epicfarming.storage.Storage;
 import com.songoda.epicfarming.storage.StorageRow;
 import com.songoda.epicfarming.storage.types.StorageYaml;
@@ -53,7 +50,6 @@ public class EpicFarming extends SongodaPlugin {
     private final GuiManager guiManager = new GuiManager(this);
     private FarmManager farmManager;
     private LevelManager levelManager;
-    private PlayerActionManager playerActionManager;
     private CommandManager commandManager;
     private BoostManager boostManager;
 
@@ -76,10 +72,6 @@ public class EpicFarming extends SongodaPlugin {
     public void onPluginDisable() {
         saveToFile();
         this.storage.closeConnection();
-        for (PlayerData playerData : playerActionManager.getRegisteredPlayers()) {
-            if (playerData.getPlayer() != null)
-                playerData.getPlayer().closeInventory();
-        }
     }
 
     @Override
@@ -91,11 +83,11 @@ public class EpicFarming extends SongodaPlugin {
         EconomyManager.load();
 
         // Setup Config
-        Settings.setupConfig();
-        this.setLocale(Settings.LANGUGE_MODE.getString(), false);
+        Setting.setupConfig();
+        this.setLocale(Setting.LANGUGE_MODE.getString(), false);
 
         // Set economy preference
-        EconomyManager.getManager().setPreferredHook(Settings.ECONOMY_PLUGIN.getString());
+        EconomyManager.getManager().setPreferredHook(Setting.ECONOMY_PLUGIN.getString());
 
         // Register commands
         this.commandManager = new CommandManager(this);
@@ -114,7 +106,6 @@ public class EpicFarming extends SongodaPlugin {
         this.loadLevelManager();
 
         this.farmManager = new FarmManager();
-        this.playerActionManager = new PlayerActionManager();
         this.boostManager = new BoostManager();
 
         /*
@@ -130,7 +121,7 @@ public class EpicFarming extends SongodaPlugin {
                     List<ItemStack> items = row.get("contents").asItemStackList();
                     UUID placedBY = UUID.fromString(row.get("placedby").asString());
                     Farm farm = new Farm(location, levelManager.getLevel(level), placedBY);
-                    farm.loadInventory(items);
+                    farm.setItems(items);
                     farmManager.addFarm(location, farm);
                 }
             }
@@ -160,7 +151,6 @@ public class EpicFarming extends SongodaPlugin {
         PluginManager pluginManager = Bukkit.getPluginManager();
         pluginManager.registerEvents(new BlockListeners(this), this);
         pluginManager.registerEvents(new InteractListeners(this), this);
-        pluginManager.registerEvents(new InventoryListeners(this), this);
 
         // Start tasks
         this.growthTask = GrowthTask.startTask(this);
@@ -230,7 +220,7 @@ public class EpicFarming extends SongodaPlugin {
     }
 
     public ItemStack makeFarmItem(Level level) {
-        ItemStack item = Settings.FARM_BLOCK_MATERIAL.getMaterial().getItem();
+        ItemStack item = Setting.FARM_BLOCK_MATERIAL.getMaterial().getItem();
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(Methods.formatText(Methods.formatName(level.getLevel(), true)));
         String line = getLocale().getMessage("general.nametag.lore").getMessage();
@@ -253,10 +243,6 @@ public class EpicFarming extends SongodaPlugin {
 
     public BoostManager getBoostManager() {
         return boostManager;
-    }
-
-    public PlayerActionManager getPlayerActionManager() {
-        return playerActionManager;
     }
 
     public GrowthTask getGrowthTask() {

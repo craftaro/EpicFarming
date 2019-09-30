@@ -4,7 +4,7 @@ import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmManager;
 import com.songoda.epicfarming.farming.Level;
-import com.songoda.epicfarming.settings.Settings;
+import com.songoda.epicfarming.settings.Setting;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -134,7 +134,7 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial())
+        if (event.getBlock().getType() != Setting.FARM_BLOCK_MATERIAL.getMaterial().getMaterial())
             return;
 
         Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
@@ -152,8 +152,7 @@ public class BlockListeners implements Listener {
         block.setType(Material.AIR);
         block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
 
-        for (ItemStack itemStack : farm.dumpInventory()) {
-            if (itemStack == null) continue;
+        for (ItemStack itemStack : farm.getItems()) {
             farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
         }
     }
@@ -208,8 +207,7 @@ public class BlockListeners implements Listener {
         block.setType(Material.AIR);
         block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
 
-        for (ItemStack itemStack : ((Farm) farm).dumpInventory()) {
-            if (itemStack == null) continue;
+        for (ItemStack itemStack : farm.getItems()) {
             farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
         }
     }

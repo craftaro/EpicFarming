@@ -155,12 +155,8 @@ public class EntityTask extends BukkitRunnable {
                 if (entry.getValue() >= 2 && entry.getValue() < plugin.getConfig().getInt("Main.Auto Breeding Cap")) {
 
                     EntityType entityType = entry.getKey();
-                    Inventory inventory = farm.getInventory();
 
-                    for (int i = 27; i < inventory.getSize(); i++) {
-                        if (inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) continue;
-
-                        ItemStack item = inventory.getItem(i);
+                    for (ItemStack item : farm.getItems()) {
 
                         try {
                             if (item.getType() != EntityInfo.valueOf(entityType.name()).getMaterial() || item.getAmount() < 2)
@@ -169,12 +165,7 @@ public class EntityTask extends BukkitRunnable {
                             continue;
                         }
 
-                        int newAmt = item.getAmount() - 2;
-
-                        if (newAmt <= 0)
-                            inventory.setItem(i, null);
-                        else
-                            item.setAmount(newAmt);
+                        farm.removeMaterial(item.getType(), 2);
 
                         Location location = entity.getLocation();
                         Entity newSpawn = location.getWorld().spawnEntity(location, entityType);
@@ -193,20 +184,9 @@ public class EntityTask extends BukkitRunnable {
 
         stack.setAmount(stack.getAmount() * (boostData == null ? 1 : boostData.getMultiplier()));
 
-        if (!canMove(farm.getInventory(), stack)) return false;
-        farm.getInventory().addItem(stack);
+        if (farm.willFit(stack)) return false;
+        farm.addItem(stack);
         return true;
-    }
-
-    private boolean canMove(Inventory inventory, ItemStack item) {
-        if (inventory.firstEmpty() != -1) return true;
-
-        for (ItemStack stack : inventory.getContents()) {
-            if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {
-                return true;
-            }
-        }
-        return false;
     }
 
     public Map<Entity, Integer> getTicksLived() {

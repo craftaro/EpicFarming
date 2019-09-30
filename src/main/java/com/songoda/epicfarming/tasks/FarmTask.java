@@ -8,14 +8,13 @@ import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.utils.CropType;
 import com.songoda.epicfarming.utils.Methods;
-import java.util.HashMap;
-import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Random;
 
@@ -73,29 +72,18 @@ public class FarmTask extends BukkitRunnable {
         ItemStack stack = new ItemStack(cropTypeData.getYieldMaterial(), (useBoneMeal(farm) ? random.nextInt(2) + 2 : 1) * (boostData == null ? 1 : boostData.getMultiplier()));
         ItemStack seedStack = new ItemStack(cropTypeData.getSeedMaterial(), random.nextInt(3) + 1 + (useBoneMeal(farm) ? 1 : 0));
 
-        if (!canMove(farm.getInventory(), stack) || !canMove(farm.getInventory(), seedStack)) return false;
+        if (!farm.willFit(stack) || !farm.willFit(seedStack)) return false;
         Methods.animate(farm.getLocation(), cropTypeData.getYieldMaterial());
-        farm.getInventory().addItem(stack);
-        farm.getInventory().addItem(seedStack);
+        farm.addItem(stack);
+        farm.addItem(seedStack);
         return true;
     }
 
     private boolean useBoneMeal(Farm farm) {
-        Inventory inventory = farm.getInventory();
-
-        for (int i = 27; i < inventory.getSize(); i++) {
-            if (inventory.getItem(i) == null || inventory.getItem(i).getType() == Material.AIR) continue;
-
-            ItemStack item = inventory.getItem(i);
-
+        for (ItemStack item : farm.getItems()) {
             if (item.getType() != Material.BONE_MEAL) continue;
 
-            int newAmt = item.getAmount() - 1;
-
-            if (newAmt <= 0)
-                inventory.setItem(i, null);
-            else
-                item.setAmount(newAmt);
+            farm.removeMaterial(Material.BONE_MEAL, 1);
 
             return true;
 

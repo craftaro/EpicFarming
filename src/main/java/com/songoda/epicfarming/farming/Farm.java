@@ -1,27 +1,19 @@
 package com.songoda.epicfarming.farming;
 
 import com.songoda.core.compatibility.CompatibleMaterial;
-import com.songoda.core.compatibility.CompatibleParticleHandler;
 import com.songoda.core.compatibility.CompatibleSound;
 import com.songoda.core.compatibility.ServerVersion;
 import com.songoda.core.hooks.EconomyManager;
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.boost.BoostData;
-import com.songoda.epicfarming.player.PlayerData;
-import com.songoda.epicfarming.settings.Settings;
-import com.songoda.epicfarming.utils.Methods;
+import com.songoda.epicfarming.gui.OverviewGui;
+import com.songoda.epicfarming.settings.Setting;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class Farm {
 
@@ -29,7 +21,8 @@ public class Farm {
     private final List<Block> cachedCrops = new ArrayList<>();
     private Location location;
     private Level level;
-    private Inventory inventory;
+    private List<ItemStack> items = new ArrayList<>();
+    private OverviewGui opened = null;
     private UUID placedBy;
     private UUID viewing = null;
     private long lastCached = 0;
@@ -38,138 +31,17 @@ public class Farm {
         this.location = location;
         this.level = level;
         this.placedBy = placedBy;
-        this.inventory = Bukkit.createInventory(null, 54, Methods.formatName(level.getLevel(), false));
     }
 
-    public void view(Player player) {
-        if (!player.hasPermission("epicfarming.view"))
+    public void view(Player player, boolean force) {
+        if (!player.hasPermission("epicfarming.view") && !force)
             return;
 
-        if (viewing != null) return;
+        if (opened != null && !force) return;
 
-        setupOverview(player);
+        opened = new OverviewGui(this, player);
 
-        player.openInventory(inventory);
-        this.viewing = player.getUniqueId();
-
-        PlayerData playerData = EpicFarming.getInstance().getPlayerActionManager().getPlayerAction(player);
-
-        playerData.setFarm(this);
-
-        getInventory();
-    }
-
-    private void setupOverview(Player player) {
-        Inventory inventory = Bukkit.createInventory(null, 54, Methods.formatName(level.getLevel(), false));
-        inventory.setContents(this.inventory.getContents());
-        this.inventory = inventory;
-
-        EpicFarming instance = EpicFarming.getInstance();
-
-        Level nextLevel = instance.getLevelManager().getHighestLevel().getLevel() > level.getLevel() ? instance.getLevelManager().getLevel(level.getLevel() + 1) : null;
-
-        int level = this.level.getLevel();
-
-        ItemStack item = new ItemStack(Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")), 1);
-        ItemMeta itemmeta = item.getItemMeta();
-        itemmeta.setDisplayName(instance.getLocale().getMessage("general.nametag.farm")
-                .processPlaceholder("level", level).getMessage());
-        List<String> lore = this.level.getDescription();
-        lore.add("");
-        if (nextLevel == null) lore.add(instance.getLocale().getMessage("event.upgrade.maxed").getMessage());
-        else {
-            lore.add(instance.getLocale().getMessage("interface.button.level")
-                    .processPlaceholder("level", nextLevel.getLevel()).getMessage());
-            lore.addAll(nextLevel.getDescription());
-        }
-
-        BoostData boostData = instance.getBoostManager().getBoost(placedBy);
-        if (boostData != null) {
-            String[] parts = instance.getLocale().getMessage("interface.button.boostedstats")
-                    .processPlaceholder("amount", Integer.toString(boostData.getMultiplier()))
-                    .processPlaceholder("time", Methods.makeReadable(boostData.getEndTime() - System.currentTimeMillis()))
-                    .getMessage().split("\\|");
-            lore.add("");
-            for (String line : parts)
-                lore.add(Methods.formatText(line));
-        }
-
-        itemmeta.setLore(lore);
-        item.setItemMeta(itemmeta);
-
-        ItemStack itemXP = Settings.XP_ICON.getMaterial().getItem();
-        ItemMeta itemmetaXP = itemXP.getItemMeta();
-        itemmetaXP.setDisplayName(instance.getLocale().getMessage("interface.button.upgradewithxp").getMessage());
-        ArrayList<String> loreXP = new ArrayList<>();
-        if (nextLevel != null)
-            loreXP.add(instance.getLocale().getMessage("interface.button.upgradewithxplore")
-                    .processPlaceholder("cost", nextLevel.getCostExperiance()).getMessage());
-        else
-            loreXP.add(instance.getLocale().getMessage("event.upgrade.maxed").getMessage());
-        itemmetaXP.setLore(loreXP);
-        itemXP.setItemMeta(itemmetaXP);
-
-        ItemStack itemECO = Settings.ECO_ICON.getMaterial().getItem();
-        ItemMeta itemmetaECO = itemECO.getItemMeta();
-        itemmetaECO.setDisplayName(instance.getLocale().getMessage("interface.button.upgradewitheconomy").getMessage());
-        ArrayList<String> loreECO = new ArrayList<>();
-        if (nextLevel != null)
-            loreECO.add(instance.getLocale().getMessage("interface.button.upgradewitheconomylore")
-                    .processPlaceholder("cost", Methods.formatEconomy(nextLevel.getCostEconomy()))
-                    .getMessage());
-        else
-            loreECO.add(instance.getLocale().getMessage("event.upgrade.maxed").getMessage());
-        itemmetaECO.setLore(loreECO);
-        itemECO.setItemMeta(itemmetaECO);
-
-        if (instance.getConfig().getBoolean("Main.Upgrade With XP") && player != null && player.hasPermission("EpicFarming.Upgrade.XP")) {
-            inventory.setItem(11, itemXP);
-        }
-
-        inventory.setItem(13, item);
-
-        if (instance.getConfig().getBoolean("Main.Upgrade With Economy") && player != null && player.hasPermission("EpicFarming.Upgrade.ECO")) {
-            inventory.setItem(15, itemECO);
-        }
-/*
-        inventory.setItem(0, Methods.getBackgroundGlass(true));
-        inventory.setItem(1, Methods.getBackgroundGlass(true));
-        inventory.setItem(2, Methods.getBackgroundGlass(false));
-        inventory.setItem(6, Methods.getBackgroundGlass(false));
-        inventory.setItem(7, Methods.getBackgroundGlass(true));
-        inventory.setItem(8, Methods.getBackgroundGlass(true));
-        inventory.setItem(9, Methods.getBackgroundGlass(true));
-        inventory.setItem(10, Methods.getBackgroundGlass(false));
-        inventory.setItem(16, Methods.getBackgroundGlass(false));
-        inventory.setItem(17, Methods.getBackgroundGlass(true));
-        inventory.setItem(18, Methods.getBackgroundGlass(true));
-        inventory.setItem(19, Methods.getBackgroundGlass(true));
-        inventory.setItem(20, Methods.getBackgroundGlass(false));
-        inventory.setItem(24, Methods.getBackgroundGlass(false));
-        inventory.setItem(25, Methods.getBackgroundGlass(true));
-        inventory.setItem(26, Methods.getBackgroundGlass(true)); */
-    }
-
-    public Inventory getInventory() {
-        return inventory;
-    }
-
-    public void loadInventory(List<ItemStack> items) {
-        setupOverview(null);
-        int i = 27;
-        for (ItemStack item : items) {
-            inventory.setItem(i++, item);
-        }
-    }
-
-    public List<ItemStack> dumpInventory() {
-        List<ItemStack> items = new ArrayList<>();
-
-        for (int i = 27; i < inventory.getSize(); i++) {
-            items.add(inventory.getItem(i));
-        }
-
-        return items;
+        EpicFarming.getInstance().getGuiManager().showGUI(player, opened);
     }
 
     public void upgrade(UpgradeType type, Player player) {
@@ -237,7 +109,7 @@ public class Farm {
     }
 
     public boolean tillLand(Location location) {
-        if (Settings.DISABLE_AUTO_TIL_LAND.getBoolean()) return true;
+        if (Setting.DISABLE_AUTO_TIL_LAND.getBoolean()) return true;
         Block block = location.getBlock();
         int radius = level.getRadius();
         int bx = block.getX();
@@ -275,6 +147,57 @@ public class Farm {
             }
         }
         return false;
+    }
+
+    public List<ItemStack> getItems() {
+        return Collections.unmodifiableList(items);
+    }
+
+    public void addItem(ItemStack toAdd) {
+        for (ItemStack item : getItems()) {
+            if (item.getType() != toAdd.getType()
+                    || item.getAmount() + toAdd.getAmount() > item.getMaxStackSize()) continue;
+            item.setAmount(item.getAmount() + toAdd.getAmount());
+            if (opened != null)
+                opened.updateInventory();
+            return;
+        }
+        items.add(toAdd);
+        if (opened != null)
+            opened.updateInventory();
+    }
+
+
+    public void removeMaterial(Material material, int amount) {
+        for (ItemStack item : getItems()) {
+            if (material == item.getType()) {
+                item.setAmount(item.getAmount() - amount);
+
+                if (item.getAmount() <= 0)
+                    this.items.remove(item);
+                if (opened != null)
+                    opened.updateInventory();
+                return;
+            }
+        }
+    }
+
+    public boolean willFit(ItemStack item) {
+        if (items.size() < 27) return true;
+
+        for (ItemStack stack : items) {
+            if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void setItems(List<ItemStack> items) {
+        this.items.clear();
+        this.items.addAll(items);
+        if (opened != null)
+            opened.updateInventory();
     }
 
     public UUID getViewing() {
@@ -327,5 +250,9 @@ public class Farm {
 
     public Level getLevel() {
         return level;
+    }
+
+    public void close() {
+        this.opened = null;
     }
 }
