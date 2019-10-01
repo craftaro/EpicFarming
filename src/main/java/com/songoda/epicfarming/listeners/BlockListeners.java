@@ -211,4 +211,12 @@ public class BlockListeners implements Listener {
             farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
         }
     }
+
+    @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
+    public void onBlockFromToEventMonitor(BlockFromToEvent event) {
+        // prevent water/lava/egg griefs
+        if (instance.getFarmManager().getFarm(event.getToBlock()) != null) {
+            event.setCancelled(true);
+        }
+    }
 }
