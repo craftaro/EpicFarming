@@ -26,6 +26,8 @@ public class OverviewGui extends Gui {
     private Level level;
     private Player player;
 
+    private int task;
+
     public OverviewGui(Farm farm, Player player) {
         this.plugin = EpicFarming.getInstance();
         this.farm = farm;
@@ -70,9 +72,11 @@ public class OverviewGui extends Gui {
         this.setOnOpen((event) -> updateInventory());
         this.setDefaultAction((event) ->
                 Bukkit.getScheduler().runTaskLater(plugin, this::updateFarm, 0L));
+        runTask();
         this.setOnClose((event) -> {
             updateFarm();
             farm.close();
+            Bukkit.getScheduler().cancelTask(task);
         });
 
         showPage();
@@ -151,6 +155,10 @@ public class OverviewGui extends Gui {
         }
     }
 
+    private void runTask() {
+        task = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::updateFarm, 2L, 1L);
+    }
+
     public void updateInventory() {
         List<ItemStack> items = farm.getItems();
 
@@ -171,7 +179,7 @@ public class OverviewGui extends Gui {
         for (int i = 0; i <= 27 * pages; i++) {
             if (i >= start && i < start + 27) {
                 ItemStack item = getItem(j);
-                j ++;
+                j++;
                 if (item != null && item.getType() != Material.AIR)
                     items.add(item);
             } else {
