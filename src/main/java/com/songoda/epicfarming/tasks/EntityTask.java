@@ -1,17 +1,19 @@
 package com.songoda.epicfarming.tasks;
 
+import com.songoda.core.hooks.EntityStackerManager;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.utils.EntityInfo;
 import com.songoda.epicfarming.utils.Methods;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.*;
-import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
+import org.bukkit.metadata.FixedMetadataValue;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
@@ -43,8 +45,9 @@ public class EntityTask extends BukkitRunnable {
             location.add(.5, .5, .5);
 
             double radius = farm.getLevel().getRadius() + .5;
-            Collection<Entity> amt = location.getWorld().getNearbyEntities(location, radius, radius, radius);
-            amt.removeIf(e -> e instanceof Player || !(e instanceof LivingEntity) || e instanceof ArmorStand);
+            Collection<LivingEntity> amt = location.getWorld().getNearbyEntities(location, radius, radius, radius)
+                    .stream().filter(e -> !(e instanceof Player) && e instanceof LivingEntity && !(e instanceof ArmorStand))
+                    .map(entity -> (LivingEntity) entity).collect(Collectors.toCollection(ArrayList::new));
 
             if (farm.getLevel().isAutoBreeding()) doAutoBreeding(farm, amt);
 
@@ -126,29 +129,30 @@ public class EntityTask extends BukkitRunnable {
         }
     }
 
-    private static final Map<Entity, Integer> lastBreed = new HashMap<>();
-
-    private void doAutoBreeding(Farm farm, Collection<Entity> entities1) {
-
-        for (Map.Entry<Entity, Integer> entry : new HashMap<>(lastBreed).entrySet()) {
-            if (entry.getValue() >= 6000) lastBreed.remove(entry.getKey());
-            lastBreed.put(entry.getKey(), entry.getValue() + 100);
-        }
-
-        List<Entity> entities = new ArrayList<>(entities1);
+    private void doAutoBreeding(Farm farm, Collection<LivingEntity> entities1) {
+        List<LivingEntity> entities = new ArrayList<>(entities1);
         Collections.shuffle(entities);
-        entities.removeIf(e -> lastBreed.containsKey(e) || !(e instanceof Ageable) || !((Ageable) e).isAdult());
+        entities.removeIf(e -> !(e instanceof Ageable) || !((Ageable) e).isAdult());
 
         Map<EntityType, Long> counts =
                 entities.stream().collect(Collectors.groupingBy(Entity::getType, Collectors.counting()));
 
+        for (LivingEntity entity : entities) {
+            counts.put(entity.getType(),
+                    counts.get(entity.getType()) - 1 + EntityStackerManager.getSize(entity));
+        }
+
         boolean mate1 = false;
 
         for (Map.Entry<EntityType, Long> entry : counts.entrySet()) {
-            for (Entity entity : entities) {
+            for (LivingEntity entity : entities) {
                 if (entry.getKey() != entity.getType()) continue;
                 if (mate1) {
-                    lastBreed.put(entity, 0);
+                    int count = EntityStackerManager.getSize(entity);
+                    if (count > 1)
+                        handleStackedBreed(entity);
+                    else
+                        handleBreed(entity);
                     return;
                 }
 
@@ -170,12 +174,35 @@ public class EntityTask extends BukkitRunnable {
                         Location location = entity.getLocation();
                         Entity newSpawn = location.getWorld().spawnEntity(location, entityType);
                         ((Ageable) newSpawn).setBaby();
-                        lastBreed.put(entity, 0);
+
+                        int count = EntityStackerManager.getSize(entity);
+                        if (count > 1) {
+                            handleStackedBreed(entity);
+                            if (count - 1 > 1) {
+                                handleStackedBreed(entity);
+                            } else {
+                                handleBreed(entity);
+                            }
+                            return;
+                        }
+                        handleBreed(entity);
                         mate1 = true;
                     }
                 }
             }
         }
+    }
+
+    private void handleStackedBreed(LivingEntity entity) {
+        EntityStackerManager.removeOne(entity);
+        LivingEntity spawned = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+        handleBreed(spawned);
+    }
+
+    private void handleBreed(Entity entity) {
+        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () ->
+                entity.removeMetadata("breedCooldown", plugin), 5 * 20 * 60);
+        entity.setMetadata("breedCooldown", new FixedMetadataValue(plugin, true));
     }
 
 

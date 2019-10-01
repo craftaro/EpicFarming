@@ -7,6 +7,7 @@ import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.core.configuration.Config;
 import com.songoda.core.gui.GuiManager;
 import com.songoda.core.hooks.EconomyManager;
+import com.songoda.core.hooks.EntityStackerManager;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.boost.BoostManager;
 import com.songoda.epicfarming.commands.*;
@@ -88,6 +89,9 @@ public class EpicFarming extends SongodaPlugin {
 
         // Set economy preference
         EconomyManager.getManager().setPreferredHook(Setting.ECONOMY_PLUGIN.getString());
+
+        // Load entity stack manager.
+        EntityStackerManager.load();
 
         // Register commands
         this.commandManager = new CommandManager(this);
