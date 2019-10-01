@@ -66,6 +66,15 @@ public class OverviewGui extends Gui {
             setOnPage((event) -> updateInventory());
         }
 
+        // events
+        this.setOnOpen((event) -> updateInventory());
+        this.setDefaultAction((event) ->
+                Bukkit.getScheduler().runTaskLater(plugin, this::updateFarm, 0L));
+        this.setOnClose((event) -> {
+            updateFarm();
+            farm.close();
+        });
+
         showPage();
     }
 
@@ -140,32 +149,27 @@ public class OverviewGui extends Gui {
                 farm.view(player, true);
             });
         }
-
-        // events
-        this.setOnOpen((event) -> updateInventory());
-        this.setDefaultAction((event) ->
-                Bukkit.getScheduler().runTaskLater(plugin, this::updateFarm, 0L));
-        this.setOnClose((event) -> farm.close());
-
     }
 
     public void updateInventory() {
+        List<ItemStack> items = farm.getItems();
+
         int j = (page - 1) * 27;
         for (int i = 27; i <= 54; i++) {
-            if (farm.getItems().size() <= (j))
+            if (items.size() <= (j))
                 setItem(i, null);
             else
-                setItem(i, farm.getItems().get(j));
+                setItem(i, items.get(j));
             j++;
         }
     }
 
-    public void updateFarm() {
+    private void updateFarm() {
         List<ItemStack> items = new ArrayList<>();
         int start = 27 * (page - 1);
         int j = 27;
         for (int i = 0; i <= 27 * pages; i++) {
-            if (i > start && i < start + 27) {
+            if (i >= start && i < start + 27) {
                 ItemStack item = getItem(j);
                 j ++;
                 if (item != null && item.getType() != Material.AIR)
