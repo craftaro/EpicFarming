@@ -8,23 +8,22 @@ import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.Level;
 import com.songoda.epicfarming.farming.UpgradeType;
-import com.songoda.epicfarming.settings.Setting;
+import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class OverviewGui extends Gui {
 
-    private EpicFarming plugin;
-    private Farm farm;
-    private Level level;
-    private Player player;
+    private final EpicFarming plugin;
+    private final Farm farm;
+    private final Level level;
+    private final Player player;
 
     private int task;
 
@@ -38,9 +37,9 @@ public class OverviewGui extends Gui {
         this.setAcceptsItems(true);
         this.setUnlockedRange(3, 0, 5, 8);
 
-        ItemStack glass1 = GuiUtils.getBorderItem(Setting.GLASS_TYPE_1.getMaterial());
-        ItemStack glass2 = GuiUtils.getBorderItem(Setting.GLASS_TYPE_2.getMaterial());
-        ItemStack glass3 = GuiUtils.getBorderItem(Setting.GLASS_TYPE_3.getMaterial());
+        ItemStack glass1 = GuiUtils.getBorderItem(Settings.GLASS_TYPE_1.getMaterial());
+        ItemStack glass2 = GuiUtils.getBorderItem(Settings.GLASS_TYPE_2.getMaterial());
+        ItemStack glass3 = GuiUtils.getBorderItem(Settings.GLASS_TYPE_3.getMaterial());
 
         this.setDefaultItem(null);
 
@@ -86,17 +85,13 @@ public class OverviewGui extends Gui {
 
         Level nextLevel = plugin.getLevelManager().getHighestLevel().getLevel() > level.getLevel() ? plugin.getLevelManager().getLevel(level.getLevel() + 1) : null;
 
-        ItemStack item = new ItemStack(Material.valueOf(plugin.getConfig().getString("Main.Farm Block Material")), 1);
-        ItemMeta itemmeta = item.getItemMeta();
-        itemmeta.setDisplayName(plugin.getLocale().getMessage("general.nametag.farm")
-                .processPlaceholder("level", level.getLevel()).getMessage());
-        List<String> lore = level.getDescription();
-        lore.add("");
-        if (nextLevel == null) lore.add(plugin.getLocale().getMessage("event.upgrade.maxed").getMessage());
+        List<String> farmLore = level.getDescription();
+        farmLore.add("");
+        if (nextLevel == null) farmLore.add(plugin.getLocale().getMessage("event.upgrade.maxed").getMessage());
         else {
-            lore.add(plugin.getLocale().getMessage("interface.button.level")
+            farmLore.add(plugin.getLocale().getMessage("interface.button.level")
                     .processPlaceholder("level", nextLevel.getLevel()).getMessage());
-            lore.addAll(nextLevel.getDescription());
+            farmLore.addAll(nextLevel.getDescription());
         }
 
         BoostData boostData = plugin.getBoostManager().getBoost(farm.getPlacedBy());
@@ -105,53 +100,43 @@ public class OverviewGui extends Gui {
                     .processPlaceholder("amount", Integer.toString(boostData.getMultiplier()))
                     .processPlaceholder("time", Methods.makeReadable(boostData.getEndTime() - System.currentTimeMillis()))
                     .getMessage().split("\\|");
-            lore.add("");
+            farmLore.add("");
             for (String line : parts)
-                lore.add(Methods.formatText(line));
+                farmLore.add(Methods.formatText(line));
         }
 
-        itemmeta.setLore(lore);
-        item.setItemMeta(itemmeta);
+        setItem(13, GuiUtils.createButtonItem(Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD),
+                plugin.getLocale().getMessage("general.nametag.farm")
+                .processPlaceholder("level", level.getLevel()).getMessage(),
+                farmLore));
 
-        ItemStack itemXP = Setting.XP_ICON.getMaterial().getItem();
-        ItemMeta itemmetaXP = itemXP.getItemMeta();
-        itemmetaXP.setDisplayName(plugin.getLocale().getMessage("interface.button.upgradewithxp").getMessage());
-        ArrayList<String> loreXP = new ArrayList<>();
-        if (nextLevel != null)
-            loreXP.add(plugin.getLocale().getMessage("interface.button.upgradewithxplore")
-                    .processPlaceholder("cost", nextLevel.getCostExperiance()).getMessage());
-        else
-            loreXP.add(plugin.getLocale().getMessage("event.upgrade.maxed").getMessage());
-        itemmetaXP.setLore(loreXP);
-        itemXP.setItemMeta(itemmetaXP);
+        if (player != null && Settings.UPGRADE_WITH_XP.getBoolean() && player.hasPermission("EpicFarming.Upgrade.XP")) {
 
-        ItemStack itemECO = Setting.ECO_ICON.getMaterial().getItem();
-        ItemMeta itemmetaECO = itemECO.getItemMeta();
-        itemmetaECO.setDisplayName(plugin.getLocale().getMessage("interface.button.upgradewitheconomy").getMessage());
-        ArrayList<String> loreECO = new ArrayList<>();
-        if (nextLevel != null)
-            loreECO.add(plugin.getLocale().getMessage("interface.button.upgradewitheconomylore")
-                    .processPlaceholder("cost", Methods.formatEconomy(nextLevel.getCostEconomy()))
-                    .getMessage());
-        else
-            loreECO.add(plugin.getLocale().getMessage("event.upgrade.maxed").getMessage());
-        itemmetaECO.setLore(loreECO);
-        itemECO.setItemMeta(itemmetaECO);
+            setButton(11, GuiUtils.createButtonItem(Settings.XP_ICON.getMaterial(CompatibleMaterial.EXPERIENCE_BOTTLE),
+                    plugin.getLocale().getMessage("interface.button.upgradewithxp").getMessage(),
+                    nextLevel != null
+                            ? plugin.getLocale().getMessage("interface.button.upgradewithxplore")
+                            .processPlaceholder("cost", nextLevel.getCostExperiance()).getMessage()
+                            : plugin.getLocale().getMessage("event.upgrade.maxed").getMessage()),
+                    event -> {
+                        farm.upgrade(UpgradeType.EXPERIENCE, player);
+                        farm.view(player, true);
+                    });
 
-        if (plugin.getConfig().getBoolean("Main.Upgrade With XP") && player != null && player.hasPermission("EpicFarming.Upgrade.XP")) {
-            setButton(11, itemXP, (event) -> {
-                farm.upgrade(UpgradeType.EXPERIENCE, player);
-                farm.view(player, true);
-            });
         }
-
-        setItem(13, item);
 
         if (plugin.getConfig().getBoolean("Main.Upgrade With Economy") && player != null && player.hasPermission("EpicFarming.Upgrade.ECO")) {
-            setButton(15, itemECO, (event) -> {
-                farm.upgrade(UpgradeType.ECONOMY, player);
-                farm.view(player, true);
-            });
+
+            setButton(15, GuiUtils.createButtonItem(Settings.ECO_ICON.getMaterial(CompatibleMaterial.SUNFLOWER),
+                    plugin.getLocale().getMessage("interface.button.upgradewitheconomy").getMessage(),
+                    nextLevel != null
+                            ? plugin.getLocale().getMessage("interface.button.upgradewitheconomylore")
+                            .processPlaceholder("cost", Methods.formatEconomy(nextLevel.getCostEconomy())).getMessage()
+                            : plugin.getLocale().getMessage("event.upgrade.maxed").getMessage()), (event) -> {
+                        farm.upgrade(UpgradeType.ECONOMY, player);
+                        farm.view(player, true);
+                    });
+
         }
     }
 
