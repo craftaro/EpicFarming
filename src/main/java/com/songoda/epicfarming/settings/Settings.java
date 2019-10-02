@@ -9,7 +9,7 @@ import com.songoda.epicfarming.EpicFarming;
 
 import java.util.stream.Collectors;
 
-public class Setting {
+public class Settings {
 
     static final Config config = EpicFarming.getInstance().getConfig().getCoreConfig();
 

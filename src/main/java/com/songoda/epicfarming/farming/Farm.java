@@ -6,7 +6,7 @@ import com.songoda.core.compatibility.ServerVersion;
 import com.songoda.core.hooks.EconomyManager;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.gui.OverviewGui;
-import com.songoda.epicfarming.settings.Setting;
+import com.songoda.epicfarming.settings.Settings;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
@@ -109,7 +109,7 @@ public class Farm {
     }
 
     public boolean tillLand(Location location) {
-        if (Setting.DISABLE_AUTO_TIL_LAND.getBoolean()) return true;
+        if (Settings.DISABLE_AUTO_TIL_LAND.getBoolean()) return true;
         Block block = location.getBlock();
         int radius = level.getRadius();
         int bx = block.getX();

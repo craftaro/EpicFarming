@@ -17,7 +17,7 @@ import com.songoda.epicfarming.farming.Level;
 import com.songoda.epicfarming.farming.LevelManager;
 import com.songoda.epicfarming.listeners.BlockListeners;
 import com.songoda.epicfarming.listeners.InteractListeners;
-import com.songoda.epicfarming.settings.Setting;
+import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.storage.Storage;
 import com.songoda.epicfarming.storage.StorageRow;
 import com.songoda.epicfarming.storage.types.StorageYaml;
@@ -84,11 +84,11 @@ public class EpicFarming extends SongodaPlugin {
         EconomyManager.load();
 
         // Setup Config
-        Setting.setupConfig();
-        this.setLocale(Setting.LANGUGE_MODE.getString(), false);
+        Settings.setupConfig();
+        this.setLocale(Settings.LANGUGE_MODE.getString(), false);
 
         // Set economy preference
-        EconomyManager.getManager().setPreferredHook(Setting.ECONOMY_PLUGIN.getString());
+        EconomyManager.getManager().setPreferredHook(Settings.ECONOMY_PLUGIN.getString());
 
         // Load entity stack manager.
         EntityStackerManager.load();
@@ -225,7 +225,7 @@ public class EpicFarming extends SongodaPlugin {
     }
 
     public ItemStack makeFarmItem(Level level) {
-        ItemStack item = Setting.FARM_BLOCK_MATERIAL.getMaterial().getItem();
+        ItemStack item = Settings.FARM_BLOCK_MATERIAL.getMaterial().getItem();
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(Methods.formatText(Methods.formatName(level.getLevel(), true)));
         String line = getLocale().getMessage("general.nametag.lore").getMessage();
