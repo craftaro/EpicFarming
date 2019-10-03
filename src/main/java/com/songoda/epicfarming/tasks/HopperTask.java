@@ -1,5 +1,6 @@
 package com.songoda.epicfarming.tasks;
 
+import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmManager;
@@ -55,7 +56,7 @@ public class HopperTask extends BukkitRunnable {
             Inventory hopperInventory = ((Hopper) block.getState()).getInventory();
 
             for (ItemStack item : farm.getItems()) {
-                if (item.getType() == Material.BONE_MEAL) continue;
+                if (item.getType() == CompatibleMaterial.BONE_MEAL.getMaterial()) continue;
 
                 ItemStack toMove = item.clone();
                 toMove.setAmount(1);

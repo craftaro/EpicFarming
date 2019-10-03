@@ -81,9 +81,9 @@ public class FarmTask extends BukkitRunnable {
 
     private boolean useBoneMeal(Farm farm) {
         for (ItemStack item : farm.getItems()) {
-            if (item.getType() != Material.BONE_MEAL) continue;
+            if (item.getType() != CompatibleMaterial.BONE_MEAL.getMaterial()) continue;
 
-            farm.removeMaterial(Material.BONE_MEAL, 1);
+            farm.removeMaterial(CompatibleMaterial.BONE_MEAL.getMaterial(), 1);
 
             return true;
 
