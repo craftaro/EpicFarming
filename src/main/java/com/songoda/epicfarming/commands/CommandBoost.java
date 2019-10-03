@@ -28,7 +28,7 @@ public class CommandBoost extends AbstractCommand {
             return ReturnType.SYNTAX_ERROR;
         }
         if (!Methods.isInt(args[1])) {
-            instance.getLocale().newMessage("&6" + args[2] + " &7is not a number...").sendPrefixedMessage(sender);
+            instance.getLocale().newMessage("&6" + args[1] + " &7is not a number...").sendPrefixedMessage(sender);
             return ReturnType.SYNTAX_ERROR;
         }
 
