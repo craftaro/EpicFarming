@@ -6,6 +6,7 @@ import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
+import org.bukkit.entity.Player;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -22,53 +23,37 @@ public class CommandBoost extends AbstractCommand {
 
     @Override
     protected ReturnType runCommand(CommandSender sender, String... args) {
-        if (args.length < 3) {
+        if (args.length < 2) {
+            instance.getLocale().newMessage("&7Syntax error...").sendPrefixedMessage(sender);
             return ReturnType.SYNTAX_ERROR;
         }
-            if (Bukkit.getPlayer(args[1]) == null) {
-                instance.getLocale().newMessage("&cThat player does not exist...").sendPrefixedMessage(sender);
-                return ReturnType.FAILURE;
-            } else if (!Methods.isInt(args[1])) {
-                instance.getLocale().newMessage("&6" + args[1] + " &7is not a number...").sendPrefixedMessage(sender);
-                return ReturnType.FAILURE;
-            } else {
-                Calendar c = Calendar.getInstance();
-                Date currentDate = new Date();
-                c.setTime(currentDate);
+        if (!Methods.isInt(args[1])) {
+            instance.getLocale().newMessage("&6" + args[2] + " &7is not a number...").sendPrefixedMessage(sender);
+            return ReturnType.SYNTAX_ERROR;
+        }
 
-                String time = "&7.";
+        long duration = 0L;
 
-                if (args.length > 3) {
-                    if (args[3].contains("m:")) {
-                        String[] arr2 = (args[3]).split(":");
-                        c.add(Calendar.MINUTE, Integer.parseInt(arr2[1]));
-                        time = " &7for &6" + arr2[1] + " minutes&7.";
-                    } else if (args[3].contains("h:")) {
-                        String[] arr2 = (args[3]).split(":");
-                        c.add(Calendar.HOUR, Integer.parseInt(arr2[1]));
-                        time = " &7for &6" + arr2[1] + " hours&7.";
-                    } else if (args[3].contains("d:")) {
-                        String[] arr2 = (args[3]).split(":");
-                        c.add(Calendar.HOUR, Integer.parseInt(arr2[1]) * 24);
-                        time = " &7for &6" + arr2[1] + " days&7.";
-                    } else if (args[3].contains("y:")) {
-                        String[] arr2 = (args[3]).split(":");
-                        c.add(Calendar.YEAR, Integer.parseInt(arr2[1]));
-                        time = " &7for &6" + arr2[1] + " years&7.";
-                    } else {
-                        instance.getLocale().newMessage("&7" + args[2] + " &7is invalid.").sendPrefixedMessage(sender);
-                        return ReturnType.SUCCESS;
-                    }
-                } else {
-                    c.add(Calendar.YEAR, 10);
-                }
+        if (args.length > 2) {
+            for (int i = 0; i < args.length; i++) {
+                String line = args[i];
+                long time = Methods.parseTime(line);
+                duration += time;
 
-                BoostData boostData = new BoostData(Integer.parseInt(args[2]), c.getTime().getTime(), Bukkit.getPlayer(args[1]).getUniqueId());
+            }
+        }
+
+        Player player = Bukkit.getPlayer(args[0]);
+        if (player == null) {
+            instance.getLocale().newMessage("&cThat player does not exist or is not online...").sendPrefixedMessage(sender);
+            return ReturnType.FAILURE;
+        }
+
+        BoostData boostData = new BoostData(Integer.parseInt(args[1]), duration == 0L ? Long.MAX_VALUE : System.currentTimeMillis() + duration, player.getUniqueId());
                 instance.getBoostManager().addBoostToPlayer(boostData);
                 instance.getLocale().newMessage("&7Successfully boosted &6" + Bukkit.getPlayer(args[0]).getName()
-                        + "'s &7furnaces reward amounts by &6" + args[2] + "x" + time).sendPrefixedMessage(sender);
-            }
-        return ReturnType.FAILURE;
+                        + "'s &7farms by &6" + args[1] + "x" + (duration == 0L ? "" : (" for " + Methods.makeReadable(duration))) + "&7.").sendPrefixedMessage(sender);
+        return ReturnType.SUCCESS;
     }
 
     @Override
@@ -78,12 +63,12 @@ public class CommandBoost extends AbstractCommand {
 
     @Override
     public String getPermissionNode() {
-        return "epicfarming.admin";
+        return "epicfarming.boost";
     }
 
     @Override
     public String getSyntax() {
-        return "/efa boost <player> <multiplier> [m:minute, h:hour, d:day, y:year]";
+        return "/efa boost <player> <amount> [duration]";
     }
 
     @Override
