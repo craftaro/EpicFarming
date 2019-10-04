@@ -7,6 +7,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class CommandGiveFarmItem extends AbstractCommand {
@@ -55,7 +57,16 @@ public class CommandGiveFarmItem extends AbstractCommand {
     }
 
     @Override
-    protected List<String> onTab(CommandSender commandSender, String... strings) {
+    protected List<String> onTab(CommandSender sender, String... args) {
+        if (args.length == 1) {
+            List<String> players = new ArrayList<>();
+            for (Player player : Bukkit.getOnlinePlayers()) {
+                players.add(player.getName());
+            }
+            return players;
+        } else if (args.length == 2) {
+            return Arrays.asList("1", "2", "3", "4", "5");
+        }
         return null;
     }
 
