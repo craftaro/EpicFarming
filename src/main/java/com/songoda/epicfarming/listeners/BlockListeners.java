@@ -1,5 +1,6 @@
 package com.songoda.epicfarming.listeners;
 
+import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmManager;
@@ -60,12 +61,10 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e) {
-        Material farmBlock = Material.valueOf(instance.getConfig().getString("Main.Farm Block Material"));
-
-        boolean allowNonCommandIssued = instance.getConfig().getBoolean("Main.Allow Non Command Issued Farm Items");
+        Material farmBlock = Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getBlockMaterial();
 
         if (e.getPlayer().getItemInHand().getType() != farmBlock
-                || instance.getLevelFromItem(e.getItemInHand()) == 0 && !allowNonCommandIssued) return;
+                || instance.getLevelFromItem(e.getItemInHand()) == 0 && !Settings.NON_COMMAND_FARMS.getBoolean()) return;
 
         if (e.getBlockAgainst().getType() == farmBlock) e.setCancelled(true);
 
@@ -105,6 +104,7 @@ public class BlockListeners implements Listener {
     }
 
     private boolean checkForFarm(Location location) {
+        Material farmBlock = Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getBlockMaterial();
 
         FarmManager farmManager = instance.getFarmManager();
 
@@ -119,7 +119,7 @@ public class BlockListeners implements Listener {
                 for (int fy = -2; fy <= 2; fy++) {
                     for (int fz = -radius; fz <= radius; fz++) {
                         Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
-                        if (b2.getType() == Material.valueOf(instance.getConfig().getString("Main.Farm Block Material"))) {
+                        if (b2.getType() == farmBlock) {
                             if (!farmManager.getFarms().containsKey(b2.getLocation())) continue;
                             if (level.getRadius() != farmManager.getFarm(b2.getLocation()).getLevel().getRadius())
                                 continue;
@@ -134,7 +134,7 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial())
+        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial())
             return;
 
         Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
@@ -190,7 +190,7 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
-        if (event.getBlock().getType() != Material.valueOf(instance.getConfig().getString("Main.Farm Block Material")))
+        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial())
             return;
 
         Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());

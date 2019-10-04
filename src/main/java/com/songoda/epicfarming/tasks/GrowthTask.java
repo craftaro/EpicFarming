@@ -3,6 +3,7 @@ package com.songoda.epicfarming.tasks;
 import com.songoda.core.utils.BlockUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Crop;
+import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.utils.CropType;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -13,16 +14,16 @@ public class GrowthTask extends BukkitRunnable {
 
     private static GrowthTask instance;
 
-    private Map<Location, Crop> liveCrops = new HashMap<>();
+    private final Map<Location, Crop> liveCrops = new HashMap<>();
 
     private static final Random random = new Random();
 
     public static GrowthTask startTask(EpicFarming plugin) {
-        if (instance == null) {
-            instance = new GrowthTask();
-            instance.runTaskTimer(plugin, 0, plugin.getConfig().getInt("Main.Growth Tick Speed"));
+        if (instance != null && !instance.isCancelled()) {
+            instance.cancel();
         }
-
+        instance = new GrowthTask();
+        instance.runTaskTimer(plugin, 0, Settings.FARM_TICK_SPEED.getInt());
         return instance;
     }
 
@@ -36,7 +37,7 @@ public class GrowthTask extends BukkitRunnable {
             int x = cropLocation.getBlockX() >> 4;
             int z = cropLocation.getBlockZ() >> 4;
 
-            if (!cropLocation.getWorld().isChunkLoaded(x, z)) {
+            if (cropLocation.getWorld() == null || !cropLocation.getWorld().isChunkLoaded(x, z)) {
                 continue;
             }
 

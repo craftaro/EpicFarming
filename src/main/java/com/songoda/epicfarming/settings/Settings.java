@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 public class Settings {
 
-    static final Config config = EpicFarming.getInstance().getConfig().getCoreConfig();
+    static final Config config = EpicFarming.getInstance().getCoreConfig();
 
     public static final ConfigSetting UPGRADE_WITH_ECONOMY = new ConfigSetting(config, "Main.Upgrade With Economy", true,
             "Should you be able to upgrade farmses with economy?");

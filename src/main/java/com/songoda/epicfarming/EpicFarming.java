@@ -172,7 +172,7 @@ public class EpicFarming extends SongodaPlugin {
 
     @Override
     public void onConfigReload() {
-        this.setLocale(getConfig().getString("System.Language Mode"), true);
+        this.setLocale(Settings.LANGUGE_MODE.getString(), true);
         this.locale.reloadMessages();
         loadLevelManager();
     }

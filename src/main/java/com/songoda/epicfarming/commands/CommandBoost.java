@@ -8,8 +8,6 @@ import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 
 public class CommandBoost extends AbstractCommand {

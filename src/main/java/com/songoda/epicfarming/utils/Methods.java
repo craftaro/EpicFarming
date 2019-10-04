@@ -1,7 +1,13 @@
 package com.songoda.epicfarming.utils;
 
+import com.songoda.core.utils.TextUtils;
 import com.songoda.epicfarming.EpicFarming;
-import org.bukkit.*;
+import com.songoda.epicfarming.settings.Settings;
+import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
+import org.bukkit.Location;
+import org.bukkit.Material;
+import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Item;
 import org.bukkit.inventory.ItemStack;
@@ -17,7 +23,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Methods {
 
-    private static Map<String, Location> serializeCache = new HashMap<>();
+    private final static Map<String, Location> serializeCache = new HashMap<>();
 
     public static String formatName(int level, boolean full) {
         String name = EpicFarming.getInstance().getLocale().getMessage("general.nametag.farm")
@@ -25,16 +31,16 @@ public class Methods {
 
         String info = "";
         if (full) {
-            info += Methods.convertToInvisibleString(level + ":");
+            info += TextUtils.convertToInvisibleString(level + ":");
         }
 
-        return info + Methods.formatText(name);
+        return info + name;
     }
 
     public static void animate(Location location, Material mat) {
-        if (!EpicFarming.getInstance().getConfig().getBoolean("Main.Animate")) return;
+        if (!Settings.ANIMATE.getBoolean()) return;
         Block block = location.getBlock();
-        if (block.getRelative(0, 1, 0).getType() != Material.AIR && EpicFarming.getInstance().getConfig().getBoolean("Main.Do Dispenser Animation"))
+        if (block.getRelative(0, 1, 0).getType() != Material.AIR)
             return;
         Item i = block.getWorld().dropItem(block.getLocation().add(0.5, 1, 0.5), new ItemStack(mat));
 
@@ -61,14 +67,6 @@ public class Methods {
         if (cap)
             text = text.substring(0, 1).toUpperCase() + text.substring(1);
         return ChatColor.translateAlternateColorCodes('&', text);
-    }
-
-    public static String convertToInvisibleString(String s) {
-        if (s == null || s.equals(""))
-            return "";
-        StringBuilder hidden = new StringBuilder();
-        for (char c : s.toCharArray()) hidden.append(ChatColor.COLOR_CHAR + "").append(c);
-        return hidden.toString();
     }
 
     public static long parseTime(String input) {

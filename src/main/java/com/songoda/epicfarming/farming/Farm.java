@@ -1,8 +1,8 @@
 package com.songoda.epicfarming.farming;
 
 import com.songoda.core.compatibility.CompatibleMaterial;
+import com.songoda.core.compatibility.CompatibleParticleHandler;
 import com.songoda.core.compatibility.CompatibleSound;
-import com.songoda.core.compatibility.ServerVersion;
 import com.songoda.core.hooks.EconomyManager;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.gui.OverviewGui;
@@ -19,9 +19,9 @@ public class Farm {
 
     private static final Random random = new Random();
     private final List<Block> cachedCrops = new ArrayList<>();
+    private final List<ItemStack> items = new ArrayList<>();
     private Location location;
     private Level level;
-    private List<ItemStack> items = new ArrayList<>();
     private OverviewGui opened = null;
     private UUID placedBy;
     private UUID viewing = null;
@@ -91,20 +91,17 @@ public class Farm {
         }
         Location loc = location.clone().add(.5, .5, .5);
         tillLand(location);
-        if (!ServerVersion.isServerVersionAtLeast(ServerVersion.V1_12)) return;
 
-        player.getWorld().spawnParticle(org.bukkit.Particle.valueOf(instance.getConfig().getString("Main.Upgrade Particle Type")), loc, 200, .5, .5, .5);
+        CompatibleParticleHandler.spawnParticles(Settings.PARTICLE_TYPE.getString(), loc, 200, .5, .5, .5);
 
         if (instance.getLevelManager().getHighestLevel() != level) {
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 0.6F, 15.0F);
+            CompatibleSound.ENTITY_PLAYER_LEVELUP.play(player, 0.6F, 15.0F);
         } else {
-            player.playSound(player.getLocation(), Sound.ENTITY_PLAYER_LEVELUP, 2F, 25.0F);
+            CompatibleSound.ENTITY_PLAYER_LEVELUP.play(player, 2F, 25.0F);
 
-            if (!ServerVersion.isServerVersionAtLeast(ServerVersion.V1_13)) return;
-
-            player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 2F, 25.0F);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1.2F, 35.0F), 5L);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> player.playSound(player.getLocation(), Sound.BLOCK_NOTE_BLOCK_CHIME, 1.8F, 35.0F), 10L);
+            CompatibleSound.BLOCK_NOTE_BLOCK_CHIME.play(player, 2F, 25.0F);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> CompatibleSound.BLOCK_NOTE_BLOCK_CHIME.play(player, 1.2F, 35.0F), 5L);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> CompatibleSound.BLOCK_NOTE_BLOCK_CHIME.play(player, 1.8F, 35.0F), 10L);
         }
     }
 

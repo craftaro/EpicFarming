@@ -125,7 +125,7 @@ public class OverviewGui extends Gui {
 
         }
 
-        if (plugin.getConfig().getBoolean("Main.Upgrade With Economy") && player != null && player.hasPermission("EpicFarming.Upgrade.ECO")) {
+        if (Settings.UPGRADE_WITH_ECONOMY.getBoolean() && player != null && player.hasPermission("EpicFarming.Upgrade.ECO")) {
 
             setButton(15, GuiUtils.createButtonItem(Settings.ECO_ICON.getMaterial(CompatibleMaterial.SUNFLOWER),
                     plugin.getLocale().getMessage("interface.button.upgradewitheconomy").getMessage(),

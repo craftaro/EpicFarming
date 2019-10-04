@@ -6,6 +6,7 @@ import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.farming.Farm;
+import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.utils.CropType;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Material;
@@ -25,12 +26,11 @@ public class FarmTask extends BukkitRunnable {
     Random random = new Random();
 
     public static FarmTask startTask(EpicFarming pl) {
-        if (instance == null) {
-            instance = new FarmTask();
-            plugin = pl;
-            instance.runTaskTimer(plugin, 0, plugin.getConfig().getInt("Main.Growth Tick Speed"));
+        if (instance != null && !instance.isCancelled()) {
+            instance.cancel();
         }
-
+        instance = new FarmTask();
+        instance.runTaskTimer(plugin = pl, 0, Settings.GROWTH_TICK_SPEED.getInt());
         return instance;
     }
 
@@ -119,17 +119,6 @@ public class FarmTask extends BukkitRunnable {
             }
         }
         return farm.getCachedCrops();
-    }
-
-    private boolean canMove(Inventory inventory, ItemStack item) {
-        if (inventory.firstEmpty() != -1) return true;
-
-        for (ItemStack stack : inventory.getContents()) {
-            if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {
-                return true;
-            }
-        }
-        return false;
     }
 
 }

@@ -4,6 +4,7 @@ import com.songoda.core.hooks.EntityStackerManager;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;
+import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.utils.EntityInfo;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
@@ -26,13 +27,14 @@ public class EntityTask extends BukkitRunnable {
     private static final Map<Entity, Integer> ticksLived = new HashMap<>();
     private static EntityTask instance;
     private static EpicFarming plugin;
-
+    private final int autoBreedCap = Settings.AUTO_BREEDING_CAP.getInt();
+    
     public static EntityTask startTask(EpicFarming pl) {
-        if (instance == null) {
-            instance = new EntityTask();
-            plugin = pl;
-            instance.runTaskTimer(plugin, 0, plugin.getConfig().getInt("Main.Entity Tick Speed"));
+        if (instance != null && !instance.isCancelled()) {
+            instance.cancel();
         }
+        instance = new EntityTask();
+        instance.runTaskTimer(plugin = pl, 0, Settings.ENTITY_TICK_SPEED.getInt());
         return instance;
     }
 
@@ -156,7 +158,7 @@ public class EntityTask extends BukkitRunnable {
                     return;
                 }
 
-                if (entry.getValue() >= 2 && entry.getValue() < plugin.getConfig().getInt("Main.Auto Breeding Cap")) {
+                if (entry.getValue() >= 2 && entry.getValue() < autoBreedCap) {
 
                     EntityType entityType = entry.getKey();
 
