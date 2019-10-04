@@ -29,7 +29,7 @@ public class CommandReload extends AbstractCommand {
 
     @Override
     public String getPermissionNode() {
-        return "epicfarming.admin";
+        return "epicfarming.reload";
     }
 
     @Override

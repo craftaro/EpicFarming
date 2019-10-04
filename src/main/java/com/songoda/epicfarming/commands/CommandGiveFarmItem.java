@@ -61,7 +61,7 @@ public class CommandGiveFarmItem extends AbstractCommand {
 
     @Override
     public String getPermissionNode() {
-        return "epicfarming.admin";
+        return "epicfarming.give";
     }
 
     @Override

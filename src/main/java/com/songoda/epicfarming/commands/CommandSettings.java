@@ -30,7 +30,7 @@ public class CommandSettings extends AbstractCommand {
 
     @Override
     public String getPermissionNode() {
-        return "epicfarming.admin";
+        return "epicfarming.settings";
     }
 
     @Override
