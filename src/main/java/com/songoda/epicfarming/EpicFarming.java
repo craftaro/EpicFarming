@@ -34,6 +34,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
@@ -115,18 +116,32 @@ public class EpicFarming extends SongodaPlugin {
         /*
          * Register Farms into FarmManger from configuration
          */
-        Bukkit.getScheduler().runTaskLater(this, () -> {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> {
             if (storage.containsGroup("farms")) {
                 for (StorageRow row : storage.getRowsByGroup("farms")) {
                     Location location = Methods.unserializeLocation(row.getKey());
-                    if (location == null || location.getWorld() == null) return;
+                    if (location == null || location.getWorld() == null) continue;
 
-                    int level = row.get("level").asInt();
-                    List<ItemStack> items = row.get("contents").asItemStackList();
-                    UUID placedBY = UUID.fromString(row.get("placedby").asString());
+                    int level = 1;
+                    int configLevel = row.get("level").asInt();
+                    if (configLevel != 0 && configLevel > 0) {
+                        level = configLevel;
+                    }
+                    List<ItemStack> items = new ArrayList<ItemStack>();
+                    List<ItemStack> configItems = row.get("contents").asItemStackList();
+                    if (configItems != null && configItems.size() > 0) {
+                        items = configItems;
+                    }
+                    UUID placedBY = null;
+                    String configPlacedBY = row.get("placedby").asString();
+                    if (configPlacedBY != null) {
+                        placedBY = UUID.fromString(configPlacedBY);
+                    }
                     Farm farm = new Farm(location, levelManager.getLevel(level), placedBY);
                     farm.setItems(items);
-                    farmManager.addFarm(location, farm);
+                    Bukkit.getScheduler().runTask(EpicFarming.getInstance(), () -> {
+                        farmManager.addFarm(location, farm);
+                    });
                 }
             }
 
@@ -141,7 +156,9 @@ public class EpicFarming extends SongodaPlugin {
                             Long.parseLong(row.getKey()),
                             UUID.fromString(row.get("player").asString()));
 
-                    this.boostManager.addBoostToPlayer(boostData);
+                    Bukkit.getScheduler().runTask(EpicFarming.getInstance(), () -> {
+                        this.boostManager.addBoostToPlayer(boostData);
+                    });
                 }
             }
 
