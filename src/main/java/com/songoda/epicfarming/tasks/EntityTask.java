@@ -213,7 +213,7 @@ public class EntityTask extends BukkitRunnable {
 
         stack.setAmount(stack.getAmount() * (boostData == null ? 1 : boostData.getMultiplier()));
 
-        if (farm.willFit(stack)) return false;
+        if (!farm.willFit(stack)) return false;
         farm.addItem(stack);
         return true;
     }
