@@ -120,6 +120,7 @@ public class OverviewGui extends Gui {
                             : plugin.getLocale().getMessage("event.upgrade.maxed").getMessage()),
                     event -> {
                         farm.upgrade(UpgradeType.EXPERIENCE, player);
+                        onClose(guiManager, player);
                         farm.view(player, true);
                     });
 
@@ -134,6 +135,7 @@ public class OverviewGui extends Gui {
                             .processPlaceholder("cost", Methods.formatEconomy(nextLevel.getCostEconomy())).getMessage()
                             : plugin.getLocale().getMessage("event.upgrade.maxed").getMessage()), (event) -> {
                         farm.upgrade(UpgradeType.ECONOMY, player);
+                        onClose(guiManager, player);
                         farm.view(player, true);
                     });
 
