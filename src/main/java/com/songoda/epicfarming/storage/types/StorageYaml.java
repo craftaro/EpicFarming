@@ -108,7 +108,8 @@ public class StorageYaml extends Storage {
         File data = new File(plugin.getDataFolder(), "data.yml");
         File dataClone = new File(plugin.getDataFolder(), "data-backup-" + System.currentTimeMillis() + ".yml");
         try {
-            copyFile(data, dataClone);
+            if (data.exists())
+                copyFile(data, dataClone);
         } catch (IOException e) {
             e.printStackTrace();
         }
