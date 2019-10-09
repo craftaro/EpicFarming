@@ -17,6 +17,7 @@ import com.songoda.epicfarming.farming.Level;
 import com.songoda.epicfarming.farming.LevelManager;
 import com.songoda.epicfarming.listeners.BlockListeners;
 import com.songoda.epicfarming.listeners.InteractListeners;
+import com.songoda.epicfarming.listeners.UnloadListeners;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.storage.Storage;
 import com.songoda.epicfarming.storage.StorageRow;
@@ -124,7 +125,7 @@ public class EpicFarming extends SongodaPlugin {
 
                     int level = 1;
                     int configLevel = row.get("level").asInt();
-                    if (configLevel != 0 && configLevel > 0) {
+                    if (configLevel > 0) {
                         level = configLevel;
                     }
                     List<ItemStack> items = new ArrayList<ItemStack>();
@@ -172,6 +173,7 @@ public class EpicFarming extends SongodaPlugin {
         PluginManager pluginManager = Bukkit.getPluginManager();
         pluginManager.registerEvents(new BlockListeners(this), this);
         pluginManager.registerEvents(new InteractListeners(this), this);
+        pluginManager.registerEvents(new UnloadListeners(this), this);
 
         // Start tasks
         this.growthTask = GrowthTask.startTask(this);

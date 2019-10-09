@@ -1,13 +1,16 @@
 package com.songoda.epicfarming.listeners;
 
 import com.songoda.epicfarming.EpicFarming;
+import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.settings.Settings;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.event.world.ChunkUnloadEvent;
 
 /**
  * Created by songoda on 3/14/2017.
