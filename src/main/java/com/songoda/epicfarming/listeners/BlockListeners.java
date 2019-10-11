@@ -70,7 +70,7 @@ public class BlockListeners implements Listener {
 
         int amt = 0;
         for (Farm farmm : instance.getFarmManager().getFarms().values()) {
-            if (!farmm.getPlacedBy().equals(e.getPlayer().getUniqueId())) continue;
+            if (farmm.getPlacedBy() == null || !farmm.getPlacedBy().equals(e.getPlayer().getUniqueId())) continue;
             amt++;
         }
         int limit = maxFarms(e.getPlayer());
