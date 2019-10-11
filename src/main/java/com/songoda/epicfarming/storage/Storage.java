@@ -46,7 +46,7 @@ public abstract class Storage {
             String endTime = String.valueOf(boostData.getEndTime());
             prepareSaveItem("boosts", new StorageItem("endtime", endTime),
                     new StorageItem("amount", boostData.getMultiplier()),
-                    new StorageItem("player", boostData.getPlayer()));
+                    new StorageItem("player", boostData.getPlayer().toString()));
         }
     }
 
