@@ -19,12 +19,16 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
+import org.bukkit.event.entity.EntityExplodeEvent;
 import org.bukkit.event.entity.ItemSpawnEvent;
 import org.bukkit.event.entity.SheepRegrowWoolEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * Created by songoda on 3/14/2017.
@@ -64,7 +68,8 @@ public class BlockListeners implements Listener {
         Material farmBlock = Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getBlockMaterial();
 
         if (e.getPlayer().getItemInHand().getType() != farmBlock
-                || instance.getLevelFromItem(e.getItemInHand()) == 0 && !Settings.NON_COMMAND_FARMS.getBoolean()) return;
+                || instance.getLevelFromItem(e.getItemInHand()) == 0 && !Settings.NON_COMMAND_FARMS.getBoolean())
+            return;
 
         if (e.getBlockAgainst().getType() == farmBlock) e.setCancelled(true);
 
@@ -184,6 +189,40 @@ public class BlockListeners implements Listener {
             Block block = event.getEntity().getLocation().getBlock().getRelative(BlockFace.DOWN);
             if (block.getType() == Material.DIRT) {
                 block.setType(Material.GRASS_BLOCK);
+            }
+        }
+    }
+
+    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
+    public void onBlow(EntityExplodeEvent event) {
+        List<Block> destroyed = event.blockList();
+        Iterator<Block> it = destroyed.iterator();
+        List<Block> toCancel = new ArrayList<>();
+        while (it.hasNext()) {
+            Block block = it.next();
+            if (block.getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial())
+                continue;
+
+            Farm farm = instance.getFarmManager().getFarm(block.getLocation());
+            if (farm == null) continue;
+
+            toCancel.add(block);
+        }
+
+        for (Block block : toCancel) {
+            event.blockList().remove(block);
+
+            Farm farm = instance.getFarmManager().removeFarm(block.getLocation());
+
+            instance.getFarmTask().getCrops(farm, false);
+
+            ItemStack item = instance.makeFarmItem(farm.getLevel());
+
+            block.setType(Material.AIR);
+            block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
+
+            for (ItemStack itemStack : farm.getItems()) {
+                farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
             }
         }
     }
