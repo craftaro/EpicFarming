@@ -134,9 +134,9 @@ public class EpicFarming extends SongodaPlugin {
                         items = configItems;
                     }
                     UUID placedBY = null;
-                    String configPlacedBY = row.get("placedby").asString();
-                    if (configPlacedBY != null) {
-                        placedBY = UUID.fromString(configPlacedBY);
+                    String configPlacedBy = row.get("placedby").asString();
+                    if (configPlacedBy != null) {
+                        placedBY = UUID.fromString(configPlacedBy);
                     }
                     Farm farm = new Farm(location, levelManager.getLevel(level), placedBY);
                     farm.setItems(items);
@@ -215,7 +215,7 @@ public class EpicFarming extends SongodaPlugin {
         for (String levelName : levelsFile.getKeys(false)) {
             ConfigurationSection levels = levelsFile.getConfigurationSection(levelName);
             
-            int level = Integer.valueOf(levelName.split("-")[1]);
+            int level = Integer.parseInt(levelName.split("-")[1]);
             int costExperiance = levels.getInt("Cost-xp");
             int costEconomy = levels.getInt("Cost-eco");
             int radius = levels.getInt("Radius");

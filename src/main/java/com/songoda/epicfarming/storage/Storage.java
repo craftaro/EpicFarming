@@ -35,7 +35,7 @@ public abstract class Storage {
             String locstr = Methods.serializeLocation(farm.getLocation());
             prepareSaveItem("farms", new StorageItem("location", locstr),
                     new StorageItem("level", farm.getLevel().getLevel()),
-                    new StorageItem("placedby", farm.getPlacedBy().toString()),
+                    new StorageItem("placedby", farm.getPlacedBy() == null ? null : farm.getPlacedBy().toString()),
                     new StorageItem("contents", farm.getItems()));
         }
 
