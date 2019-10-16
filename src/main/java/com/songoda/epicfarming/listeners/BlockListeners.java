@@ -58,7 +58,9 @@ public class BlockListeners implements Listener {
         int limit = -1;
         for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
             if (!permissionAttachmentInfo.getPermission().toLowerCase().startsWith("epicfarming.limit")) continue;
-            limit = Integer.parseInt(permissionAttachmentInfo.getPermission().split("\\.")[2]);
+            int num = Integer.parseInt(permissionAttachmentInfo.getPermission().split("\\.")[2]);
+            if (num > limit)
+                limit = num;
         }
         return limit;
     }
