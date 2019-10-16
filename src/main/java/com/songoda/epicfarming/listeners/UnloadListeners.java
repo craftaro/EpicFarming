@@ -9,6 +9,8 @@ import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.world.ChunkUnloadEvent;
 
+import java.util.ArrayList;
+
 public class UnloadListeners implements Listener {
 
     private EpicFarming instance;
@@ -20,7 +22,7 @@ public class UnloadListeners implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onUnload(ChunkUnloadEvent event) {
         Material type = Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial();
-        for (Farm farm : instance.getFarmManager().getFarms().values()) {
+        for (Farm farm : new ArrayList<>(instance.getFarmManager().getFarms().values())) {
             int x = farm.getLocation().getBlockX() >> 4;
             int z = farm.getLocation().getBlockZ() >> 4;
             if (event.getChunk().getX() == x && event.getChunk().getZ() == z) {
