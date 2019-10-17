@@ -47,7 +47,7 @@ public class ModuleAutoButcher extends Module {
         for (LivingEntity entity : entities) {
             int stackSize = EntityStackerManager.getSize(entity);
             if (stackSize == 0) stackSize = 1;
-            count = stackSize;
+            count += stackSize;
         }
 
         if (count <= 2 || !farm.willFit(new ItemStack(Material.STONE))) return;
