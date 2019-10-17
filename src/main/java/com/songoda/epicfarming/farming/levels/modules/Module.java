@@ -37,15 +37,18 @@ public abstract class Module {
 
     public abstract int runEveryXTicks();
 
-    private int currentTick = 0;
+    private Map<Farm, Integer> currentTicks = new HashMap<>();
 
     public void run(Farm farm, Collection<LivingEntity> entitiesAroundFarm) {
+        if (!currentTicks.containsKey(farm))
+            currentTicks.put(farm, 1);
+        int currentTick = currentTicks.get(farm);
         if (currentTick >= runEveryXTicks()) {
             runFinal(farm, entitiesAroundFarm);
-            currentTick = 0;
+            currentTicks.remove(farm);
             return;
         }
-        currentTick++;
+        currentTicks.put(farm, currentTick + 1);
     }
 
     public abstract void runFinal(Farm farm, Collection<LivingEntity> entitiesAroundFarm);

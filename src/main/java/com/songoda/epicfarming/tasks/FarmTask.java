@@ -1,22 +1,17 @@
 package com.songoda.epicfarming.tasks;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.settings.Settings;
-import com.songoda.epicfarming.utils.CropType;
-import com.songoda.epicfarming.utils.Methods;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
 import org.bukkit.entity.ArmorStand;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
-import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.stream.Collectors;
 
 public class FarmTask extends BukkitRunnable {
