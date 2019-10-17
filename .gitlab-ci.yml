@@ -4,7 +4,7 @@ stages:
 variables:
   name: "EpicFarming"
   path: "/builds/$CI_PROJECT_PATH"
-  version: "2.3.9"
+  version: "3"
 
 build:
   stage: build
