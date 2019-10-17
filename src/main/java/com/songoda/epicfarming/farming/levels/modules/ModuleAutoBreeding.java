@@ -61,8 +61,8 @@ public class ModuleAutoBreeding extends Module {
         }
 
 
+        boolean mate1 = false;
         for (Map.Entry<EntityType, Long> entry : counts.entrySet()) {
-            boolean mate1 = false;
 
             for (LivingEntity entity : entities) {
                 if (entry.getKey() != entity.getType()) continue;
@@ -107,6 +107,7 @@ public class ModuleAutoBreeding extends Module {
                         }
                         handleBreed(entity);
                         mate1 = true;
+                        break;
                     }
                 }
             }
