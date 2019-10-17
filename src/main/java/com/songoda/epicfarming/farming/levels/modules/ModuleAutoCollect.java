@@ -50,8 +50,6 @@ public class ModuleAutoCollect extends Module {
     }
 
     private void collectCrops(Farm farm) {
-        HashMap<Material, Boolean> hasDropped = new HashMap();
-
         for (Block block : getCrops(farm, true)) {
             Material mat = block.getType();
             if (!CropType.isCrop(mat)) continue;
@@ -59,8 +57,7 @@ public class ModuleAutoCollect extends Module {
             if (!BlockUtils.isCropFullyGrown(block)) {
                 // Add to GrowthTask
                 plugin.getGrowthTask().addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
-            } else if (isEnabled(farm) && !hasDropped.getOrDefault(mat, false) && doCropDrop(farm, mat)) {
-                hasDropped.put(mat, true);
+            } else if (isEnabled(farm) && doCropDrop(farm, mat)) {
 
                 if (farm.getLevel().isAutoReplant()) {
                     BlockUtils.resetGrowthStage(block);
