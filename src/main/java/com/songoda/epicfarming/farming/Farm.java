@@ -5,9 +5,13 @@ import com.songoda.core.compatibility.CompatibleParticleHandler;
 import com.songoda.core.compatibility.CompatibleSound;
 import com.songoda.core.hooks.EconomyManager;
 import com.songoda.epicfarming.EpicFarming;
+import com.songoda.epicfarming.farming.levels.Level;
 import com.songoda.epicfarming.gui.OverviewGui;
 import com.songoda.epicfarming.settings.Settings;
-import org.bukkit.*;
+import org.bukkit.Bukkit;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
@@ -26,6 +30,10 @@ public class Farm {
     private UUID placedBy;
     private UUID viewing = null;
     private long lastCached = 0;
+
+    private FarmType farmType = FarmType.BOTH;
+
+    private final Map<String, Object> moduleCache = new HashMap<>();
 
     public Farm(Location location, Level level, UUID placedBy) {
         this.location = location;
@@ -89,9 +97,8 @@ public class Farm {
             instance.getLocale().getMessage("event.upgrade.successmaxed")
                     .processPlaceholder("level", level.getLevel()).sendPrefixedMessage(player);
         }
+        tillLand();
         Location loc = location.clone().add(.5, .5, .5);
-        tillLand(location);
-
         CompatibleParticleHandler.spawnParticles(Settings.PARTICLE_TYPE.getString(), loc, 200, .5, .5, .5);
 
         if (instance.getLevelManager().getHighestLevel() != level) {
@@ -105,7 +112,7 @@ public class Farm {
         }
     }
 
-    public boolean tillLand(Location location) {
+    public boolean tillLand() {
         if (Settings.DISABLE_AUTO_TIL_LAND.getBoolean()) return true;
         Block block = location.getBlock();
         int radius = level.getRadius();
@@ -251,5 +258,47 @@ public class Farm {
 
     public void close() {
         this.opened = null;
+    }
+
+    public Object getDataFromModuleCache(String key) {
+        return this.moduleCache.getOrDefault(key, null);
+    }
+
+    public void addDataToModuleCache(String key, Object data) {
+        this.moduleCache.put(key, data);
+    }
+
+    public boolean isDataCachedInModuleCache(String key) {
+        return this.moduleCache.containsKey(key);
+    }
+
+    public void removeDataFromModuleCache(String key) {
+        this.moduleCache.remove(key);
+    }
+
+    public void clearModuleCache() {
+        this.moduleCache.clear();
+    }
+
+    public FarmType getFarmType() {
+        return farmType;
+    }
+
+    public void toggleFarmType() {
+        switch (farmType) {
+            case CROPS:
+                farmType = FarmType.LIVESTOCK;
+                break;
+            case LIVESTOCK:
+                farmType = FarmType.BOTH;
+                break;
+            case BOTH:
+                farmType = FarmType.CROPS;
+                break;
+        }
+    }
+
+    public void setFarmType(FarmType farmType) {
+        this.farmType = farmType;
     }
 }

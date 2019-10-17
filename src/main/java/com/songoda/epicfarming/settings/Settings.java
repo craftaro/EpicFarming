@@ -22,13 +22,10 @@ public class Settings {
     public static final ConfigSetting PARTICLE_TYPE = new ConfigSetting(config, "Main.Upgrade Particle Type", "SPELL_WITCH",
             "The type of particle shown when a furnace is upgraded.");
 
-    public static final ConfigSetting FARM_TICK_SPEED = new ConfigSetting(config, "Main.Farm Tick Speed", 70,
+    public static final ConfigSetting FARM_TICK_SPEED = new ConfigSetting(config, "Main.Farm Tick Speed", 20,
             "The delay in ticks between each farm growth event.");
 
-    public static final ConfigSetting ENTITY_TICK_SPEED = new ConfigSetting(config, "Main.Entity Tick Speed", 100,
-            "The delay in ticks between each farm entity event.");
-
-    public static final ConfigSetting GROWTH_TICK_SPEED = new ConfigSetting(config, "Main.Growth Tick Speed", 20,
+    public static final ConfigSetting GROWTH_TICK_SPEED = new ConfigSetting(config, "Main.Growth Tick Speed", 70,
             "The delay in ticks between each farm entity event.");
 
     public static final ConfigSetting FARM_BLOCK_MATERIAL = new ConfigSetting(config, "Main.Farm Block Material", ServerVersion.isServerVersionAtLeast(ServerVersion.V1_9) ? "END_ROD" : "TORCH",
@@ -36,9 +33,6 @@ public class Settings {
 
     public static final ConfigSetting NON_COMMAND_FARMS = new ConfigSetting(config, "Main.Allow Non Command Issued Farm Items", false,
             "Should farm item materials found in the wild work as farms?");
-
-    public static final ConfigSetting AUTO_BREEDING_CAP = new ConfigSetting(config, "Main.Auto Breeding Cap", 15,
-            "How many entities should auto breeding stop at?");
 
     public static final ConfigSetting ANIMATE = new ConfigSetting(config, "Main.Animate", true,
             "Should the processed farm item be animated above the farm item?");
@@ -80,6 +74,10 @@ public class Settings {
         if ((color = GLASS_TYPE_3.getInt(-1)) != -1) {
             config.set(GLASS_TYPE_3.getKey(), CompatibleMaterial.getGlassPaneColor(color).name());
         }
+
+
+        if (Settings.FARM_TICK_SPEED.getInt() == 70)
+            config.set(FARM_TICK_SPEED.getKey(), 20);
 
         config.saveChanges();
     }

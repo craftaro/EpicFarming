@@ -13,16 +13,21 @@ import com.songoda.epicfarming.boost.BoostManager;
 import com.songoda.epicfarming.commands.*;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmManager;
-import com.songoda.epicfarming.farming.Level;
-import com.songoda.epicfarming.farming.LevelManager;
+import com.songoda.epicfarming.farming.FarmType;
+import com.songoda.epicfarming.farming.levels.Level;
+import com.songoda.epicfarming.farming.levels.LevelManager;
+import com.songoda.epicfarming.farming.levels.modules.Module;
+import com.songoda.epicfarming.farming.levels.modules.ModuleAutoBreeding;
+import com.songoda.epicfarming.farming.levels.modules.ModuleAutoButcher;
+import com.songoda.epicfarming.farming.levels.modules.ModuleAutoCollect;
 import com.songoda.epicfarming.listeners.BlockListeners;
+import com.songoda.epicfarming.listeners.EntityListeners;
 import com.songoda.epicfarming.listeners.InteractListeners;
 import com.songoda.epicfarming.listeners.UnloadListeners;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.storage.Storage;
 import com.songoda.epicfarming.storage.StorageRow;
 import com.songoda.epicfarming.storage.types.StorageYaml;
-import com.songoda.epicfarming.tasks.EntityTask;
 import com.songoda.epicfarming.tasks.FarmTask;
 import com.songoda.epicfarming.tasks.GrowthTask;
 import com.songoda.epicfarming.tasks.HopperTask;
@@ -35,6 +40,7 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -58,7 +64,6 @@ public class EpicFarming extends SongodaPlugin {
 
     private GrowthTask growthTask;
     private FarmTask farmTask;
-    private EntityTask entityTask;
 
     private Storage storage;
 
@@ -138,11 +143,17 @@ public class EpicFarming extends SongodaPlugin {
                     if (configPlacedBy != null) {
                         placedBY = UUID.fromString(configPlacedBy);
                     }
+
+                    FarmType farmType = FarmType.BOTH;
+                    String farmTypeStr = row.get("farmtype").asString();
+                    if (farmTypeStr != null)
+                        farmType = FarmType.valueOf(farmTypeStr);
+
                     Farm farm = new Farm(location, levelManager.getLevel(level), placedBY);
+                    farm.setFarmType(farmType);
                     farm.setItems(items);
-                    Bukkit.getScheduler().runTask(EpicFarming.getInstance(), () -> {
-                        farmManager.addFarm(location, farm);
-                    });
+                    Bukkit.getScheduler().runTask(EpicFarming.getInstance(), () ->
+                            farmManager.addFarm(location, farm));
                 }
             }
 
@@ -171,6 +182,7 @@ public class EpicFarming extends SongodaPlugin {
         // Register Listeners
         guiManager.init();
         PluginManager pluginManager = Bukkit.getPluginManager();
+        pluginManager.registerEvents(new EntityListeners(this), this);
         pluginManager.registerEvents(new BlockListeners(this), this);
         pluginManager.registerEvents(new InteractListeners(this), this);
         pluginManager.registerEvents(new UnloadListeners(this), this);
@@ -178,7 +190,6 @@ public class EpicFarming extends SongodaPlugin {
         // Start tasks
         this.growthTask = GrowthTask.startTask(this);
         this.farmTask = FarmTask.startTask(this);
-        this.entityTask = EntityTask.startTask(this);
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if (!Bukkit.getPluginManager().isPluginEnabled("EpicHoppers"))
@@ -202,7 +213,7 @@ public class EpicFarming extends SongodaPlugin {
     }
 
     private void loadLevelManager() {
-        if (!levelsFile.getFile().exists())
+        if (!new File(this.getDataFolder(), "levels.yml").exists())
             this.saveResource("levels.yml", false);
         levelsFile.load();
 
@@ -214,24 +225,51 @@ public class EpicFarming extends SongodaPlugin {
          */
         for (String levelName : levelsFile.getKeys(false)) {
             ConfigurationSection levels = levelsFile.getConfigurationSection(levelName);
-            
+
+            if (levels.get("Auto-Harvest") != null) {
+                levels.set("Auto-Collect", levels.getBoolean("Auto-Harvest"));
+                levels.set("Auto-Harvest", null);
+            }
+
             int level = Integer.parseInt(levelName.split("-")[1]);
             int costExperiance = levels.getInt("Cost-xp");
             int costEconomy = levels.getInt("Cost-eco");
             int radius = levels.getInt("Radius");
             double speedMultiplier = levels.getDouble("Speed-Multiplier");
-            boolean autoHarvest = levels.getBoolean("Auto-Harvest");
+            boolean autoCollect = levels.getBoolean("Auto-Collect");
             boolean autoReplant = levels.getBoolean("Auto-Replant");
-            boolean autoBreeding = levels.getBoolean("Auto-Breeding");
             int pages = levels.getInt("Pages", 1);
-            levelManager.addLevel(level, costExperiance, costEconomy, speedMultiplier, radius, autoHarvest, autoReplant, autoBreeding, pages);
+
+            if (levels.get("Auto-Breeding") instanceof Boolean) {
+                levels.set("Auto-Breeding", 15);
+            }
+
+            ArrayList<Module> modules = new ArrayList<>();
+
+            for (String key : levels.getKeys(false)) {
+                if (key.equals("Auto-Breeding") && levels.getInt("Auto-Breeding") != 0) {
+                    modules.add(new ModuleAutoBreeding(this, levels.getInt("Auto-Breeding")));
+                } else if (key.equals("Auto-Butcher") && levels.getInt("Auto-Butcher") != 0) {
+                    modules.add(new ModuleAutoButcher(this, levels.getInt("Auto-Butcher")));
+                } else if (key.equals("Auto-Collect")) {
+                    modules.add(new ModuleAutoCollect(this));
+                }
+            }
+            levelManager.addLevel(level, costExperiance, costEconomy, speedMultiplier, radius, autoCollect, autoReplant, pages, modules);
         }
+        levelsFile.saveChanges();
     }
 
     /*
      * Saves registered farms to file.
      */
     private void saveToFile() {
+        if (levelManager != null) {
+            for (Level level : levelManager.getLevels().values())
+                for (Module module : level.getRegisteredModules())
+                    module.saveDataToFile();
+        }
+
         storage.doSave();
     }
 
@@ -275,10 +313,6 @@ public class EpicFarming extends SongodaPlugin {
 
     public FarmTask getFarmTask() {
         return farmTask;
-    }
-
-    public EntityTask getEntityTask() {
-        return entityTask;
     }
 
     public GuiManager getGuiManager() {

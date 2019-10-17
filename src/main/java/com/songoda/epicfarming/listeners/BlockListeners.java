@@ -4,31 +4,21 @@ import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmManager;
-import com.songoda.epicfarming.farming.Level;
+import com.songoda.epicfarming.farming.FarmType;
+import com.songoda.epicfarming.farming.levels.Level;
+import com.songoda.epicfarming.farming.levels.modules.ModuleAutoCollect;
 import com.songoda.epicfarming.settings.Settings;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.BlockFace;
-import org.bukkit.entity.Chicken;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
-import org.bukkit.event.entity.EntityExplodeEvent;
-import org.bukkit.event.entity.ItemSpawnEvent;
-import org.bukkit.event.entity.SheepRegrowWoolEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
-
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * Created by songoda on 3/14/2017.
@@ -44,13 +34,15 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent e) {
-        if (checkForFarm(e.getBlock().getLocation()))
+        Farm farm = checkForFarm(e.getBlock().getLocation());
+        if (farm != null && farm.getFarmType() != FarmType.LIVESTOCK)
             e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onGrow(BlockGrowEvent e) {
-        if (checkForFarm(e.getNewState().getLocation()))
+        Farm farm = checkForFarm(e.getBlock().getLocation());
+        if (farm != null && farm.getFarmType() != FarmType.LIVESTOCK)
             e.setCancelled(true);
     }
 
@@ -91,7 +83,7 @@ public class BlockListeners implements Listener {
 
         Location location = e.getBlock().getLocation();
         if (e.getBlockPlaced().getType().equals(Material.MELON_SEEDS) || e.getBlockPlaced().getType().equals(Material.PUMPKIN_SEEDS)) {
-            if (checkForFarm(location)) {
+            if (checkForFarm(location) != null) {
                 instance.getLocale().getMessage("event.warning.noauto").sendPrefixedMessage(e.getPlayer());
             }
         }
@@ -106,11 +98,11 @@ public class BlockListeners implements Listener {
             Farm farm = new Farm(location, instance.getLevelManager().getLevel(level), e.getPlayer().getUniqueId());
             instance.getFarmManager().addFarm(location, farm);
 
-            farm.tillLand(e.getBlock().getLocation());
+            farm.tillLand();
         }, 1);
     }
 
-    private boolean checkForFarm(Location location) {
+    private Farm checkForFarm(Location location) {
         Material farmBlock = Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getBlockMaterial();
 
         FarmManager farmManager = instance.getFarmManager();
@@ -127,16 +119,17 @@ public class BlockListeners implements Listener {
                     for (int fz = -radius; fz <= radius; fz++) {
                         Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
                         if (b2.getType() == farmBlock) {
-                            if (!farmManager.getFarms().containsKey(b2.getLocation())) continue;
+                            Farm farm = farmManager.getFarms().get(b2.getLocation());
+                            if (farm == null) continue;
                             if (level.getRadius() != farmManager.getFarm(b2.getLocation()).getLevel().getRadius())
                                 continue;
-                            return true;
+                            return farm;
                         }
                     }
                 }
             }
         }
-        return false;
+        return null;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
@@ -148,7 +141,7 @@ public class BlockListeners implements Listener {
 
         if (farm == null) return;
 
-        instance.getFarmTask().getCrops(farm, false);
+        ModuleAutoCollect.getCrops(farm, false);
 
         event.setCancelled(true);
 
@@ -165,71 +158,6 @@ public class BlockListeners implements Listener {
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onSpawn(ItemSpawnEvent event) {
-        Item item = event.getEntity();
-
-        if (item.getItemStack().getType() != Material.EGG) return;
-
-        Location location = event.getEntity().getLocation();
-        Collection<Entity> nearby = location.getWorld().getNearbyEntities(location, 0.01, 0.3, 0.01);
-
-        Entity entity = null;
-        for (Entity e : nearby) {
-            if (e instanceof Player) return;
-            if (e instanceof Chicken) entity = e;
-        }
-
-        if (instance.getEntityTask().getTicksLived().containsKey(entity)) {
-            event.setCancelled(true);
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onSpawn(SheepRegrowWoolEvent event) {
-        if (instance.getEntityTask().getTicksLived().containsKey(event.getEntity())) {
-            event.setCancelled(true);
-            Block block = event.getEntity().getLocation().getBlock().getRelative(BlockFace.DOWN);
-            if (block.getType() == Material.DIRT) {
-                block.setType(Material.GRASS_BLOCK);
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
-    public void onBlow(EntityExplodeEvent event) {
-        List<Block> destroyed = event.blockList();
-        Iterator<Block> it = destroyed.iterator();
-        List<Block> toCancel = new ArrayList<>();
-        while (it.hasNext()) {
-            Block block = it.next();
-            if (block.getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial())
-                continue;
-
-            Farm farm = instance.getFarmManager().getFarm(block.getLocation());
-            if (farm == null) continue;
-
-            toCancel.add(block);
-        }
-
-        for (Block block : toCancel) {
-            event.blockList().remove(block);
-
-            Farm farm = instance.getFarmManager().removeFarm(block.getLocation());
-
-            instance.getFarmTask().getCrops(farm, false);
-
-            ItemStack item = instance.makeFarmItem(farm.getLevel());
-
-            block.setType(Material.AIR);
-            block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
-
-            for (ItemStack itemStack : farm.getItems()) {
-                farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
-            }
-        }
-    }
-
-    @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
         if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial())
             return;
@@ -237,7 +165,7 @@ public class BlockListeners implements Listener {
         Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
 
         if (farm == null) return;
-        instance.getFarmTask().getCrops(farm, false);
+        ModuleAutoCollect.getCrops(farm, false);
 
         event.setCancelled(true);
 

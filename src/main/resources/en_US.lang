@@ -5,6 +5,12 @@ general.nametag.farm = "&eLevel %level% &fFarm"
 general.nametag.lore = ""
 general.interface.next = "Next"
 general.interface.previous = "Previous"
+general.interface.unlocked = "Unlocked"
+general.interface.on = "On"
+general.interface.off = "Off"
+general.interface.both = "Both"
+general.interface.crops = "Crops"
+general.interface.livestock = "Livestock"
 
 #Interface Messages
 
@@ -15,11 +21,15 @@ interface.button.upgradewitheconomylore = "&7Cost: &a$%cost%"
 interface.button.level = "&6Next Level &7%level%"
 interface.button.radius = "&7Radius: &6%radius%"
 interface.button.speed = "&7Speed: &6%speed%x"
-interface.button.autoharvest =  "&7Auto Harvest: &6%status%"
+interface.button.autocollect =  "&7Auto Collect: &6%status%"
 interface.button.autoreplant = "&7Auto Replant: &6%status%"
 interface.button.autobreeding = "&7Auto Breeding: &6%status%"
+interface.button.autobutcher = "&7Auto Butcher: &6%status%"
 interface.button.pages = "&7Pages: &6%amount%"
 interface.button.boostedstats = "&a&lCurrently boosted!|&7Yield rate multiplied by &6%amount%x&7.|&7Expires in &6%time%&7."
+interface.button.farmtype = "&7Farm type: &6%type%"
+interface.button.farmtypelore = "&7Click to switch your farm type."
+interface.button.functiontoggle = "&7Click to toggle this function."
 
 #Command Messages
 

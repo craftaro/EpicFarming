@@ -2,7 +2,7 @@ package com.songoda.epicfarming.commands;
 
 import com.songoda.core.commands.AbstractCommand;
 import com.songoda.epicfarming.EpicFarming;
-import com.songoda.epicfarming.farming.Level;
+import com.songoda.epicfarming.farming.levels.Level;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;

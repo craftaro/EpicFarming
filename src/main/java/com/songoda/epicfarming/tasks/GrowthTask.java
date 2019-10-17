@@ -3,6 +3,7 @@ package com.songoda.epicfarming.tasks;
 import com.songoda.core.utils.BlockUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Crop;
+import com.songoda.epicfarming.farming.FarmType;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.utils.CropType;
 import org.bukkit.Location;
@@ -23,7 +24,7 @@ public class GrowthTask extends BukkitRunnable {
             instance.cancel();
         }
         instance = new GrowthTask();
-        instance.runTaskTimer(plugin, 0, Settings.FARM_TICK_SPEED.getInt());
+        instance.runTaskTimer(plugin, 0, Settings.GROWTH_TICK_SPEED.getInt());
         return instance;
     }
 
@@ -32,6 +33,7 @@ public class GrowthTask extends BukkitRunnable {
         List<Crop> toRemove =  new ArrayList<>();
 
         for (Crop crop : liveCrops.values()) {
+            if (crop.getFarm().getFarmType() == FarmType.LIVESTOCK) continue;
             Location cropLocation = crop.getLocation();
 
             int x = cropLocation.getBlockX() >> 4;

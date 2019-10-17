@@ -6,17 +6,20 @@ import com.songoda.core.gui.GuiUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;
-import com.songoda.epicfarming.farming.Level;
+import com.songoda.epicfarming.farming.FarmType;
 import com.songoda.epicfarming.farming.UpgradeType;
+import com.songoda.epicfarming.farming.levels.Level;
+import com.songoda.epicfarming.farming.levels.modules.Module;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class OverviewGui extends Gui {
 
@@ -107,7 +110,7 @@ public class OverviewGui extends Gui {
 
         setItem(13, GuiUtils.createButtonItem(Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD),
                 plugin.getLocale().getMessage("general.nametag.farm")
-                .processPlaceholder("level", level.getLevel()).getMessage(),
+                        .processPlaceholder("level", level.getLevel()).getMessage(),
                 farmLore));
 
         if (player != null && Settings.UPGRADE_WITH_XP.getBoolean() && player.hasPermission("EpicFarming.Upgrade.XP")) {
@@ -134,16 +137,76 @@ public class OverviewGui extends Gui {
                             ? plugin.getLocale().getMessage("interface.button.upgradewitheconomylore")
                             .processPlaceholder("cost", Methods.formatEconomy(nextLevel.getCostEconomy())).getMessage()
                             : plugin.getLocale().getMessage("event.upgrade.maxed").getMessage()), (event) -> {
-                        farm.upgrade(UpgradeType.ECONOMY, player);
-                        onClose(guiManager, player);
-                        farm.view(player, true);
-                    });
+                farm.upgrade(UpgradeType.ECONOMY, player);
+                onClose(guiManager, player);
+                farm.view(player, true);
+            });
 
+        }
+
+        Material farmTypeMaterial = CompatibleMaterial.WHEAT.getMaterial();
+        if (farm.getFarmType() == FarmType.LIVESTOCK)
+            farmTypeMaterial = CompatibleMaterial.BEEF.getMaterial();
+        else if (farm.getFarmType() == FarmType.BOTH)
+            farmTypeMaterial = CompatibleMaterial.GOLD_NUGGET.getMaterial();
+
+        ItemStack farmType = new ItemStack(farmTypeMaterial, 1);
+        ItemMeta farmTypeMeta = farmType.getItemMeta();
+        farmTypeMeta.setDisplayName(plugin.getLocale().getMessage("interface.button.farmtype")
+                .processPlaceholder("type", farm.getFarmType().translate())
+                .getMessage());
+        farmTypeMeta.setLore(Collections.singletonList(plugin.getLocale().getMessage("interface.button.farmtypelore")
+                .getMessage()));
+        farmType.setItemMeta(farmTypeMeta);
+
+        Map<Integer, Integer[]> layouts = new HashMap<>();
+        layouts.put(1, new Integer[]{22});
+        layouts.put(2, new Integer[]{22, 4});
+        layouts.put(3, new Integer[]{22, 3, 5});
+        layouts.put(4, new Integer[]{23, 3, 5, 21});
+        layouts.put(5, new Integer[]{23, 3, 5, 21, 22});
+        layouts.put(6, new Integer[]{23, 3, 4, 5, 21, 22});
+        layouts.put(7, new Integer[]{23, 3, 4, 5, 21, 22, 12});
+        layouts.put(8, new Integer[]{23, 3, 4, 5, 21, 22, 12, 14});
+        layouts.put(9, new Integer[]{23, 3, 4, 5, 21, 22, 12, 14, 20});
+        layouts.put(10, new Integer[]{23, 3, 4, 5, 21, 22, 12, 14, 20, 24});
+
+
+        List<Module> modules = level.getRegisteredModules().stream().filter(module ->
+                module.getGUIButton(farm) != null).collect(Collectors.toList());
+
+        int amount = modules.size();
+
+        if (amount > 0) amount++;
+
+        Integer[] layout = layouts.get(amount);
+
+        for (int ii = 0; ii < amount; ii++) {
+            int slot = layout[ii];
+            if (ii == 0 && level.getRegisteredModules().stream().map(Module::getName).anyMatch(s -> s.equals("AutoCollect"))) {
+                setButton(slot, farmType,
+                        (event) -> {
+                            farm.toggleFarmType();
+                            if (farm.getFarmType() != FarmType.LIVESTOCK)
+                                farm.tillLand();
+                            showPage();
+                        });
+            } else {
+                if (modules.isEmpty()) break;
+
+                Module module = modules.get(0);
+                modules.remove(module);
+                setButton(slot, module.getGUIButton(farm),
+                        (event) -> module.runButtonPress(player, farm, event.clickType));
+            }
         }
     }
 
     private void runTask() {
-        task = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, this::updateFarm, 2L, 1L);
+        task = Bukkit.getScheduler().scheduleSyncRepeatingTask(plugin, () -> {
+            updateFarm();
+            showPage();
+        }, 2L, 1L);
     }
 
     public void updateInventory() {

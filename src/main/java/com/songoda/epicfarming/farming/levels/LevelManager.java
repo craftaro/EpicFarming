@@ -1,16 +1,15 @@
-package com.songoda.epicfarming.farming;
+package com.songoda.epicfarming.farming.levels;
 
-import java.util.Collections;
-import java.util.Map;
-import java.util.NavigableMap;
-import java.util.TreeMap;
+import com.songoda.epicfarming.farming.levels.modules.Module;
+
+import java.util.*;
 
 public class LevelManager {
 
     private final NavigableMap<Integer, Level> registeredLevels = new TreeMap<>();
 
-    public void addLevel(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoHarvest, boolean autoReplant, boolean autobreeding, int pages) {
-        registeredLevels.put(level, new Level(level, costExperiance, costEconomy, speedMultiplier, radius, autoHarvest, autoReplant, autobreeding, pages));
+    public void addLevel(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoCollect, boolean autoReplant, int pages, ArrayList<Module> modules) {
+        registeredLevels.put(level, new Level(level, costExperiance, costEconomy, speedMultiplier, radius, autoReplant, pages, modules));
     }
 
     public Level getLevel(int level) {

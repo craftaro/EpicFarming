@@ -14,7 +14,7 @@ Level-3:
   Speed-Multiplier: 1.5
   Auto-Harvest: true
   Auto-Replant: true
-  Auto-Breeding: true
+  Auto-Breeding: 5
   Cost-xp: 25
   Cost-eco: 7500
 Level-4:
@@ -22,7 +22,8 @@ Level-4:
   Speed-Multiplier: 2
   Auto-Harvest: true
   Auto-Replant: true
-  Auto-Breeding: true
+  Auto-Breeding: 10
+  Auto-Butcher: 25
   Pages: 2
   Cost-xp: 30
   Cost-eco: 10000
@@ -31,7 +32,8 @@ Level-5:
   Speed-Multiplier: 2.5
   Auto-Harvest: true
   Auto-Replant: true
-  Auto-Breeding: true
+  Auto-Breeding: 15
+  Auto-Butcher: 20
   Pages: 2
   Cost-xp: 35
   Cost-eco: 12000
@@ -40,7 +42,8 @@ Level-6:
   Speed-Multiplier: 3
   Auto-Harvest: true
   Auto-Replant: true
-  Auto-Breeding: true
+  Auto-Breeding: 20
+  Auto-Butcher: 15
   Pages: 2
   Cost-xp: 40
   Cost-eco: 25000
