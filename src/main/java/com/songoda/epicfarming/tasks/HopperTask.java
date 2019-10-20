@@ -24,11 +24,12 @@ public class HopperTask extends BukkitRunnable {
 
 
     public static HopperTask startTask(EpicFarming plugin) {
-        if (instance == null) {
-            instance = new HopperTask(plugin);
-            instance.runTaskTimer(plugin, 0, 8);
+        if (instance != null) {
+            instance.cancel();
         }
 
+        instance = new HopperTask(plugin);
+        instance.runTaskTimer(plugin, 0, 8);
         return instance;
     }
 

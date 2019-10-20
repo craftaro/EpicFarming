@@ -8,8 +8,11 @@ import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.utils.CropType;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class GrowthTask extends BukkitRunnable {
 
@@ -20,7 +23,7 @@ public class GrowthTask extends BukkitRunnable {
     private static final Random random = new Random();
 
     public static GrowthTask startTask(EpicFarming plugin) {
-        if (instance != null && !instance.isCancelled()) {
+        if (instance != null) {
             instance.cancel();
         }
         instance = new GrowthTask();
@@ -33,15 +36,9 @@ public class GrowthTask extends BukkitRunnable {
         List<Crop> toRemove =  new ArrayList<>();
 
         for (Crop crop : liveCrops.values()) {
-            if (crop.getFarm().getFarmType() == FarmType.LIVESTOCK) continue;
-            Location cropLocation = crop.getLocation();
-
-            int x = cropLocation.getBlockX() >> 4;
-            int z = cropLocation.getBlockZ() >> 4;
-
-            if (cropLocation.getWorld() == null || !cropLocation.getWorld().isChunkLoaded(x, z)) {
+            if (crop.getFarm().getFarmType() == FarmType.LIVESTOCK 
+                    || !crop.getFarm().isInLoadedChunk())
                 continue;
-            }
 
             if (!CropType.isGrowableCrop(crop.getLocation().getBlock().getType())) {
                 toRemove.add(crop);
