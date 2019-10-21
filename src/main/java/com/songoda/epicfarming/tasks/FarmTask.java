@@ -20,7 +20,7 @@ public class FarmTask extends BukkitRunnable {
     private static EpicFarming plugin;
 
     public static FarmTask startTask(EpicFarming pl) {
-        if (instance != null && !instance.isCancelled()) {
+        if (instance != null) {
             instance.cancel();
         }
         instance = new FarmTask();
