@@ -178,7 +178,7 @@ public class ModuleAutoCollect extends Module {
                         Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
                         CompatibleMaterial mat = CompatibleMaterial.getMaterial(b2.getType());
 
-                        if (!mat.isCrop()) continue;
+                        if (mat == null || !mat.isCrop()) continue;
 
                         if (add) {
                             farm.addCachedCrop(b2);
