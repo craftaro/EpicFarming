@@ -160,8 +160,6 @@ public class EpicFarming extends SongodaPlugin {
             // Adding in Boosts
             if (storage.containsGroup("boosts")) {
                 for (StorageRow row : storage.getRowsByGroup("boosts")) {
-                    if (row.getItems().get("player").asObject() != null)
-                        continue;
 
                     BoostData boostData = new BoostData(
                             row.get("amount").asInt(),

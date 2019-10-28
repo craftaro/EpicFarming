@@ -22,12 +22,12 @@ public class StorageItem {
         this.object = object;
     }
 
-    public StorageItem(String key, List<ItemStack> material) {
-        if (material == null || material.isEmpty()) return;
+    public StorageItem(String key, List<ItemStack> items) {
+        if (items == null || items.isEmpty()) return;
         StringBuilder object = new StringBuilder();
-        for (ItemStack m : material) {
-            if (m == null) continue;
-            object.append(Serializers.serialize(m));
+        for (ItemStack item : items) {
+            if (item == null) continue;
+            object.append(Serializers.serialize(item));
             object.append(";;");
         }
         this.key = key;
