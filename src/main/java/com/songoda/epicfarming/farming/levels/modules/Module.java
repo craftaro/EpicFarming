@@ -4,7 +4,6 @@ import com.songoda.core.configuration.Config;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.utils.Methods;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -21,6 +20,7 @@ public abstract class Module {
 
     protected final EpicFarming plugin;
     private final Config config;
+    private final Map<Farm, Integer> currentTicks = new HashMap<>();
 
     public Module(EpicFarming plugin) {
         this.plugin = plugin;
@@ -37,16 +37,13 @@ public abstract class Module {
 
     public abstract int runEveryXTicks();
 
-    private Map<Farm, Integer> currentTicks = new HashMap<>();
-
     public void run(Farm farm, Collection<LivingEntity> entitiesAroundFarm) {
         if (!currentTicks.containsKey(farm))
             currentTicks.put(farm, 1);
         int currentTick = currentTicks.get(farm);
         if (currentTick >= runEveryXTicks()) {
             runFinal(farm, entitiesAroundFarm);
-            currentTicks.remove(farm);
-            return;
+            currentTick = 0;
         }
         currentTicks.put(farm, currentTick + 1);
     }

@@ -13,18 +13,28 @@ import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Ageable;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class ModuleAutoCollect extends Module {
 
     private static Map<Entity, Integer> lastTicksLived = new HashMap<>();
     private static final Map<Entity, Integer> ticksLived = new HashMap<>();
-    private Random random = new Random();
+    private static final Random random = new Random();
 
     public ModuleAutoCollect(EpicFarming plugin) {
         super(plugin);
@@ -51,13 +61,11 @@ public class ModuleAutoCollect extends Module {
 
     private void collectCrops(Farm farm) {
         for (Block block : getCrops(farm, true)) {
-            Material mat = block.getType();
-            if (!CropType.isCrop(mat)) continue;
 
             if (!BlockUtils.isCropFullyGrown(block)) {
                 // Add to GrowthTask
                 plugin.getGrowthTask().addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
-            } else if (isEnabled(farm) && doCropDrop(farm, mat)) {
+            } else if (isEnabled(farm) && doCropDrop(farm, CompatibleMaterial.getMaterial(block).getMaterial())) {
 
                 if (farm.getLevel().isAutoReplant()) {
                     BlockUtils.resetGrowthStage(block);
@@ -176,9 +184,9 @@ public class ModuleAutoCollect extends Module {
                 for (int fy = -2; fy <= 1; fy++) {
                     for (int fz = -radius; fz <= radius; fz++) {
                         Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
-                        CompatibleMaterial mat = CompatibleMaterial.getMaterial(b2.getType());
+                        CompatibleMaterial mat = CompatibleMaterial.getMaterial(b2);
 
-                        if (mat == null || !mat.isCrop()) continue;
+                        if (!mat.isCrop() || !CropType.isGrowableCrop(mat.getBlockMaterial())) continue;
 
                         if (add) {
                             farm.addCachedCrop(b2);
