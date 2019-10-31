@@ -26,7 +26,7 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 @SuppressWarnings("Duplicates")
 public class BlockListeners implements Listener {
 
-    private EpicFarming instance;
+    private final EpicFarming instance;
 
     public BlockListeners(EpicFarming instance) {
         this.instance = instance;

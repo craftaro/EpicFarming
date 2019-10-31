@@ -13,7 +13,7 @@ import java.util.ArrayList;
 
 public class UnloadListeners implements Listener {
 
-    private EpicFarming instance;
+    private final EpicFarming instance;
 
     public UnloadListeners(EpicFarming instance) {
         this.instance = instance;

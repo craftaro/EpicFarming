@@ -6,6 +6,7 @@ import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.utils.Methods;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Storage {
@@ -29,7 +30,7 @@ public abstract class Storage {
         /*
          * Dump FarmManager to file.
          */
-        for (Farm farm : instance.getFarmManager().getFarms().values()) {
+        for (Farm farm : new ArrayList<>(instance.getFarmManager().getFarms().values())) {
             if (farm.getLocation() == null
                     || farm.getLocation().getWorld() == null) continue;
             String locstr = Methods.serializeLocation(farm.getLocation());

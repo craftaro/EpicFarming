@@ -1,5 +1,6 @@
 package com.songoda.epicfarming.tasks;
 
+import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.core.utils.BlockUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Crop;
@@ -40,7 +41,8 @@ public class GrowthTask extends BukkitRunnable {
                     || !crop.getFarm().isInLoadedChunk())
                 continue;
 
-            if (!CropType.isGrowableCrop(crop.getLocation().getBlock().getType())) {
+            CompatibleMaterial blockMat = CompatibleMaterial.getMaterial(crop.getLocation().getBlock());
+            if(!blockMat.isCrop() || !CropType.isGrowableCrop(blockMat.getBlockMaterial())) {
                 toRemove.add(crop);
                 continue;
             }

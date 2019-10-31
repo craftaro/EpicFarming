@@ -27,7 +27,7 @@ import java.util.List;
 
 public class EntityListeners implements Listener {
 
-    private EpicFarming instance;
+    private final EpicFarming instance;
 
     public EntityListeners(EpicFarming instance) {
         this.instance = instance;
