@@ -140,14 +140,12 @@ public class Methods {
         if (serializeCache.containsKey(str)) {
             return serializeCache.get(str).clone();
         }
-        String cacheKey = str;
-        str = str.replace("y:", ":").replace("z:", ":").replace("w:", "").replace("x:", ":").replace("/", ".");
         List<String> args = Arrays.asList(str.split("\\s*:\\s*"));
 
         World world = Bukkit.getWorld(args.get(0));
         double x = Double.parseDouble(args.get(1)), y = Double.parseDouble(args.get(2)), z = Double.parseDouble(args.get(3));
         Location location = new Location(world, x, y, z, 0, 0);
-        serializeCache.put(cacheKey, location.clone());
+        serializeCache.put(str, location.clone());
         return location;
     }
 
