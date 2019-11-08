@@ -13,22 +13,12 @@ import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Ageable;
-import org.bukkit.entity.Chicken;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.LivingEntity;
-import org.bukkit.entity.Player;
-import org.bukkit.entity.Sheep;
+import org.bukkit.entity.*;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class ModuleAutoCollect extends Module {
 
@@ -137,12 +127,16 @@ public class ModuleAutoCollect extends Module {
                         .processPlaceholder("status", isEnabled(farm)
                                 ? plugin.getLocale().getMessage("general.interface.on").getMessage()
                                 : plugin.getLocale().getMessage("general.interface.off").getMessage()).getMessage(),
+                plugin.getLocale().getMessage("interface.button.collectiontype").processPlaceholder("status", getCollectionType(farm).translate()).getMessage(),
                 plugin.getLocale().getMessage("interface.button.functiontoggle").getMessage());
     }
 
     @Override
     public void runButtonPress(Player player, Farm farm, ClickType type) {
-        toggleEnabled(farm);
+        if (type == ClickType.LEFT)
+            toggleEnabled(farm);
+        else if (type == ClickType.RIGHT)
+            toggleCollectionType(farm);
     }
 
     @Override
@@ -160,6 +154,16 @@ public class ModuleAutoCollect extends Module {
 
     private void toggleEnabled(Farm farm) {
         saveData(farm, "enabled", !isEnabled(farm));
+    }
+
+    public CollectionType getCollectionType(Farm farm) {
+        Object obj = getData(farm, "collectiontype");
+        return obj == null ? CollectionType.ALL : CollectionType.valueOf((String) obj);
+    }
+
+    private void toggleCollectionType(Farm farm) {
+        saveData(farm, "collectiontype", getCollectionType(farm) == CollectionType.ALL
+                ? CollectionType.NO_SEEDS.toString() : CollectionType.ALL.toString());
     }
 
     private boolean useBoneMeal(Farm farm) {
@@ -236,7 +240,8 @@ public class ModuleAutoCollect extends Module {
         if (!farm.willFit(stack) || !farm.willFit(seedStack)) return false;
         Methods.animate(farm.getLocation(), cropTypeData.getYieldMaterial());
         farm.addItem(stack);
-        farm.addItem(seedStack);
+        if (getCollectionType(farm) != CollectionType.NO_SEEDS)
+            farm.addItem(seedStack);
         return true;
     }
 
@@ -252,6 +257,14 @@ public class ModuleAutoCollect extends Module {
 
     public static Map<Entity, Integer> getTicksLived() {
         return Collections.unmodifiableMap(ticksLived);
+    }
+
+    public enum CollectionType {
+        ALL, NO_SEEDS;
+
+        public String translate() {
+            return EpicFarming.getInstance().getLocale().getMessage("general.interface." + name().replace("_", "").toLowerCase()).getMessage();
+        }
     }
 
 }
