@@ -14,6 +14,8 @@ general:
     both: Both
     crops: Crops
     livestock: Livestock
+    all: All
+    noseeds: No Seeds
 
 # Interface Messages
 
@@ -27,6 +29,7 @@ interface:
     radius: '&7Radius: &6%radius%'
     speed: '&7Speed: &6%speed%x'
     autocollect: '&7Auto Collect: &6%status%'
+    collectiontype: '&7Collection Type: &6%status%'
     autoreplant: '&7Auto Replant: &6%status%'
     autobreeding: '&7Auto Breeding: &6%status%'
     autobutcher: '&7Auto Butcher: &6%status%'
