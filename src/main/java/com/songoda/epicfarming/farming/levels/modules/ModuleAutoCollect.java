@@ -55,7 +55,7 @@ public class ModuleAutoCollect extends Module {
             if (!BlockUtils.isCropFullyGrown(block)) {
                 // Add to GrowthTask
                 plugin.getGrowthTask().addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
-            } else if (isEnabled(farm) && doCropDrop(farm, CompatibleMaterial.getMaterial(block).getMaterial())) {
+            } else if (isEnabled(farm) && doCropDrop(farm, CompatibleMaterial.getMaterial(block).getBlockMaterial())) {
 
                 if (farm.getLevel().isAutoReplant()) {
                     BlockUtils.resetGrowthStage(block);

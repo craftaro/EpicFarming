@@ -81,8 +81,9 @@ public class ModuleAutoBreeding extends Module {
 
                     for (ItemStack item : new ArrayList<>(farm.getItems())) {
 
+                        EntityInfo info = EntityInfo.of(entityType);
                         try {
-                            if (item.getType() != EntityInfo.valueOf(entityType.name()).getMaterial() || item.getAmount() < 2)
+                            if (info == null || item.getType() != info.getMaterial() || item.getAmount() < 2)
                                 continue;
                         } catch (IllegalArgumentException e) {
                             continue;
