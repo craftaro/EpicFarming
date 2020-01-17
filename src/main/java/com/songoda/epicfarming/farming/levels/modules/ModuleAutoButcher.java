@@ -9,6 +9,7 @@ import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmType;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
 import org.bukkit.entity.*;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
@@ -36,7 +37,7 @@ public class ModuleAutoButcher extends Module {
     }
 
     @Override
-    public void runFinal(Farm farm, Collection<LivingEntity> entitiesAroundFarm) {
+    public void runFinal(Farm farm, Collection<LivingEntity> entitiesAroundFarm, List<Block> crops) {
         if (!isEnabled(farm)|| farm.getFarmType() == FarmType.CROPS) return;
 
         List<LivingEntity> entities = new ArrayList<>(entitiesAroundFarm);

@@ -8,6 +8,7 @@ import com.songoda.epicfarming.farming.FarmType;
 import com.songoda.epicfarming.farming.levels.Level;
 import com.songoda.epicfarming.farming.levels.modules.ModuleAutoCollect;
 import com.songoda.epicfarming.settings.Settings;
+import com.songoda.epicfarming.tasks.FarmTask;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -141,7 +142,7 @@ public class BlockListeners implements Listener {
 
         if (farm == null) return;
 
-        ModuleAutoCollect.getCrops(farm, false);
+        FarmTask.getCrops(farm, false);
 
         event.setCancelled(true);
 
@@ -165,7 +166,7 @@ public class BlockListeners implements Listener {
         Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
 
         if (farm == null) return;
-        ModuleAutoCollect.getCrops(farm, false);
+        FarmTask.getCrops(farm, false);
 
         event.setCancelled(true);
 

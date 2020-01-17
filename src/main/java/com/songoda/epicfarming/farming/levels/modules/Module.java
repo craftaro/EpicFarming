@@ -4,6 +4,7 @@ import com.songoda.core.configuration.Config;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.utils.Methods;
+import org.bukkit.block.Block;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.ClickType;
@@ -12,6 +13,7 @@ import org.bukkit.inventory.ItemStack;
 import java.io.File;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public abstract class Module {
@@ -37,18 +39,18 @@ public abstract class Module {
 
     public abstract int runEveryXTicks();
 
-    public void run(Farm farm, Collection<LivingEntity> entitiesAroundFarm) {
+    public void run(Farm farm, Collection<LivingEntity> entitiesAroundFarm, List<Block> crops) {
         if (!currentTicks.containsKey(farm))
             currentTicks.put(farm, 1);
         int currentTick = currentTicks.get(farm);
         if (currentTick >= runEveryXTicks()) {
-            runFinal(farm, entitiesAroundFarm);
+            runFinal(farm, entitiesAroundFarm, crops);
             currentTick = 0;
         }
         currentTicks.put(farm, currentTick + 1);
     }
 
-    public abstract void runFinal(Farm farm, Collection<LivingEntity> entitiesAroundFarm);
+    public abstract void runFinal(Farm farm, Collection<LivingEntity> entitiesAroundFarm, List<Block> crops);
 
     public abstract ItemStack getGUIButton(Farm farm);
 
