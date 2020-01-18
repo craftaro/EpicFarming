@@ -41,21 +41,18 @@ public class ModuleAutoCollect extends Module {
     }
 
     @Override
-    public void runFinal(Farm farm, Collection<LivingEntity> entitiesAroundFarm) {
+    public void runFinal(Farm farm, Collection<LivingEntity> entitiesAroundFarm, List<Block> crops) {
         if (farm.getFarmType() != FarmType.LIVESTOCK)
-            collectCrops(farm);
+            collectCrops(farm, crops);
 
         if (farm.getFarmType() != FarmType.CROPS)
             collectLivestock(farm, entitiesAroundFarm);
     }
 
-    private void collectCrops(Farm farm) {
-        for (Block block : getCrops(farm, true)) {
+    private void collectCrops(Farm farm, List<Block> crops) {
+        for (Block block : crops) {
 
-            if (!BlockUtils.isCropFullyGrown(block)) {
-                // Add to GrowthTask
-                plugin.getGrowthTask().addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
-            } else if (isEnabled(farm) && doCropDrop(farm, CompatibleMaterial.getMaterial(block).getBlockMaterial())) {
+            if (BlockUtils.isCropFullyGrown(block) && isEnabled(farm) && doCropDrop(farm, CompatibleMaterial.getMaterial(block).getBlockMaterial())) {
 
                 if (farm.getLevel().isAutoReplant()) {
                     BlockUtils.resetGrowthStage(block);
@@ -173,36 +170,6 @@ public class ModuleAutoCollect extends Module {
             return true;
         }
         return false;
-    }
-
-    public static List<Block> getCrops(Farm farm, boolean add) {
-        if (((System.currentTimeMillis() - farm.getLastCached()) > (30 * 1000)) || !add) {
-            farm.setLastCached(System.currentTimeMillis());
-            if (add) farm.clearCache();
-            Block block = farm.getLocation().getBlock();
-            int radius = farm.getLevel().getRadius();
-            int bx = block.getX();
-            int by = block.getY();
-            int bz = block.getZ();
-            for (int fx = -radius; fx <= radius; fx++) {
-                for (int fy = -2; fy <= 1; fy++) {
-                    for (int fz = -radius; fz <= radius; fz++) {
-                        Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
-                        CompatibleMaterial mat = CompatibleMaterial.getMaterial(b2);
-
-                        if (!mat.isCrop() || !CropType.isGrowableCrop(mat.getBlockMaterial())) continue;
-
-                        if (add) {
-                            farm.addCachedCrop(b2);
-                            continue;
-                        }
-                        farm.removeCachedCrop(b2);
-                        EpicFarming.getInstance().getGrowthTask().removeCropByLocation(b2.getLocation());
-                    }
-                }
-            }
-        }
-        return farm.getCachedCrops();
     }
 
     private int getMin(Entity entity) {
