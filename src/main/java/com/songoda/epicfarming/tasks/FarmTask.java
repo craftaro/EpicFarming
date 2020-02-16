@@ -82,7 +82,7 @@ public class FarmTask extends BukkitRunnable {
                         Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
                         CompatibleMaterial mat = CompatibleMaterial.getMaterial(b2);
 
-                        if (!mat.isCrop() || !CropType.isGrowableCrop(mat.getBlockMaterial())) continue;
+                        if (mat == null || !mat.isCrop() || !CropType.isGrowableCrop(mat.getBlockMaterial())) continue;
 
                         if (add) {
                             farm.addCachedCrop(b2);
