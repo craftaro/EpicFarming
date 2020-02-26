@@ -132,7 +132,8 @@ public class Farm {
                             || b2.getType() == CompatibleMaterial.AZURE_BLUET.getMaterial()
                             || b2.getType() == CompatibleMaterial.ALLIUM.getMaterial()
                             || b2.getType() == CompatibleMaterial.POPPY.getMaterial()
-                            || b2.getType() == CompatibleMaterial.DANDELION.getMaterial()) {
+                            || b2.getType() == CompatibleMaterial.DANDELION.getMaterial()
+                            || b2.getType() == CompatibleMaterial.SNOW.getMaterial()) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
                             b2.getRelative(BlockFace.DOWN).setType(CompatibleMaterial.FARMLAND.getMaterial());
                             b2.breakNaturally();
