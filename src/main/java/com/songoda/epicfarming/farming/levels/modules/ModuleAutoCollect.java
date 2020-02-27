@@ -5,11 +5,11 @@ import com.songoda.core.gui.GuiUtils;
 import com.songoda.core.utils.BlockUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
-import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmType;
 import com.songoda.epicfarming.utils.CropType;
 import com.songoda.epicfarming.utils.Methods;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -45,17 +45,17 @@ public class ModuleAutoCollect extends Module {
         if (farm.getFarmType() != FarmType.LIVESTOCK)
             collectCrops(farm, crops);
 
-        if (farm.getFarmType() != FarmType.CROPS)
+        if (farm.getFarmType() != FarmType.CROPS) {
             collectLivestock(farm, entitiesAroundFarm);
+        }
     }
 
     private void collectCrops(Farm farm, List<Block> crops) {
         for (Block block : crops) {
-
             if (BlockUtils.isCropFullyGrown(block) && isEnabled(farm) && doCropDrop(farm, CompatibleMaterial.getMaterial(block).getBlockMaterial())) {
-
                 if (farm.getLevel().isAutoReplant()) {
-                    BlockUtils.resetGrowthStage(block);
+                    Bukkit.getScheduler().runTask(plugin, () ->
+                            BlockUtils.resetGrowthStage(block));
                     continue;
                 }
                 block.setType(Material.AIR);
@@ -89,7 +89,8 @@ public class ModuleAutoCollect extends Module {
                 } else {
                     doLivestockDrop(farm, new ItemStack(Material.EGG, 1));
                 }
-                Methods.animate(farm.getLocation(), Material.EGG);
+                Bukkit.getScheduler().runTask(plugin, () ->
+                        Methods.animate(farm.getLocation(), Material.EGG));
             } else if (entity instanceof Sheep) {
                 if (!((Ageable) entity).isAdult()) continue;
                 ((Sheep) entity).setSheared(true);
@@ -101,7 +102,8 @@ public class ModuleAutoCollect extends Module {
                 } else {
                     doLivestockDrop(farm, wool);
                 }
-                Methods.animate(farm.getLocation(), wool.getType());
+                Bukkit.getScheduler().runTask(plugin, () ->
+                        Methods.animate(farm.getLocation(), wool.getType()));
             }
             ticksLived.put(entity, 0);
         }
@@ -205,7 +207,8 @@ public class ModuleAutoCollect extends Module {
         ItemStack seedStack = new ItemStack(cropTypeData.getSeedMaterial(), random.nextInt(3) + 1 + (useBoneMeal(farm) ? 1 : 0));
 
         if (!farm.willFit(stack) || !farm.willFit(seedStack)) return false;
-        Methods.animate(farm.getLocation(), cropTypeData.getYieldMaterial());
+        Bukkit.getScheduler().runTask(plugin, () ->
+                Methods.animate(farm.getLocation(), cropTypeData.getYieldMaterial()));
         farm.addItem(stack);
         if (getCollectionType(farm) != CollectionType.NO_SEEDS)
             farm.addItem(seedStack);

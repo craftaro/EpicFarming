@@ -31,6 +31,7 @@ import com.songoda.epicfarming.storage.types.StorageYaml;
 import com.songoda.epicfarming.tasks.FarmTask;
 import com.songoda.epicfarming.tasks.GrowthTask;
 import com.songoda.epicfarming.tasks.HopperTask;
+import com.songoda.epicfarming.utils.EntityUtils;
 import com.songoda.epicfarming.utils.Methods;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
@@ -64,6 +65,8 @@ public class EpicFarming extends SongodaPlugin {
 
     private GrowthTask growthTask;
     private FarmTask farmTask;
+
+    private EntityUtils entityUtils;
 
     private Storage storage;
 
@@ -99,6 +102,8 @@ public class EpicFarming extends SongodaPlugin {
 
         // Load entity stack manager.
         EntityStackerManager.load();
+
+        this.entityUtils = new EntityUtils();
 
         // Register commands
         this.commandManager = new CommandManager(this);
@@ -315,5 +320,9 @@ public class EpicFarming extends SongodaPlugin {
 
     public GuiManager getGuiManager() {
         return guiManager;
+    }
+
+    public EntityUtils getEntityUtils() {
+        return entityUtils;
     }
 }
