@@ -21,6 +21,10 @@ import java.util.*;
 
 public class Farm {
 
+    // This is the unique identifier for this farm.
+    // It is reset on every plugin load.
+    private UUID uniqueId = UUID.randomUUID();
+
     private static final Random random = new Random();
     private final List<Block> cachedCrops = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
@@ -132,7 +136,8 @@ public class Farm {
                             || b2.getType() == CompatibleMaterial.AZURE_BLUET.getMaterial()
                             || b2.getType() == CompatibleMaterial.ALLIUM.getMaterial()
                             || b2.getType() == CompatibleMaterial.POPPY.getMaterial()
-                            || b2.getType() == CompatibleMaterial.DANDELION.getMaterial()) {
+                            || b2.getType() == CompatibleMaterial.DANDELION.getMaterial()
+                            || b2.getType() == CompatibleMaterial.SNOW.getMaterial()) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
                             b2.getRelative(BlockFace.DOWN).setType(CompatibleMaterial.FARMLAND.getMaterial());
                             b2.breakNaturally();
@@ -151,6 +156,10 @@ public class Farm {
             }
         }
         return false;
+    }
+
+    public UUID getUniqueId() {
+        return uniqueId;
     }
 
     public List<ItemStack> getItems() {

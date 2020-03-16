@@ -73,7 +73,8 @@ public class ModuleAutoBreeding extends Module {
                         handleStackedBreed(entity);
                     else
                         handleBreed(entity);
-                    Methods.animate(farm.getLocation(), Material.EGG);
+                    Bukkit.getScheduler().runTask(plugin, () ->
+                            Methods.animate(farm.getLocation(), Material.EGG));
                     return;
                 }
 
@@ -95,8 +96,10 @@ public class ModuleAutoBreeding extends Module {
                         Location location = entity.getLocation();
                         CompatibleParticleHandler.spawnParticles(CompatibleParticleHandler.ParticleType.HEART,
                                 location, 5, .5, .5, .5);
-                        Entity newSpawn = location.getWorld().spawnEntity(location, entityType);
-                        ((Ageable) newSpawn).setBaby();
+                        Bukkit.getScheduler().runTask(plugin, () -> {
+                            Entity newSpawn = location.getWorld().spawnEntity(location, entityType);
+                            ((Ageable) newSpawn).setBaby();
+                        });
 
                         if (count > 1) {
                             handleStackedBreed(entity);
