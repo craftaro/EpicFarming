@@ -2,7 +2,7 @@
     <groupId>com.songoda</groupId>
     <artifactId>EpicFarming</artifactId>
     <modelVersion>4.0.0</modelVersion>
-    <version>3.0.12</version>
+    <version>3.0.13</version>
     <build>
         <defaultGoal>clean install</defaultGoal>
         <finalName>EpicFarming-${project.version}</finalName>
@@ -84,6 +84,10 @@
         <repository>
             <id>private</id>
             <url>https://repo.songoda.com/artifactory/private/</url>
+        </repository>
+        <repository>
+            <id>public</id>
+            <url>https://repo.songoda.com/artifactory/public/</url>
         </repository>
     </repositories>
     <dependencies>
