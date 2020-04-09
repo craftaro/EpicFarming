@@ -64,7 +64,7 @@ public class ModuleAutoButcher extends Module {
             entity.getLocation().getWorld().playSound(entity.getLocation(),
                     CompatibleSound.ENTITY_PLAYER_ATTACK_SWEEP.getSound(), 1L, 1L);
             Bukkit.getScheduler().runTask(plugin, () -> {
-                entity.damage(99999999);
+                entity.damage(99999999, entity);
                 Methods.animate(farm.getLocation(), Material.IRON_SWORD);
             });
             return;
