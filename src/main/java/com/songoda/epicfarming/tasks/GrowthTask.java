@@ -7,7 +7,6 @@ import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.farming.FarmType;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.utils.CropType;
-import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -27,7 +26,7 @@ public class GrowthTask extends BukkitRunnable {
             instance.cancel();
         }
         instance = new GrowthTask();
-        instance.runTaskTimerAsynchronously(plugin = pl, 0, Settings.GROWTH_TICK_SPEED.getInt());
+        instance.runTaskTimer(plugin = pl, 0, Settings.GROWTH_TICK_SPEED.getInt());
         return instance;
     }
 
@@ -55,8 +54,7 @@ public class GrowthTask extends BukkitRunnable {
                 if (rand != cap - 1 && crop.getTicksLived() != cap / 2) continue;
             }
 
-            Bukkit.getScheduler().runTask(plugin, () ->
-                    BlockUtils.incrementGrowthStage(crop.getLocation().getBlock()));
+            BlockUtils.incrementGrowthStage(crop.getLocation().getBlock());
             crop.setTicksLived(1);
         }
 

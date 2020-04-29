@@ -68,7 +68,7 @@ public class FarmTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        for (Farm farm : plugin.getFarmManager().getFarms().values()) {
+        for (Farm farm : new ArrayList<>(plugin.getFarmManager().getFarms().values())) {
             try {
                 if (!farm.isInLoadedChunk()) continue;
 

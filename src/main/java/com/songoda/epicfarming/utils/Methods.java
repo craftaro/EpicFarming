@@ -25,16 +25,10 @@ public class Methods {
 
     private final static Map<String, Location> serializeCache = new HashMap<>();
 
-    public static String formatName(int level, boolean full) {
+    public static String formatName(int level) {
         String name = EpicFarming.getInstance().getLocale().getMessage("general.nametag.farm")
                 .processPlaceholder("level", level).getMessage();
-
-        String info = "";
-        if (full) {
-            info += TextUtils.convertToInvisibleString(level + ":");
-        }
-
-        return info + name;
+        return name;
     }
 
     public static void animate(Location location, Material mat) {
