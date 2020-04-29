@@ -36,7 +36,7 @@ public class OverviewGui extends Gui {
         this.level = farm.getLevel();
         this.player = player;
         this.setRows(6);
-        this.setTitle(Methods.formatName(level.getLevel(), false));
+        this.setTitle(Methods.formatName(level.getLevel()));
         this.setAcceptsItems(true);
         this.setUnlockedRange(3, 0, 5, 8);
 
@@ -184,13 +184,15 @@ public class OverviewGui extends Gui {
         for (int ii = 0; ii < amount; ii++) {
             int slot = layout[ii];
             if (ii == 0 && level.getRegisteredModules().stream().map(Module::getName).anyMatch(s -> s.equals("AutoCollect"))) {
-                setButton(slot, farmType,
-                        (event) -> {
-                            farm.toggleFarmType();
-                            if (farm.getFarmType() != FarmType.LIVESTOCK)
-                                farm.tillLand();
-                            showPage();
-                        });
+                if (level.getRegisteredModules().stream().map(Module::getName).anyMatch(s -> s.equals("AutoButcher"))
+                        || level.getRegisteredModules().stream().map(Module::getName).anyMatch(s -> s.equals("AutoBreeding")))
+                    setButton(slot, farmType,
+                            (event) -> {
+                                farm.toggleFarmType();
+                                if (farm.getFarmType() != FarmType.LIVESTOCK)
+                                    farm.tillLand();
+                                showPage();
+                            });
             } else {
                 if (modules.isEmpty()) break;
 
