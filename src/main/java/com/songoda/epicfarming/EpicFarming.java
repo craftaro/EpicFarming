@@ -8,6 +8,9 @@ import com.songoda.core.configuration.Config;
 import com.songoda.core.gui.GuiManager;
 import com.songoda.core.hooks.EconomyManager;
 import com.songoda.core.hooks.EntityStackerManager;
+import com.songoda.core.nms.NmsManager;
+import com.songoda.core.nms.nbt.NBTCore;
+import com.songoda.core.nms.nbt.NBTItem;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.boost.BoostManager;
 import com.songoda.epicfarming.commands.*;
@@ -277,6 +280,13 @@ public class EpicFarming extends SongodaPlugin {
     }
 
     public int getLevelFromItem(ItemStack item) {
+        NBTCore nbt = NmsManager.getNbt();
+        NBTItem nbtItem = nbt.of(item);
+
+        if (nbtItem.has("level"))
+            return nbtItem.getNBTObject("level").asInt();
+
+        // Legacy trash.
         if (!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) return 0;
         if (item.getItemMeta().getDisplayName().contains(":")) {
             return NumberUtils.toInt(item.getItemMeta().getDisplayName().replace("\u00A7", "").split(":")[0], 0);
@@ -287,11 +297,14 @@ public class EpicFarming extends SongodaPlugin {
     public ItemStack makeFarmItem(Level level) {
         ItemStack item = Settings.FARM_BLOCK_MATERIAL.getMaterial().getItem();
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(Methods.formatText(Methods.formatName(level.getLevel(), true)));
+        meta.setDisplayName(Methods.formatText(Methods.formatName(level.getLevel())));
         String line = getLocale().getMessage("general.nametag.lore").getMessage();
         if (!line.equals("")) meta.setLore(Arrays.asList(line));
         item.setItemMeta(meta);
-        return item;
+
+        NBTItem nbtItem = NmsManager.getNbt().of(item);
+        nbtItem.set("level", level.getLevel());
+        return nbtItem.finish();
     }
 
     public FarmManager getFarmManager() {
