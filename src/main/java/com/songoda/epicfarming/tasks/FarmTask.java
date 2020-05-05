@@ -37,31 +37,33 @@ public class FarmTask extends BukkitRunnable {
 
     public static List<Block> getCrops(Farm farm, boolean add) {
         if (((System.currentTimeMillis() - farm.getLastCached()) > (30 * 1000)) || !add) {
-            farm.setLastCached(System.currentTimeMillis());
-            if (add) farm.clearCache();
-            Block block = farm.getLocation().getBlock();
-            int radius = farm.getLevel().getRadius();
-            int bx = block.getX();
-            int by = block.getY();
-            int bz = block.getZ();
-            for (int fx = -radius; fx <= radius; fx++) {
-                for (int fy = -2; fy <= 1; fy++) {
-                    for (int fz = -radius; fz <= radius; fz++) {
-                        Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
-                        CompatibleMaterial mat = CompatibleMaterial.getMaterial(b2);
+            Bukkit.getScheduler().runTask(plugin, () -> {
+                farm.setLastCached(System.currentTimeMillis());
+                if (add) farm.clearCache();
+                Block block = farm.getLocation().getBlock();
+                int radius = farm.getLevel().getRadius();
+                int bx = block.getX();
+                int by = block.getY();
+                int bz = block.getZ();
+                for (int fx = -radius; fx <= radius; fx++) {
+                    for (int fy = -2; fy <= 1; fy++) {
+                        for (int fz = -radius; fz <= radius; fz++) {
+                            Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
+                            CompatibleMaterial mat = CompatibleMaterial.getMaterial(b2);
 
-                        if (mat == null || !mat.isCrop() || !CropType.isGrowableCrop(mat.getBlockMaterial()))
-                            continue;
+                            if (mat == null || !mat.isCrop() || !CropType.isGrowableCrop(mat.getBlockMaterial()))
+                                continue;
 
-                        if (add) {
-                            farm.addCachedCrop(b2);
-                            continue;
+                            if (add) {
+                                farm.addCachedCrop(b2);
+                                continue;
+                            }
+                            farm.removeCachedCrop(b2);
+                            plugin.getGrowthTask().removeCropByLocation(b2.getLocation());
                         }
-                        farm.removeCachedCrop(b2);
-                        plugin.getGrowthTask().removeCropByLocation(b2.getLocation());
                     }
                 }
-            }
+            });
         }
         return farm.getCachedCrops();
     }
