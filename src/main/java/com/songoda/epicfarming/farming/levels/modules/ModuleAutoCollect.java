@@ -85,7 +85,8 @@ public class ModuleAutoCollect extends Module {
                 entity.getLocation().getWorld().playSound(entity.getLocation(), Sound.ENTITY_CHICKEN_EGG, 1, 2);
                 if (!isEnabled(farm)) {
                     ticksLived.remove(entity);
-                    entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), new ItemStack(Material.EGG));
+                    Bukkit.getScheduler().runTask(plugin, () ->
+                    entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), new ItemStack(Material.EGG)));
                 } else {
                     doLivestockDrop(farm, new ItemStack(Material.EGG, 1));
                 }
@@ -98,7 +99,8 @@ public class ModuleAutoCollect extends Module {
                 Wool woolColor = new Wool(((Sheep) entity).getColor());
                 ItemStack wool = woolColor.toItemStack((int) Math.round(1 + (Math.random() * 3)));
                 if (!isEnabled(farm)) {
-                    entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), wool);
+                    Bukkit.getScheduler().runTask(plugin, () ->
+                    entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), wool));
                 } else {
                     doLivestockDrop(farm, wool);
                 }
