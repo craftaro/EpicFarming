@@ -11,6 +11,7 @@ import com.songoda.core.hooks.EntityStackerManager;
 import com.songoda.core.nms.NmsManager;
 import com.songoda.core.nms.nbt.NBTCore;
 import com.songoda.core.nms.nbt.NBTItem;
+import com.songoda.core.utils.TextUtils;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.boost.BoostManager;
 import com.songoda.epicfarming.commands.*;
@@ -45,10 +46,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 /**
  * Created by songoda on 1/23/2018.
@@ -297,9 +295,9 @@ public class EpicFarming extends SongodaPlugin {
     public ItemStack makeFarmItem(Level level) {
         ItemStack item = Settings.FARM_BLOCK_MATERIAL.getMaterial().getItem();
         ItemMeta meta = item.getItemMeta();
-        meta.setDisplayName(Methods.formatText(Methods.formatName(level.getLevel())));
+        meta.setDisplayName(TextUtils.formatText(Methods.formatName(level.getLevel())));
         String line = getLocale().getMessage("general.nametag.lore").getMessage();
-        if (!line.equals("")) meta.setLore(Arrays.asList(line));
+        if (!line.equals("")) meta.setLore(Collections.singletonList(line));
         item.setItemMeta(meta);
 
         NBTItem nbtItem = NmsManager.getNbt().of(item);
