@@ -64,7 +64,7 @@ public class ModuleAutoCollect extends Module {
     }
 
     private void collectLivestock(Farm farm, Collection<LivingEntity> entitiesAroundFarm) {
-        for (Entity entity : entitiesAroundFarm) {
+        for (Entity entity : new ArrayList<>(entitiesAroundFarm)) {
             if (!ticksLived.containsKey(entity)) ticksLived.put(entity, 0);
 
             int lived = ticksLived.get(entity);
