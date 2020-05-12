@@ -141,8 +141,10 @@ public class ModuleAutoBreeding extends Module {
 
     private void handleStackedBreed(LivingEntity entity) {
         EntityStackerManager.removeOne(entity);
-        LivingEntity spawned = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
-        handleBreed(spawned);
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            LivingEntity spawned = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+            handleBreed(spawned);
+        });
     }
 
     private void handleBreed(Entity entity) {
