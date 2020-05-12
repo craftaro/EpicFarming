@@ -88,15 +88,11 @@ public class BlockListeners implements Listener {
                 instance.getLocale().getMessage("event.warning.noauto").sendPrefixedMessage(e.getPlayer());
             }
         }
+        int level = instance.getLevelFromItem(e.getItemInHand());
         Bukkit.getScheduler().runTaskLater(instance, () -> {
-            int level = 1;
-            if (instance.getLevelFromItem(e.getItemInHand()) != 0) {
-                level = instance.getLevelFromItem(e.getItemInHand());
-            }
-
             if (location.getBlock().getType() != farmBlock) return;
 
-            Farm farm = new Farm(location, instance.getLevelManager().getLevel(level), e.getPlayer().getUniqueId());
+            Farm farm = new Farm(location, instance.getLevelManager().getLevel(level == 0 ? 1 : 0), e.getPlayer().getUniqueId());
             instance.getFarmManager().addFarm(location, farm);
 
             farm.tillLand();
