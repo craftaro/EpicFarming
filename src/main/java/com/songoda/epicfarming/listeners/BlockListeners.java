@@ -92,7 +92,7 @@ public class BlockListeners implements Listener {
         Bukkit.getScheduler().runTaskLater(instance, () -> {
             if (location.getBlock().getType() != farmBlock) return;
 
-            Farm farm = new Farm(location, instance.getLevelManager().getLevel(level == 0 ? 1 : 0), e.getPlayer().getUniqueId());
+            Farm farm = new Farm(location, instance.getLevelManager().getLevel(level == 0 ? 1 : level), e.getPlayer().getUniqueId());
             instance.getFarmManager().addFarm(location, farm);
 
             farm.tillLand();
