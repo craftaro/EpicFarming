@@ -15,6 +15,7 @@ import com.songoda.core.utils.TextUtils;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.boost.BoostManager;
 import com.songoda.epicfarming.commands.*;
+import com.songoda.epicfarming.compatibility.EpicFarmingPermission;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmManager;
 import com.songoda.epicfarming.farming.FarmType;
@@ -37,6 +38,7 @@ import com.songoda.epicfarming.tasks.GrowthTask;
 import com.songoda.epicfarming.tasks.HopperTask;
 import com.songoda.epicfarming.utils.EntityUtils;
 import com.songoda.epicfarming.utils.Methods;
+import com.songoda.skyblock.SkyBlock;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
@@ -190,6 +192,10 @@ public class EpicFarming extends SongodaPlugin {
         pluginManager.registerEvents(new BlockListeners(this), this);
         pluginManager.registerEvents(new InteractListeners(this), this);
         pluginManager.registerEvents(new UnloadListeners(this), this);
+
+        if (pluginManager.isPluginEnabled("FabledSkyBlock")) {
+            SkyBlock.getInstance().getPermissionManager().registerPermission(new EpicFarmingPermission());
+        }
 
         // Start tasks
         this.growthTask = GrowthTask.startTask(this);
