@@ -2,7 +2,7 @@
     <groupId>com.songoda</groupId>
     <artifactId>EpicFarming</artifactId>
     <modelVersion>4.0.0</modelVersion>
-    <version>3.0.17</version>
+    <version>3.0.18</version>
     <build>
         <defaultGoal>clean install</defaultGoal>
         <finalName>EpicFarming-${project.version}</finalName>
@@ -101,6 +101,11 @@
             <artifactId>SongodaCore</artifactId>
             <version>LATEST</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.songoda</groupId>
+            <artifactId>skyblock</artifactId>
+            <version>2.2.13</version>
         </dependency>
     </dependencies>
 </project>
