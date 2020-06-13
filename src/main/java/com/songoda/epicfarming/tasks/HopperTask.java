@@ -49,7 +49,7 @@ public class HopperTask extends BukkitRunnable {
                 continue;
             }
 
-            Block block = farmLocation.getBlock().getRelative(BlockFace.DOWN).getRelative(BlockFace.DOWN);
+            Block block = farmLocation.getBlock().getRelative(BlockFace.DOWN);
 
             if (block.getType() != Material.HOPPER)
                 continue;
