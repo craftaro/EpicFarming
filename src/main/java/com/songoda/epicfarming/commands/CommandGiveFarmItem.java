@@ -77,7 +77,7 @@ public class CommandGiveFarmItem extends AbstractCommand {
 
     @Override
     public String getSyntax() {
-        return "/efa givefarmitem [player] <level>";
+        return "givefarmitem [player] <level>";
     }
 
     @Override
