@@ -110,7 +110,7 @@ public class EpicFarming extends SongodaPlugin {
 
         // Register commands
         this.commandManager = new CommandManager(this);
-        this.commandManager.addCommand(new CommandEpicFarming(this))
+        this.commandManager.addMainCommand("EFA")
                 .addSubCommands(
                         new CommandBoost(this),
                         new CommandGiveFarmItem(this),

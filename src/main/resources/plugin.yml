@@ -6,8 +6,8 @@ softdepend: [FabledSkyBlock, Arconix, SkyBlock, Towny, RedProtect, Kingdoms, Plo
 author: Songoda
 api-version: 1.13
 commands:
-  EpicFarming:
+  EFA:
     description: View information on this plugin.
     default: true
-    aliases: [efa]
+    aliases: [EpicFarming]
     usage: /efa
