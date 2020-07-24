@@ -58,7 +58,7 @@ public class ModuleAutoCollect extends Module {
                             BlockUtils.resetGrowthStage(block));
                     continue;
                 }
-                block.setType(Material.AIR);
+                Bukkit.getScheduler().runTask(plugin, () -> block.setType(Material.AIR));
             }
         }
     }
