@@ -1,5 +1,6 @@
 package com.songoda.epicfarming.listeners;
 
+import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.skyblock.SkyBlock;
@@ -24,8 +25,14 @@ public class InteractListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onBlockInteract(PlayerInteractEvent e) {
-        if (e.getClickedBlock() == null
-                || e.getClickedBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial())
+        if (e.getClickedBlock() == null) return;
+        Location location = e.getClickedBlock().getLocation();
+
+        if (e.getItem() != null && CompatibleMaterial.getMaterial(e.getItem()) == CompatibleMaterial.BONE_MEAL
+                && instance.getFarmManager().checkForFarm(location) != null)
+            e.setCancelled(true);
+
+        if (e.getClickedBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial())
             return;
 
         if (e.getAction() != Action.RIGHT_CLICK_BLOCK) return;
@@ -39,8 +46,6 @@ public class InteractListeners implements Listener {
                         "EpicFarming"))
                     return;
         }
-
-        Location location = e.getClickedBlock().getLocation();
 
         if (instance.getFarmManager().getFarms().containsKey(location)) {
             e.setCancelled(true);

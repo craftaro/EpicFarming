@@ -24,10 +24,7 @@ import com.songoda.epicfarming.farming.levels.modules.Module;
 import com.songoda.epicfarming.farming.levels.modules.ModuleAutoBreeding;
 import com.songoda.epicfarming.farming.levels.modules.ModuleAutoButcher;
 import com.songoda.epicfarming.farming.levels.modules.ModuleAutoCollect;
-import com.songoda.epicfarming.listeners.BlockListeners;
-import com.songoda.epicfarming.listeners.EntityListeners;
-import com.songoda.epicfarming.listeners.InteractListeners;
-import com.songoda.epicfarming.listeners.UnloadListeners;
+import com.songoda.epicfarming.listeners.*;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.storage.Storage;
 import com.songoda.epicfarming.storage.StorageRow;
@@ -124,7 +121,7 @@ public class EpicFarming extends SongodaPlugin {
 
         this.loadLevelManager();
 
-        this.farmManager = new FarmManager();
+        this.farmManager = new FarmManager(levelManager);
         this.boostManager = new BoostManager();
 
         /*
@@ -192,6 +189,7 @@ public class EpicFarming extends SongodaPlugin {
         pluginManager.registerEvents(new BlockListeners(this), this);
         pluginManager.registerEvents(new InteractListeners(this), this);
         pluginManager.registerEvents(new UnloadListeners(this), this);
+        pluginManager.registerEvents(new InventoryListeners(), this);
 
         if (pluginManager.isPluginEnabled("FabledSkyBlock")) {
             try {

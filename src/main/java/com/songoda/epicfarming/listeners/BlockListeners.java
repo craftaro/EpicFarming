@@ -35,14 +35,14 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent e) {
-        Farm farm = checkForFarm(e.getBlock().getLocation());
+        Farm farm = instance.getFarmManager().checkForFarm(e.getBlock().getLocation());
         if (farm != null && farm.getFarmType() != FarmType.LIVESTOCK)
             e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onGrow(BlockGrowEvent e) {
-        Farm farm = checkForFarm(e.getBlock().getLocation());
+        Farm farm = instance.getFarmManager().checkForFarm(e.getBlock().getLocation());
         if (farm != null && farm.getFarmType() != FarmType.LIVESTOCK)
             e.setCancelled(true);
     }
@@ -84,7 +84,7 @@ public class BlockListeners implements Listener {
 
         Location location = e.getBlock().getLocation();
         if (e.getBlockPlaced().getType().equals(Material.MELON_SEEDS) || e.getBlockPlaced().getType().equals(Material.PUMPKIN_SEEDS)) {
-            if (checkForFarm(location) != null) {
+            if (instance.getFarmManager().checkForFarm(location) != null) {
                 instance.getLocale().getMessage("event.warning.noauto").sendPrefixedMessage(e.getPlayer());
             }
         }
@@ -97,36 +97,6 @@ public class BlockListeners implements Listener {
 
             farm.tillLand();
         }, 1);
-    }
-
-    private Farm checkForFarm(Location location) {
-        Material farmBlock = Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getBlockMaterial();
-
-        FarmManager farmManager = instance.getFarmManager();
-
-        Block block = location.getBlock();
-        for (Level level : instance.getLevelManager().getLevels().values()) {
-            int radius = level.getRadius();
-            int bx = block.getX();
-            int by = block.getY();
-            int bz = block.getZ();
-
-            for (int fx = -radius; fx <= radius; fx++) {
-                for (int fy = -2; fy <= 2; fy++) {
-                    for (int fz = -radius; fz <= radius; fz++) {
-                        Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
-                        if (b2.getType() == farmBlock) {
-                            Farm farm = farmManager.getFarms().get(b2.getLocation());
-                            if (farm == null) continue;
-                            if (level.getRadius() != farmManager.getFarm(b2.getLocation()).getLevel().getRadius())
-                                continue;
-                            return farm;
-                        }
-                    }
-                }
-            }
-        }
-        return null;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)

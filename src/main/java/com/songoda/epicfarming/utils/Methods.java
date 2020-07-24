@@ -114,9 +114,9 @@ public class Methods {
         if (location == null || location.getWorld() == null)
             return "";
         String w = location.getWorld().getName();
-        double x = location.getX();
-        double y = location.getY();
-        double z = location.getZ();
+        int x = location.getBlockX();
+        int y = location.getBlockY();
+        int z = location.getBlockZ();
         String str = w + ":" + x + ":" + y + ":" + z;
         str = str.replace(".0", "").replace(".", "/");
         return str;
