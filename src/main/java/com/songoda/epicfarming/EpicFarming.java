@@ -124,7 +124,7 @@ public class EpicFarming extends SongodaPlugin {
 
         this.loadLevelManager();
 
-        this.farmManager = new FarmManager();
+        this.farmManager = new FarmManager(levelManager);
         this.boostManager = new BoostManager();
 
         /*
