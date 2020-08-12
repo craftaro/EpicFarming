@@ -2,7 +2,7 @@
     <groupId>com.songoda</groupId>
     <artifactId>EpicFarming</artifactId>
     <modelVersion>4.0.0</modelVersion>
-    <version>3.0.22</version>
+    <version>3.0.22</version> 
     <build>
         <defaultGoal>clean install</defaultGoal>
         <finalName>EpicFarming-${project.version}</finalName>
