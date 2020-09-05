@@ -35,7 +35,7 @@ public class GrowthTask extends BukkitRunnable {
     }
 
     @Override
-    public void run() {
+    public synchronized void run() {
         List<Crop> toRemove = new ArrayList<>();
 
         for (Crop crop : liveCrops.values()) {
@@ -67,12 +67,12 @@ public class GrowthTask extends BukkitRunnable {
     }
 
 
-    public void addLiveCrop(Location location, Crop crop) {
+    public synchronized void addLiveCrop(Location location, Crop crop) {
         if (!liveCrops.containsKey(location))
             liveCrops.put(location, crop);
     }
 
-    public void removeCropByLocation(Location location) {
+    public synchronized void removeCropByLocation(Location location) {
         liveCrops.remove(location);
     }
 
