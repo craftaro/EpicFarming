@@ -14,21 +14,21 @@ import java.util.List;
 
 public class CommandBoost extends AbstractCommand {
 
-    final EpicFarming instance;
+    private final EpicFarming plugin;
 
-    public CommandBoost(EpicFarming instance) {
-        super(false, "boost");
-        this.instance = instance;
+    public CommandBoost(EpicFarming plugin) {
+        super(CommandType.CONSOLE_OK, "boost");
+        this.plugin = plugin;
     }
 
     @Override
     protected ReturnType runCommand(CommandSender sender, String... args) {
         if (args.length < 2) {
-            instance.getLocale().newMessage("&7Syntax error...").sendPrefixedMessage(sender);
+            plugin.getLocale().newMessage("&7Syntax error...").sendPrefixedMessage(sender);
             return ReturnType.SYNTAX_ERROR;
         }
         if (!Methods.isInt(args[1])) {
-            instance.getLocale().newMessage("&6" + args[1] + " &7is not a number...").sendPrefixedMessage(sender);
+            plugin.getLocale().newMessage("&6" + args[1] + " &7is not a number...").sendPrefixedMessage(sender);
             return ReturnType.SYNTAX_ERROR;
         }
 
@@ -45,13 +45,13 @@ public class CommandBoost extends AbstractCommand {
 
         Player player = Bukkit.getPlayer(args[0]);
         if (player == null) {
-            instance.getLocale().newMessage("&cThat player does not exist or is not online...").sendPrefixedMessage(sender);
+            plugin.getLocale().newMessage("&cThat player does not exist or is not online...").sendPrefixedMessage(sender);
             return ReturnType.FAILURE;
         }
 
         BoostData boostData = new BoostData(Integer.parseInt(args[1]), duration == 0L ? Long.MAX_VALUE : System.currentTimeMillis() + duration, player.getUniqueId());
-        instance.getBoostManager().addBoostToPlayer(boostData);
-        instance.getLocale().newMessage("&7Successfully boosted &6" + Bukkit.getPlayer(args[0]).getName()
+        plugin.getBoostManager().addBoostToPlayer(boostData);
+        plugin.getLocale().newMessage("&7Successfully boosted &6" + Bukkit.getPlayer(args[0]).getName()
                 + "'s &7farms by &6" + args[1] + "x" + (duration == 0L ? "" : (" for " + Methods.makeReadable(duration))) + "&7.").sendPrefixedMessage(sender);
         return ReturnType.SUCCESS;
     }

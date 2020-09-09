@@ -8,17 +8,17 @@ import java.util.List;
 
 public class CommandReload extends AbstractCommand {
 
-    final EpicFarming instance;
+    private final EpicFarming plugin;
 
-    public CommandReload(EpicFarming instance) {
-        super(false, "reload");
-        this.instance = instance;
+    public CommandReload(EpicFarming plugin) {
+        super(CommandType.CONSOLE_OK, "reload");
+        this.plugin = plugin;
     }
 
     @Override
     protected ReturnType runCommand(CommandSender sender, String... args) {
-        instance.reloadConfig();
-        instance.getLocale().getMessage("&7Configuration and Language files reloaded.").sendPrefixedMessage(sender);
+        plugin.reloadConfig();
+        plugin.getLocale().getMessage("&7Configuration and Language files reloaded.").sendPrefixedMessage(sender);
         return AbstractCommand.ReturnType.SUCCESS;
     }
 

@@ -10,16 +10,16 @@ import java.util.List;
 
 public class CommandSettings extends AbstractCommand {
 
-    final EpicFarming instance;
+    private final EpicFarming plugin;
 
-    public CommandSettings(EpicFarming instance) {
-        super(true, "settings");
-        this.instance = instance;
+    public CommandSettings(EpicFarming plugin) {
+        super(CommandType.PLAYER_ONLY, "settings");
+        this.plugin = plugin;
     }
 
     @Override
     protected ReturnType runCommand(CommandSender sender, String... args) {
-        instance.getGuiManager().showGUI((Player) sender, new PluginConfigGui(instance));
+        plugin.getGuiManager().showGUI((Player) sender, new PluginConfigGui(plugin));
         return ReturnType.SUCCESS;
     }
 
