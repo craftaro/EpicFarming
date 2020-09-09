@@ -19,7 +19,7 @@ public class CachedChunk {
     }
 
     public CachedChunk(Location location) {
-        this(location.getWorld().getName(), (int)location.getX() >> 4, (int)location.getZ() >> 4);
+        this(location.getWorld().getName(), (int) location.getX() >> 4, (int) location.getZ() >> 4);
     }
 
     public CachedChunk(String world, int x, int z) {

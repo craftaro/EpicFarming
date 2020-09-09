@@ -40,17 +40,17 @@ public class StorageItem {
 
     public String asString() {
         if (object == null) return null;
-        return (String)object;
+        return (String) object;
     }
 
     public boolean asBoolean() {
         if (object == null) return false;
-        return (boolean)object;
+        return (boolean) object;
     }
 
     public int asInt() {
         if (object == null) return 0;
-        return (int)object;
+        return (int) object;
     }
 
     public Object asObject() {
@@ -61,7 +61,7 @@ public class StorageItem {
         List<ItemStack> list = new ArrayList<>();
         if (object == null) return list;
         String obj = (String) object;
-        if (obj.equals("[]"))return list;
+        if (obj.equals("[]")) return list;
         List<String> sers = new ArrayList<>(Arrays.asList(obj.split(";;")));
         for (String ser : sers) {
             list.add(Serializers.deserialize(ser));
