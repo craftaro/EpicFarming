@@ -1,6 +1,5 @@
 package com.songoda.epicfarming.utils;
 
-import com.songoda.core.utils.TextUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.settings.Settings;
 import org.bukkit.Bukkit;

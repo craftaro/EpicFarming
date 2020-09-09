@@ -13,12 +13,23 @@ import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
-import org.bukkit.entity.*;
+import org.bukkit.entity.Ageable;
+import org.bukkit.entity.Chicken;
+import org.bukkit.entity.Entity;
+import org.bukkit.entity.LivingEntity;
+import org.bukkit.entity.Player;
+import org.bukkit.entity.Sheep;
 import org.bukkit.event.inventory.ClickType;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.material.Wool;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class ModuleAutoCollect extends Module {
 
@@ -86,7 +97,7 @@ public class ModuleAutoCollect extends Module {
                 if (!isEnabled(farm)) {
                     ticksLived.remove(entity);
                     Bukkit.getScheduler().runTask(plugin, () ->
-                    entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), new ItemStack(Material.EGG)));
+                            entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), new ItemStack(Material.EGG)));
                 } else {
                     doLivestockDrop(farm, new ItemStack(Material.EGG, 1));
                 }
@@ -100,7 +111,7 @@ public class ModuleAutoCollect extends Module {
                 ItemStack wool = woolColor.toItemStack((int) Math.round(1 + (Math.random() * 3)));
                 if (!isEnabled(farm)) {
                     Bukkit.getScheduler().runTask(plugin, () ->
-                    entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), wool));
+                            entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), wool));
                 } else {
                     doLivestockDrop(farm, wool);
                 }

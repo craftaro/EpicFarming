@@ -2,7 +2,11 @@ package com.songoda.epicfarming.farming.levels;
 
 import com.songoda.epicfarming.farming.levels.modules.Module;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Map;
+import java.util.NavigableMap;
+import java.util.TreeMap;
 
 public class LevelManager {
 

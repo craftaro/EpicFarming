@@ -17,10 +17,10 @@ import org.bukkit.event.player.PlayerInteractEvent;
  */
 public class InteractListeners implements Listener {
 
-    private final EpicFarming instance;
+    private final EpicFarming plugin;
 
-    public InteractListeners(EpicFarming instance) {
-        this.instance = instance;
+    public InteractListeners(EpicFarming plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -29,7 +29,7 @@ public class InteractListeners implements Listener {
         Location location = e.getClickedBlock().getLocation();
 
         if (e.getItem() != null && CompatibleMaterial.getMaterial(e.getItem()) == CompatibleMaterial.BONE_MEAL
-                && instance.getFarmManager().checkForFarm(location) != null)
+                && plugin.getFarmManager().checkForFarm(location) != null)
             e.setCancelled(true);
 
         if (e.getClickedBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial())
@@ -47,9 +47,9 @@ public class InteractListeners implements Listener {
                     return;
         }
 
-        if (instance.getFarmManager().getFarms().containsKey(location)) {
+        if (plugin.getFarmManager().getFarms().containsKey(location)) {
             e.setCancelled(true);
-            instance.getFarmManager().getFarm(location).view(e.getPlayer(), false);
+            plugin.getFarmManager().getFarm(location).view(e.getPlayer(), false);
         }
     }
 }

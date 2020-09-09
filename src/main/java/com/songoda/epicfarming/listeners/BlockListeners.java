@@ -3,10 +3,7 @@ package com.songoda.epicfarming.listeners;
 import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
-import com.songoda.epicfarming.farming.FarmManager;
 import com.songoda.epicfarming.farming.FarmType;
-import com.songoda.epicfarming.farming.levels.Level;
-import com.songoda.epicfarming.farming.levels.modules.ModuleAutoCollect;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.tasks.FarmTask;
 import org.bukkit.Bukkit;
@@ -17,7 +14,12 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
-import org.bukkit.event.block.*;
+import org.bukkit.event.block.BlockBreakEvent;
+import org.bukkit.event.block.BlockExplodeEvent;
+import org.bukkit.event.block.BlockFadeEvent;
+import org.bukkit.event.block.BlockFromToEvent;
+import org.bukkit.event.block.BlockGrowEvent;
+import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
@@ -27,22 +29,22 @@ import org.bukkit.permissions.PermissionAttachmentInfo;
 @SuppressWarnings("Duplicates")
 public class BlockListeners implements Listener {
 
-    private final EpicFarming instance;
+    private final EpicFarming plugin;
 
-    public BlockListeners(EpicFarming instance) {
-        this.instance = instance;
+    public BlockListeners(EpicFarming plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent e) {
-        Farm farm = instance.getFarmManager().checkForFarm(e.getBlock().getLocation());
+        Farm farm = plugin.getFarmManager().checkForFarm(e.getBlock().getLocation());
         if (farm != null && farm.getFarmType() != FarmType.LIVESTOCK)
             e.setCancelled(true);
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onGrow(BlockGrowEvent e) {
-        Farm farm = instance.getFarmManager().checkForFarm(e.getBlock().getLocation());
+        Farm farm = plugin.getFarmManager().checkForFarm(e.getBlock().getLocation());
         if (farm != null && farm.getFarmType() != FarmType.LIVESTOCK)
             e.setCancelled(true);
     }
@@ -63,13 +65,13 @@ public class BlockListeners implements Listener {
         Material farmBlock = Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getBlockMaterial();
 
         if (e.getPlayer().getItemInHand().getType() != farmBlock
-                || instance.getLevelFromItem(e.getItemInHand()) == 0 && !Settings.NON_COMMAND_FARMS.getBoolean())
+                || plugin.getLevelFromItem(e.getItemInHand()) == 0 && !Settings.NON_COMMAND_FARMS.getBoolean())
             return;
 
         if (e.getBlockAgainst().getType() == farmBlock) e.setCancelled(true);
 
         int amt = 0;
-        for (Farm farmm : instance.getFarmManager().getFarms().values()) {
+        for (Farm farmm : plugin.getFarmManager().getFarms().values()) {
             if (farmm.getPlacedBy() == null || !farmm.getPlacedBy().equals(e.getPlayer().getUniqueId())) continue;
             amt++;
         }
@@ -77,23 +79,23 @@ public class BlockListeners implements Listener {
 
         if (limit != -1 && amt >= limit) {
             e.setCancelled(true);
-            instance.getLocale().getMessage("event.limit.hit")
+            plugin.getLocale().getMessage("event.limit.hit")
                     .processPlaceholder("limit", limit).sendPrefixedMessage(e.getPlayer());
             return;
         }
 
         Location location = e.getBlock().getLocation();
         if (e.getBlockPlaced().getType().equals(Material.MELON_SEEDS) || e.getBlockPlaced().getType().equals(Material.PUMPKIN_SEEDS)) {
-            if (instance.getFarmManager().checkForFarm(location) != null) {
-                instance.getLocale().getMessage("event.warning.noauto").sendPrefixedMessage(e.getPlayer());
+            if (plugin.getFarmManager().checkForFarm(location) != null) {
+                plugin.getLocale().getMessage("event.warning.noauto").sendPrefixedMessage(e.getPlayer());
             }
         }
-        int level = instance.getLevelFromItem(e.getItemInHand());
-        Bukkit.getScheduler().runTaskLater(instance, () -> {
+        int level = plugin.getLevelFromItem(e.getItemInHand());
+        Bukkit.getScheduler().runTaskLater(plugin, () -> {
             if (location.getBlock().getType() != farmBlock) return;
 
-            Farm farm = new Farm(location, instance.getLevelManager().getLevel(level == 0 ? 1 : level), e.getPlayer().getUniqueId());
-            instance.getFarmManager().addFarm(location, farm);
+            Farm farm = new Farm(location, plugin.getLevelManager().getLevel(level == 0 ? 1 : level), e.getPlayer().getUniqueId());
+            plugin.getFarmManager().addFarm(location, farm);
 
             farm.tillLand();
         }, 1);
@@ -104,7 +106,7 @@ public class BlockListeners implements Listener {
         if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial())
             return;
 
-        Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
+        Farm farm = plugin.getFarmManager().removeFarm(event.getBlock().getLocation());
 
         if (farm == null) return;
 
@@ -112,7 +114,7 @@ public class BlockListeners implements Listener {
 
         event.setCancelled(true);
 
-        ItemStack item = instance.makeFarmItem(farm.getLevel());
+        ItemStack item = plugin.makeFarmItem(farm.getLevel());
 
         Block block = event.getBlock();
 
@@ -129,14 +131,14 @@ public class BlockListeners implements Listener {
         if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial())
             return;
 
-        Farm farm = instance.getFarmManager().removeFarm(event.getBlock().getLocation());
+        Farm farm = plugin.getFarmManager().removeFarm(event.getBlock().getLocation());
 
         if (farm == null) return;
         FarmTask.getCrops(farm, false);
 
         event.setCancelled(true);
 
-        ItemStack item = instance.makeFarmItem(farm.getLevel());
+        ItemStack item = plugin.makeFarmItem(farm.getLevel());
 
         Block block = event.getBlock();
 
@@ -151,7 +153,7 @@ public class BlockListeners implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockFromToEventMonitor(BlockFromToEvent event) {
         // prevent water/lava/egg griefs
-        if (instance.getFarmManager().getFarm(event.getToBlock()) != null) {
+        if (plugin.getFarmManager().getFarm(event.getToBlock()) != null) {
             event.setCancelled(true);
         }
     }
