@@ -32,10 +32,10 @@ import java.util.List;
 
 public class EntityListeners implements Listener {
 
-    private final EpicFarming instance;
+    private final EpicFarming plugin;
 
-    public EntityListeners(EpicFarming instance) {
-        this.instance = instance;
+    public EntityListeners(EpicFarming plugin) {
+        this.plugin = plugin;
     }
 
     @EventHandler(priority = EventPriority.HIGHEST)
@@ -43,7 +43,7 @@ public class EntityListeners implements Listener {
         LivingEntity entity = event.getEntity();
         if (!entity.hasMetadata("EFA-TAGGED")) return;
         Location location = (Location) entity.getMetadata("EFA-TAGGED").get(0).value();
-        Farm farm = instance.getFarmManager().getFarm(location);
+        Farm farm = plugin.getFarmManager().getFarm(location);
 
         boolean autoCollect = false;
         for (Module module : farm.getLevel().getRegisteredModules()) {
@@ -99,7 +99,7 @@ public class EntityListeners implements Listener {
             if (block.getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial())
                 continue;
 
-            Farm farm = instance.getFarmManager().getFarm(block.getLocation());
+            Farm farm = plugin.getFarmManager().getFarm(block.getLocation());
             if (farm == null) continue;
 
             toCancel.add(block);
@@ -108,11 +108,11 @@ public class EntityListeners implements Listener {
         for (Block block : toCancel) {
             event.blockList().remove(block);
 
-            Farm farm = instance.getFarmManager().removeFarm(block.getLocation());
+            Farm farm = plugin.getFarmManager().removeFarm(block.getLocation());
 
             FarmTask.getCrops(farm, false);
 
-            ItemStack item = instance.makeFarmItem(farm.getLevel());
+            ItemStack item = plugin.makeFarmItem(farm.getLevel());
 
             block.setType(Material.AIR);
             block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
