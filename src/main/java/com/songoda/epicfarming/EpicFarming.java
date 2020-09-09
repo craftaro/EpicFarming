@@ -124,64 +124,6 @@ public class EpicFarming extends SongodaPlugin {
         this.farmManager = new FarmManager(levelManager);
         this.boostManager = new BoostManager();
 
-        /*
-         * Register Farms into FarmManger from configuration
-         */
-        Bukkit.getScheduler().runTaskLaterAsynchronously(this, () -> {
-            if (storage.containsGroup("farms")) {
-                for (StorageRow row : storage.getRowsByGroup("farms")) {
-                    Location location = Methods.unserializeLocation(row.getKey());
-                    if (location == null || location.getWorld() == null) continue;
-
-                    int level = 1;
-                    int configLevel = row.get("level").asInt();
-                    if (configLevel > 0) {
-                        level = configLevel;
-                    }
-                    List<ItemStack> items = new ArrayList<ItemStack>();
-                    List<ItemStack> configItems = row.get("contents").asItemStackList();
-                    if (configItems != null && configItems.size() > 0) {
-                        items = configItems;
-                    }
-                    UUID placedBY = null;
-                    String configPlacedBy = row.get("placedby").asString();
-                    if (configPlacedBy != null) {
-                        placedBY = UUID.fromString(configPlacedBy);
-                    }
-
-                    FarmType farmType = FarmType.BOTH;
-                    String farmTypeStr = row.get("farmtype").asString();
-                    if (farmTypeStr != null)
-                        farmType = FarmType.valueOf(farmTypeStr);
-
-                    Farm farm = new Farm(location, levelManager.getLevel(level), placedBY);
-                    farm.setFarmType(farmType);
-                    farm.setItems(items);
-                    Bukkit.getScheduler().runTask(EpicFarming.getInstance(), () ->
-                            farmManager.addFarm(location, farm));
-                }
-            }
-
-            // Adding in Boosts
-            if (storage.containsGroup("boosts")) {
-                for (StorageRow row : storage.getRowsByGroup("boosts")) {
-
-                    BoostData boostData = new BoostData(
-                            row.get("amount").asInt(),
-                            Long.parseLong(row.getKey()),
-                            UUID.fromString(row.get("player").asString()));
-
-                    Bukkit.getScheduler().runTask(EpicFarming.getInstance(), () -> {
-                        this.boostManager.addBoostToPlayer(boostData);
-                    });
-                }
-            }
-
-            // Save data initially so that if the person reloads again fast they don't lose all their data.
-            this.saveToFile();
-        }, 10);
-
-
         // Register Listeners
         guiManager.init();
         PluginManager pluginManager = Bukkit.getPluginManager();
@@ -207,10 +149,64 @@ public class EpicFarming extends SongodaPlugin {
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if (!Bukkit.getPluginManager().isPluginEnabled("EpicHoppers"))
                 HopperTask.startTask(this);
-        }, 20L);
+        }, 30L);
 
         // Start auto save
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
+    }
+    @Override
+    public void onDataLoad() {
+        if (storage.containsGroup("farms")) {
+            for (StorageRow row : storage.getRowsByGroup("farms")) {
+                Location location = Methods.unserializeLocation(row.getKey());
+                if (location == null || location.getWorld() == null) continue;
+
+                int level = 1;
+                int configLevel = row.get("level").asInt();
+                if (configLevel > 0) {
+                    level = configLevel;
+                }
+                List<ItemStack> items = new ArrayList<ItemStack>();
+                List<ItemStack> configItems = row.get("contents").asItemStackList();
+                if (configItems != null && configItems.size() > 0) {
+                    items = configItems;
+                }
+                UUID placedBY = null;
+                String configPlacedBy = row.get("placedby").asString();
+                if (configPlacedBy != null) {
+                    placedBY = UUID.fromString(configPlacedBy);
+                }
+
+                FarmType farmType = FarmType.BOTH;
+                String farmTypeStr = row.get("farmtype").asString();
+                if (farmTypeStr != null)
+                    farmType = FarmType.valueOf(farmTypeStr);
+
+                Farm farm = new Farm(location, levelManager.getLevel(level), placedBY);
+                farm.setFarmType(farmType);
+                farm.setItems(items);
+                Bukkit.getScheduler().runTask(EpicFarming.getInstance(), () ->
+                        farmManager.addFarm(location, farm));
+            }
+        }
+
+        // Adding in Boosts
+        if (storage.containsGroup("boosts")) {
+            for (StorageRow row : storage.getRowsByGroup("boosts")) {
+
+                BoostData boostData = new BoostData(
+                        row.get("amount").asInt(),
+                        Long.parseLong(row.getKey()),
+                        UUID.fromString(row.get("player").asString()));
+
+                Bukkit.getScheduler().runTask(EpicFarming.getInstance(), () -> {
+                    this.boostManager.addBoostToPlayer(boostData);
+                });
+            }
+        }
+
+        // Save data initially so that if the person reloads again fast they don't lose all their data.
+        this.saveToFile();
     }
 
     @Override
@@ -287,8 +283,7 @@ public class EpicFarming extends SongodaPlugin {
     }
 
     public int getLevelFromItem(ItemStack item) {
-        NBTCore nbt = NmsManager.getNbt();
-        NBTItem nbtItem = nbt.of(item);
+        NBTItem nbtItem = NmsManager.getNbt().of(item);
 
         if (nbtItem.has("level"))
             return nbtItem.getNBTObject("level").asInt();
