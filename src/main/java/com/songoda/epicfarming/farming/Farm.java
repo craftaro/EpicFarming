@@ -173,7 +173,7 @@ public class Farm {
     }
 
     public void addItem(ItemStack toAdd) {
-        for (ItemStack item : getItems()) {
+        for (ItemStack item : new ArrayList<>(getItems())) {
             if (item.getType() != toAdd.getType()
                     || item.getAmount() + toAdd.getAmount() > item.getMaxStackSize()) continue;
             item.setAmount(item.getAmount() + toAdd.getAmount());
