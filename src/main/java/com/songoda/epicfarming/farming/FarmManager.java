@@ -8,6 +8,7 @@ import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,6 +25,11 @@ public class FarmManager {
 
     public void addFarm(Location location, Farm farm) {
         registeredFarms.put(roundLocation(location), farm);
+    }
+
+    public void addFarms(Collection<Farm> farms) {
+        for (Farm farm : farms)
+            registeredFarms.put(farm.getLocation(), farm);
     }
 
     public Farm removeFarm(Location location) {
