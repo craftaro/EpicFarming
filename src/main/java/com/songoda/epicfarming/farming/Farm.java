@@ -31,6 +31,9 @@ public class Farm {
     // It is reset on every plugin load.
     private UUID uniqueId = UUID.randomUUID();
 
+    // Id for database usage.
+    private int id;
+
     private static final Random random = new Random();
     private final List<Block> cachedCrops = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
@@ -100,6 +103,7 @@ public class Farm {
     private void upgradeFinal(Level level, Player player) {
         EpicFarming instance = EpicFarming.getInstance();
         this.level = level;
+        instance.getDataManager().updateFarm(this);
         if (instance.getLevelManager().getHighestLevel() != level) {
             instance.getLocale().getMessage("event.upgrade.success")
                     .processPlaceholder("level", level.getLevel()).sendPrefixedMessage(player);
@@ -311,9 +315,19 @@ public class Farm {
                 farmType = FarmType.CROPS;
                 break;
         }
+        EpicFarming.getInstance().getDataManager().updateFarm(this);
     }
 
     public void setFarmType(FarmType farmType) {
         this.farmType = farmType;
+        EpicFarming.getInstance().getDataManager().updateFarm(this);
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

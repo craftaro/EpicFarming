@@ -50,21 +50,21 @@ public class OverviewGui extends Gui {
 
         this.setDefaultItem(null);
 
-        GuiUtils.mirrorFill(this, 0, 0, false, true, glass2);
-        GuiUtils.mirrorFill(this, 0, 1, false, true, glass2);
-        GuiUtils.mirrorFill(this, 0, 2, false, true, glass3);
-        GuiUtils.mirrorFill(this, 1, 0, false, true, glass2);
-        GuiUtils.mirrorFill(this, 1, 1, false, true, glass3);
-        GuiUtils.mirrorFill(this, 2, 0, false, true, glass2);
-        GuiUtils.mirrorFill(this, 2, 1, false, true, glass2);
-        GuiUtils.mirrorFill(this, 2, 2, false, true, glass3);
+        mirrorFill(0, 0, false, true, glass2);
+        mirrorFill(0, 1, false, true, glass2);
+        mirrorFill(0, 2, false, true, glass3);
+        mirrorFill(1, 0, false, true, glass2);
+        mirrorFill(1, 1, false, true, glass3);
+        mirrorFill(2, 0, false, true, glass2);
+        mirrorFill(2, 1, false, true, glass2);
+        mirrorFill(2, 2, false, true, glass3);
 
-        GuiUtils.mirrorFill(this, 0, 3, false, true, glass1);
-        GuiUtils.mirrorFill(this, 0, 4, false, false, glass1);
-        GuiUtils.mirrorFill(this, 1, 3, false, true, glass1);
-        GuiUtils.mirrorFill(this, 1, 2, false, true, glass1);
-        GuiUtils.mirrorFill(this, 2, 3, false, true, glass1);
-        GuiUtils.mirrorFill(this, 2, 4, false, false, glass1);
+        mirrorFill(0, 3, false, true, glass1);
+        mirrorFill(0, 4, false, false, glass1);
+        mirrorFill(1, 3, false, true, glass1);
+        mirrorFill(1, 2, false, true, glass1);
+        mirrorFill(2, 3, false, true, glass1);
+        mirrorFill(2, 4, false, false, glass1);
 
         // enable page events
         if (level.getPages() > 1) {

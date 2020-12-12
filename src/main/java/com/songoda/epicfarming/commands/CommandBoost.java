@@ -50,6 +50,7 @@ public class CommandBoost extends AbstractCommand {
         }
 
         BoostData boostData = new BoostData(Integer.parseInt(args[1]), duration == 0L ? Long.MAX_VALUE : System.currentTimeMillis() + duration, player.getUniqueId());
+        plugin.getDataManager().createBoost(boostData);
         plugin.getBoostManager().addBoostToPlayer(boostData);
         plugin.getLocale().newMessage("&7Successfully boosted &6" + Bukkit.getPlayer(args[0]).getName()
                 + "'s &7farms by &6" + args[1] + "x" + (duration == 0L ? "" : (" for " + Methods.makeReadable(duration))) + "&7.").sendPrefixedMessage(sender);

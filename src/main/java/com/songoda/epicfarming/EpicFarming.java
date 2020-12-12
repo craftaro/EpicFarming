@@ -5,6 +5,9 @@ import com.songoda.core.SongodaPlugin;
 import com.songoda.core.commands.CommandManager;
 import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.core.configuration.Config;
+import com.songoda.core.database.DataMigrationManager;
+import com.songoda.core.database.DatabaseConnector;
+import com.songoda.core.database.SQLiteConnector;
 import com.songoda.core.gui.GuiManager;
 import com.songoda.core.hooks.EconomyManager;
 import com.songoda.core.hooks.EntityStackerManager;
@@ -17,6 +20,8 @@ import com.songoda.epicfarming.commands.CommandBoost;
 import com.songoda.epicfarming.commands.CommandGiveFarmItem;
 import com.songoda.epicfarming.commands.CommandReload;
 import com.songoda.epicfarming.commands.CommandSettings;
+import com.songoda.epicfarming.database.DataManager;
+import com.songoda.epicfarming.database.migrations._1_InitialMigration;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmManager;
 import com.songoda.epicfarming.farming.FarmType;
@@ -44,6 +49,7 @@ import com.songoda.skyblock.SkyBlock;
 import com.songoda.skyblock.permission.BasicPermission;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
+import org.bukkit.ChatColor;
 import org.bukkit.Location;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.inventory.ItemStack;
@@ -78,7 +84,8 @@ public class EpicFarming extends SongodaPlugin {
 
     private EntityUtils entityUtils;
 
-    private Storage storage;
+    private DatabaseConnector databaseConnector;
+    private DataManager dataManager;
 
     public static EpicFarming getInstance() {
         return INSTANCE;
@@ -92,7 +99,8 @@ public class EpicFarming extends SongodaPlugin {
     @Override
     public void onPluginDisable() {
         saveToFile();
-        this.storage.closeConnection();
+        for (Farm farm : farmManager.getFarms().values())
+            dataManager.updateItems(farm);
     }
 
     @Override
@@ -125,9 +133,13 @@ public class EpicFarming extends SongodaPlugin {
                         new CommandSettings(this)
                 );
 
-        dataConfig.load();
+        this.databaseConnector = new SQLiteConnector(this);
+        this.getLogger().info("Data handler connected using SQLite.");
 
-        this.storage = new StorageYaml(this);
+        this.dataManager = new DataManager(this.databaseConnector, this);
+        DataMigrationManager dataMigrationManager = new DataMigrationManager(this.databaseConnector, this.dataManager,
+                new _1_InitialMigration());
+        dataMigrationManager.runMigrations();
 
         this.loadLevelManager();
 
@@ -162,62 +174,88 @@ public class EpicFarming extends SongodaPlugin {
         }, 30L);
 
         // Start auto save
-        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, this::saveToFile, 6000, 6000);
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
+            saveToFile();
+
+            for (Farm farm : farmManager.getFarms().values())
+                dataManager.updateItemsAsync(farm);
+        }, 6000, 6000);
     }
 
     @Override
     public void onDataLoad() {
-        if (storage.containsGroup("farms")) {
-            for (StorageRow row : storage.getRowsByGroup("farms")) {
-                Location location = Methods.unserializeLocation(row.getKey());
-                if (location == null || location.getWorld() == null) continue;
+        Bukkit.getScheduler().runTaskAsynchronously(this, () -> {
+            // Legacy data! Yay!
+            File folder = getDataFolder();
+            File dataFile = new File(folder, "data.yml");
 
-                int level = 1;
-                int configLevel = row.get("level").asInt();
-                if (configLevel > 0) {
-                    level = configLevel;
-                }
-                List<ItemStack> items = new ArrayList<ItemStack>();
-                List<ItemStack> configItems = row.get("contents").asItemStackList();
-                if (configItems != null && configItems.size() > 0) {
-                    items = configItems;
-                }
-                UUID placedBY = null;
-                String configPlacedBy = row.get("placedby").asString();
-                if (configPlacedBy != null) {
-                    placedBY = UUID.fromString(configPlacedBy);
+            boolean converted = false;
+            if (dataFile.exists()) {
+                converted = true;
+                Storage storage = new StorageYaml(this);
+                if (storage.containsGroup("farms")) {
+                    console.sendMessage("[" + getDescription().getName() + "] " + ChatColor.RED +
+                            "Conversion process starting. Do NOT turn off your server." +
+                            "EpicFarming hasn't fully loaded yet, so make sure users don't" +
+                            "interact with the plugin until the conversion process is complete.");
+
+                    List<Farm> farms = new ArrayList<>();
+                    for (StorageRow row : storage.getRowsByGroup("farms")) {
+                        Location location = Methods.unserializeLocation(row.getKey());
+                        if (location == null) continue;
+
+                        if (row.get("level").asInt() == 0) continue;
+
+                        String placedByStr = row.get("placedby").asString();
+                        UUID placedBy = placedByStr == null ? null : UUID.fromString(placedByStr);
+
+                        List<ItemStack> items = row.get("contents").asItemStackList();
+                        if (items == null) {
+                            items = new ArrayList<>();
+                        }
+
+                        FarmType farmType = FarmType.BOTH;
+                        String farmTypeStr = row.get("farmtype").asString();
+                        if (farmTypeStr != null) {
+                            farmType = FarmType.valueOf(farmTypeStr);
+                        }
+
+                        Farm farm = new Farm(location, levelManager.getLevel(row.get("level").asInt()), placedBy);
+                        farm.setFarmType(farmType);
+                        farm.setItems(items);
+
+                        farms.add(farm);
+                    }
+                    dataManager.createFarms(farms);
                 }
 
-                FarmType farmType = FarmType.BOTH;
-                String farmTypeStr = row.get("farmtype").asString();
-                if (farmTypeStr != null)
-                    farmType = FarmType.valueOf(farmTypeStr);
+                // Adding in Boosts
+                if (storage.containsGroup("boosts")) {
+                    for (StorageRow row : storage.getRowsByGroup("boosts")) {
+                        if (row.get("uuid").asObject() == null)
+                            continue;
 
-                Farm farm = new Farm(location, levelManager.getLevel(level), placedBY);
-                farm.setFarmType(farmType);
-                farm.setItems(items);
-                Bukkit.getScheduler().runTask(EpicFarming.getInstance(), () ->
-                        farmManager.addFarm(location, farm));
+                        dataManager.createBoost(new BoostData(
+                                row.get("amount").asInt(),
+                                Long.parseLong(row.getKey()),
+                                UUID.fromString(row.get("uuid").asString())));
+                    }
+                }
+                dataFile.delete();
             }
-        }
 
-        // Adding in Boosts
-        if (storage.containsGroup("boosts")) {
-            for (StorageRow row : storage.getRowsByGroup("boosts")) {
+            final boolean finalConverted = converted;
+            dataManager.queueAsync(() -> {
+                if (finalConverted) {
+                    console.sendMessage("[" + getDescription().getName() + "] " + ChatColor.GREEN + "Conversion complete :)");
+                }
 
-                BoostData boostData = new BoostData(
-                        row.get("amount").asInt(),
-                        Long.parseLong(row.getKey()),
-                        UUID.fromString(row.get("player").asString()));
-
-                Bukkit.getScheduler().runTask(EpicFarming.getInstance(), () -> {
-                    this.boostManager.addBoostToPlayer(boostData);
+                this.dataManager.getFarms((farms) -> {
+                    this.farmManager.addFarms(farms.values());
+                    this.dataManager.getBoosts((boosts) -> this.boostManager.addBoosts(boosts));
                 });
-            }
-        }
-
-        // Save data initially so that if the person reloads again fast they don't lose all their data.
-        this.saveToFile();
+            }, "create");
+        });
     }
 
     @Override
@@ -289,8 +327,6 @@ public class EpicFarming extends SongodaPlugin {
                 for (Module module : level.getRegisteredModules())
                     module.saveDataToFile();
         }
-
-        storage.doSave();
     }
 
     public int getLevelFromItem(ItemStack item) {
@@ -350,5 +386,13 @@ public class EpicFarming extends SongodaPlugin {
 
     public EntityUtils getEntityUtils() {
         return entityUtils;
+    }
+
+    public DatabaseConnector getDatabaseConnector() {
+        return databaseConnector;
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
     }
 }
