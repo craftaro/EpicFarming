@@ -5,6 +5,7 @@ import com.songoda.core.database.DatabaseConnector;
 import com.songoda.core.nms.NmsManager;
 import com.songoda.core.nms.nbt.NBTCore;
 import com.songoda.core.nms.nbt.NBTItem;
+import com.songoda.core.utils.ItemSerializer;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;
@@ -14,12 +15,7 @@ import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.plugin.Plugin;
-import org.bukkit.util.io.BukkitObjectInputStream;
-import org.bukkit.util.io.BukkitObjectOutputStream;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
@@ -94,15 +90,7 @@ public class DataManager extends DataManagerAbstract {
             try (PreparedStatement statement = connection.prepareStatement(createItem)) {
                 for (ItemStack item : farm.getItems()) {
                     statement.setInt(1, farm.getId());
-
-                    try (ByteArrayOutputStream stream = new ByteArrayOutputStream(); BukkitObjectOutputStream bukkitStream = new BukkitObjectOutputStream(stream)) {
-                        bukkitStream.writeObject(item);
-                        statement.setString(2, Base64.getEncoder().encodeToString(stream.toByteArray()));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        continue;
-                    }
-
+                    statement.setBytes(2, ItemSerializer.serializeItem(item));
                     statement.addBatch();
                 }
                 statement.executeBatch();
@@ -160,14 +148,7 @@ public class DataManager extends DataManagerAbstract {
             try (PreparedStatement statement = connection.prepareStatement(createItem)) {
                 for (ItemStack item : farm.getItems()) {
                     statement.setInt(1, farm.getId());
-
-                    try (ByteArrayOutputStream stream = new ByteArrayOutputStream(); BukkitObjectOutputStream bukkitStream = new BukkitObjectOutputStream(stream)) {
-                        bukkitStream.writeObject(item);
-                        statement.setString(2, Base64.getEncoder().encodeToString(stream.toByteArray()));
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                        continue;
-                    }
+                    statement.setBytes(2, ItemSerializer.serializeItem(item));
 
                     statement.addBatch();
                 }
@@ -215,14 +196,7 @@ public class DataManager extends DataManagerAbstract {
                 ResultSet result = statement.executeQuery(selectItems);
                 while (result.next()) {
                     int id = result.getInt("farm_id");
-
-                    ItemStack item = null;
-                    try (BukkitObjectInputStream stream = new BukkitObjectInputStream(
-                            new ByteArrayInputStream(Base64.getDecoder().decode(result.getString("item"))))) {
-                        item = (ItemStack) stream.readObject();
-                    } catch (IOException | ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
+                    ItemStack item = ItemSerializer.deserializeItem(result.getBytes("item"));
 
                     Farm farm = farms.get(id);
                     if (farm == null) {
