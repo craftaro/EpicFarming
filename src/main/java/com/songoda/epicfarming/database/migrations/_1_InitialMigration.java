@@ -38,7 +38,7 @@ public class _1_InitialMigration extends DataMigration {
         try (Statement statement = connection.createStatement()) {
             statement.execute("CREATE TABLE " + tablePrefix + "items (" +
                     "farm_id INTEGER NOT NULL, " +
-                    "item TEXT NOT NULL" +
+                    "item VARBINARY(999) NOT NULL" +
                     ")");
         }
 
