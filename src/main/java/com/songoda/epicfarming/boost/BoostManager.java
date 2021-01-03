@@ -1,9 +1,8 @@
 package com.songoda.epicfarming.boost;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.UUID;
+import com.songoda.epicfarming.EpicFarming;
+
+import java.util.*;
 
 public class BoostManager {
 
@@ -17,6 +16,11 @@ public class BoostManager {
         this.registeredBoosts.remove(data);
     }
 
+    public void addBoosts(Collection<BoostData> boosts) {
+        for (BoostData boost : boosts)
+            this.registeredBoosts.add(boost);
+    }
+
     public Set<BoostData> getBoosts() {
         return Collections.unmodifiableSet(registeredBoosts);
     }
@@ -26,6 +30,7 @@ public class BoostManager {
         for (BoostData boostData : registeredBoosts) {
             if (boostData.getPlayer().toString().equals(player.toString())) {
                 if (System.currentTimeMillis() >= boostData.getEndTime()) {
+                    EpicFarming.getInstance().getDataManager().deleteBoost(boostData);
                     removeBoostFromPlayer(boostData);
                 }
                 return boostData;
