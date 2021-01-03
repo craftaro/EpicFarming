@@ -176,8 +176,9 @@ public class Farm {
         return Collections.unmodifiableList(items);
     }
 
+    // Should be used in sync.
     public void addItem(ItemStack toAdd) {
-        for (ItemStack item : new ArrayList<>(getItems())) {
+        for (ItemStack item : new ArrayList<>(items)) {
             if (item.getType() != toAdd.getType()
                     || item.getAmount() + toAdd.getAmount() > item.getMaxStackSize()) continue;
             item.setAmount(item.getAmount() + toAdd.getAmount());
