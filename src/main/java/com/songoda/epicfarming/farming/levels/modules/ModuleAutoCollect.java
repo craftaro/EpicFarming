@@ -220,9 +220,10 @@ public class ModuleAutoCollect extends Module {
         ItemStack seedStack = new ItemStack(cropTypeData.getSeedMaterial(), random.nextInt(3) + 1 + (useBoneMeal(farm) ? 1 : 0));
 
         if (!farm.willFit(stack) || !farm.willFit(seedStack)) return false;
-        Bukkit.getScheduler().runTask(plugin, () ->
-                Methods.animate(farm.getLocation(), cropTypeData.getYieldMaterial()));
-        farm.addItem(stack);
+        Bukkit.getScheduler().runTask(plugin, () -> {
+            Methods.animate(farm.getLocation(), cropTypeData.getYieldMaterial());
+            farm.addItem(stack);
+        });
         if (getCollectionType(farm) != CollectionType.NO_SEEDS)
             farm.addItem(seedStack);
         return true;
