@@ -1,6 +1,7 @@
 package com.songoda.epicfarming.gui;
 
 import com.songoda.core.compatibility.CompatibleMaterial;
+import com.songoda.core.gui.CustomizableGui;
 import com.songoda.core.gui.Gui;
 import com.songoda.core.gui.GuiUtils;
 import com.songoda.epicfarming.EpicFarming;
@@ -25,9 +26,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class OverviewGui extends Gui {
+public class OverviewGui extends CustomizableGui {
 
-    private final EpicFarming plugin;
+    private static final EpicFarming plugin = EpicFarming.getInstance();
     private final Farm farm;
     private final Level level;
     private final Player player;
@@ -35,7 +36,7 @@ public class OverviewGui extends Gui {
     private int task;
 
     public OverviewGui(Farm farm, Player player) {
-        this.plugin = EpicFarming.getInstance();
+        super(plugin, "overview");
         this.farm = farm;
         this.level = farm.getLevel();
         this.player = player;
@@ -50,21 +51,21 @@ public class OverviewGui extends Gui {
 
         this.setDefaultItem(null);
 
-        mirrorFill(0, 0, false, true, glass2);
-        mirrorFill(0, 1, false, true, glass2);
-        mirrorFill(0, 2, false, true, glass3);
-        mirrorFill(1, 0, false, true, glass2);
-        mirrorFill(1, 1, false, true, glass3);
-        mirrorFill(2, 0, false, true, glass2);
-        mirrorFill(2, 1, false, true, glass2);
-        mirrorFill(2, 2, false, true, glass3);
+        mirrorFill("mirrorfill_1", 0, 0, false, true, glass2);
+        mirrorFill("mirrorfill_2", 0, 1, false, true, glass2);
+        mirrorFill("mirrorfill_3", 0, 2, false, true, glass3);
+        mirrorFill("mirrorfill_4", 1, 0, false, true, glass2);
+        mirrorFill("mirrorfill_5", 1, 1, false, true, glass3);
+        mirrorFill("mirrorfill_6", 2, 0, false, true, glass2);
+        mirrorFill("mirrorfill_7", 2, 1, false, true, glass2);
+        mirrorFill("mirrorfill_8", 2, 2, false, true, glass3);
 
-        mirrorFill(0, 3, false, true, glass1);
-        mirrorFill(0, 4, false, false, glass1);
-        mirrorFill(1, 3, false, true, glass1);
-        mirrorFill(1, 2, false, true, glass1);
-        mirrorFill(2, 3, false, true, glass1);
-        mirrorFill(2, 4, false, false, glass1);
+        mirrorFill("mirrorfill_9", 0, 3, false, true, glass1);
+        mirrorFill("mirrorfill_10", 0, 4, false, false, glass1);
+        mirrorFill("mirrorfill_11", 1, 3, false, true, glass1);
+        mirrorFill("mirrorfill_12", 1, 2, false, true, glass1);
+        mirrorFill("mirrorfill_13", 2, 3, false, true, glass1);
+        mirrorFill("mirrorfill_14", 2, 4, false, false, glass1);
 
         // enable page events
         if (level.getPages() > 1) {
@@ -112,14 +113,14 @@ public class OverviewGui extends Gui {
                 farmLore.add(Methods.formatText(line));
         }
 
-        setItem(13, GuiUtils.createButtonItem(Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD),
+        setItem("farm",13, GuiUtils.createButtonItem(Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD),
                 plugin.getLocale().getMessage("general.nametag.farm")
                         .processPlaceholder("level", level.getLevel()).getMessage(),
                 farmLore));
 
         if (player != null && Settings.UPGRADE_WITH_XP.getBoolean() && player.hasPermission("EpicFarming.Upgrade.XP")) {
 
-            setButton(11, GuiUtils.createButtonItem(Settings.XP_ICON.getMaterial(CompatibleMaterial.EXPERIENCE_BOTTLE),
+            setButton("xp", 11, GuiUtils.createButtonItem(Settings.XP_ICON.getMaterial(CompatibleMaterial.EXPERIENCE_BOTTLE),
                     plugin.getLocale().getMessage("interface.button.upgradewithxp").getMessage(),
                     nextLevel != null
                             ? plugin.getLocale().getMessage("interface.button.upgradewithxplore")
@@ -135,7 +136,7 @@ public class OverviewGui extends Gui {
 
         if (Settings.UPGRADE_WITH_ECONOMY.getBoolean() && player != null && player.hasPermission("EpicFarming.Upgrade.ECO")) {
 
-            setButton(15, GuiUtils.createButtonItem(Settings.ECO_ICON.getMaterial(CompatibleMaterial.SUNFLOWER),
+            setButton("eco", 15, GuiUtils.createButtonItem(Settings.ECO_ICON.getMaterial(CompatibleMaterial.SUNFLOWER),
                     plugin.getLocale().getMessage("interface.button.upgradewitheconomy").getMessage(),
                     nextLevel != null
                             ? plugin.getLocale().getMessage("interface.button.upgradewitheconomylore")
@@ -188,9 +189,9 @@ public class OverviewGui extends Gui {
         for (int ii = 0; ii < amount; ii++) {
             int slot = layout[ii];
             if (ii == 0 && level.getRegisteredModules().stream().map(Module::getName).anyMatch(s -> s.equals("AutoCollect"))) {
-                if (level.getRegisteredModules().stream().map(Module::getName).anyMatch(s -> s.equals("AutoButcher"))
-                        || level.getRegisteredModules().stream().map(Module::getName).anyMatch(s -> s.equals("AutoBreeding")))
-                    setButton(slot, farmType,
+                if (level.getRegisteredModules().stream().map(Module::getName).anyMatch(s -> s.equals("AutoButcher")
+                        || s.equals("AutoBreeding")))
+                    setButton("toggle", slot, farmType,
                             (event) -> {
                                 farm.toggleFarmType();
                                 if (farm.getFarmType() != FarmType.LIVESTOCK)
@@ -202,7 +203,7 @@ public class OverviewGui extends Gui {
 
                 Module module = modules.get(0);
                 modules.remove(module);
-                setButton(slot, module.getGUIButton(farm),
+                setButton("module_" + module.getName().toLowerCase(), slot, module.getGUIButton(farm),
                         (event) -> module.runButtonPress(player, farm, event.clickType));
             }
         }
