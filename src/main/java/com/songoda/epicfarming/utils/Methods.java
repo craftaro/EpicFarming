@@ -31,12 +31,16 @@ public class Methods {
         return name;
     }
 
-    public static void animate(Location location, CompatibleMaterial mat) {
+    public static void animate(Location location, CompatibleMaterial material) {
+        animate(location, material.getItem());
+    }
+
+    public static void animate(Location location, ItemStack item) {
         if (!Settings.ANIMATE.getBoolean()) return;
         Block block = location.getBlock();
         if (block.getRelative(0, 1, 0).getType() != Material.AIR)
             return;
-        Item i = block.getWorld().dropItem(block.getLocation().add(0.5, 1, 0.5), mat.getItem());
+        Item i = block.getWorld().dropItem(block.getLocation().add(0.5, 1, 0.5), item);
 
         // Support for EpicHoppers suction.
         i.setMetadata("grabbed", new FixedMetadataValue(EpicFarming.getInstance(), "true"));
