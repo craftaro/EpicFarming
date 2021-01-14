@@ -7,7 +7,6 @@ import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmType;
 import com.songoda.epicfarming.settings.Settings;
-import com.songoda.epicfarming.utils.CropType;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.block.Block;
@@ -55,10 +54,13 @@ public class FarmTask extends BukkitRunnable {
                     for (int fy = -2; fy <= 1; fy++) {
                         for (int fz = -radius; fz <= radius; fz++) {
                             Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
-                            CompatibleMaterial mat = CompatibleMaterial.getMaterial(b2);
+                            CompatibleMaterial mat = CompatibleMaterial.getBlockMaterial(b2.getType());
 
-                            if (mat == null || !mat.isCrop() || !CropType.isGrowableCrop(mat.getBlockMaterial()))
+                            if (mat == null || !mat.isCrop()) {
+                                if (mat == CompatibleMaterial.STONE || mat == CompatibleMaterial.DIRT || mat == CompatibleMaterial.GRASS_BLOCK)
+                                    continue;
                                 continue;
+                            }
 
                             if (add) {
                                 farm.addCachedCrop(b2);

@@ -1,5 +1,6 @@
 package com.songoda.epicfarming.utils;
 
+import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.settings.Settings;
 import org.bukkit.Bukkit;
@@ -30,12 +31,12 @@ public class Methods {
         return name;
     }
 
-    public static void animate(Location location, Material mat) {
+    public static void animate(Location location, CompatibleMaterial mat) {
         if (!Settings.ANIMATE.getBoolean()) return;
         Block block = location.getBlock();
         if (block.getRelative(0, 1, 0).getType() != Material.AIR)
             return;
-        Item i = block.getWorld().dropItem(block.getLocation().add(0.5, 1, 0.5), new ItemStack(mat));
+        Item i = block.getWorld().dropItem(block.getLocation().add(0.5, 1, 0.5), mat.getItem());
 
         // Support for EpicHoppers suction.
         i.setMetadata("grabbed", new FixedMetadataValue(EpicFarming.getInstance(), "true"));

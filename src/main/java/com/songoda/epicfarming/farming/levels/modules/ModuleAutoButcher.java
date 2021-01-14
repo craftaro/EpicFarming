@@ -57,7 +57,7 @@ public class ModuleAutoButcher extends Module {
             count += stackSize;
         }
 
-        if (count <= 2 || !farm.willFit(new ItemStack(Material.STONE))) return;
+        if (count <= 2 || !farm.willFit(CompatibleMaterial.STONE.getItem())) return;
 
         for (LivingEntity entity : entities) {
             entity.setMetadata("EFA-TAGGED", new FixedMetadataValue(plugin, farm.getLocation()));
@@ -65,7 +65,7 @@ public class ModuleAutoButcher extends Module {
                     CompatibleSound.ENTITY_PLAYER_ATTACK_SWEEP.getSound(), 1L, 1L);
             Bukkit.getScheduler().runTask(plugin, () -> {
                 entity.damage(99999999, entity);
-                Methods.animate(farm.getLocation(), Material.IRON_SWORD);
+                Methods.animate(farm.getLocation(), CompatibleMaterial.IRON_SWORD);
             });
             return;
         }
