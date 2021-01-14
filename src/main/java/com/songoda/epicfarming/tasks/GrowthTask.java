@@ -6,7 +6,6 @@ import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.farming.FarmType;
 import com.songoda.epicfarming.settings.Settings;
-import com.songoda.epicfarming.utils.CropType;
 import org.bukkit.Location;
 import org.bukkit.scheduler.BukkitRunnable;
 
@@ -19,18 +18,17 @@ import java.util.Random;
 public class GrowthTask extends BukkitRunnable {
 
     private static GrowthTask instance;
-    private static EpicFarming plugin;
 
     private final Map<Location, Crop> liveCrops = new HashMap<>();
 
     private static final Random random = new Random();
 
-    public static GrowthTask startTask(EpicFarming pl) {
+    public static GrowthTask startTask(EpicFarming plugin) {
         if (instance != null) {
             instance.cancel();
         }
         instance = new GrowthTask();
-        instance.runTaskTimer(plugin = pl, 0, Settings.GROWTH_TICK_SPEED.getInt());
+        instance.runTaskTimer(plugin, 0, Settings.GROWTH_TICK_SPEED.getInt());
         return instance;
     }
 
@@ -43,8 +41,8 @@ public class GrowthTask extends BukkitRunnable {
                     || !crop.getFarm().isInLoadedChunk())
                 continue;
 
-            CompatibleMaterial blockMat = CompatibleMaterial.getMaterial(crop.getLocation().getBlock());
-            if (!blockMat.isCrop() || !CropType.isGrowableCrop(blockMat.getBlockMaterial())) {
+            CompatibleMaterial blockMat = CompatibleMaterial.getBlockMaterial(crop.getLocation().getBlock().getType());
+            if (!blockMat.isCrop()) {
                 toRemove.add(crop);
                 continue;
             }

@@ -82,7 +82,7 @@ public class ModuleAutoBreeding extends Module {
                     else
                         handleBreed(entity);
                     Bukkit.getScheduler().runTask(plugin, () ->
-                            Methods.animate(farm.getLocation(), Material.EGG));
+                            Methods.animate(farm.getLocation(), CompatibleMaterial.EGG));
                     return;
                 }
 
