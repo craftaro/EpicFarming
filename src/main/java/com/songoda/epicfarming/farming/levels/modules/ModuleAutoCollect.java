@@ -115,7 +115,7 @@ public class ModuleAutoCollect extends Module {
                     doLivestockDrop(farm, wool);
                 }
                 Bukkit.getScheduler().runTask(plugin, () ->
-                        Methods.animate(farm.getLocation(), CompatibleMaterial.getMaterial(wool)));
+                        Methods.animate(farm.getLocation(), wool));
             }
             ticksLived.put(entity, 0);
         }
