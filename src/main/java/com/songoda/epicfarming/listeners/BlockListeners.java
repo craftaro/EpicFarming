@@ -112,6 +112,7 @@ public class BlockListeners implements Listener {
         if (farm == null) return;
 
         plugin.getDataManager().deleteFarm(farm);
+        farm.forceMenuClose();
 
         FarmTask.getCrops(farm, false);
 
@@ -140,6 +141,7 @@ public class BlockListeners implements Listener {
         FarmTask.getCrops(farm, false);
 
         plugin.getDataManager().deleteFarm(farm);
+        farm.forceMenuClose();
 
         event.setCancelled(true);
 

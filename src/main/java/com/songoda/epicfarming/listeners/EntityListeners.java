@@ -110,6 +110,7 @@ public class EntityListeners implements Listener {
 
             Farm farm = plugin.getFarmManager().removeFarm(block.getLocation());
             plugin.getDataManager().deleteFarm(farm);
+            farm.forceMenuClose();
 
             FarmTask.getCrops(farm, false);
 
