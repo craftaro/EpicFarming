@@ -65,6 +65,14 @@ public class Farm {
         EpicFarming.getInstance().getGuiManager().showGUI(player, opened);
     }
 
+    public void forceMenuClose() {
+        if (opened == null) {
+            return;
+        }
+
+        opened.close();
+    }
+
     public void upgrade(UpgradeType type, Player player) {
         EpicFarming instance = EpicFarming.getInstance();
         if (instance.getLevelManager().getLevels().containsKey(this.level.getLevel() + 1)) {
