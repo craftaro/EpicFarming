@@ -4,6 +4,7 @@ import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.core.compatibility.CompatibleParticleHandler;
 import com.songoda.core.compatibility.CompatibleSound;
 import com.songoda.core.hooks.EconomyManager;
+import com.songoda.core.hooks.ProtectionManager;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.levels.Level;
 import com.songoda.epicfarming.gui.OverviewGui;
@@ -60,9 +61,22 @@ public class Farm {
 
         if (opened != null && !force) return;
 
+        if (Settings.USE_PROTECTION_PLUGINS.getBoolean() && !ProtectionManager.canInteract(player, location)) {
+            player.sendMessage(EpicFarming.getInstance().getLocale().getMessage("event.general.protected").getPrefixedMessage());
+            return;
+        }
+
         opened = new OverviewGui(this, player);
 
         EpicFarming.getInstance().getGuiManager().showGUI(player, opened);
+    }
+
+    public void forceMenuClose() {
+        if (opened == null) {
+            return;
+        }
+
+        opened.close();
     }
 
     public void upgrade(UpgradeType type, Player player) {

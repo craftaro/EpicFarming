@@ -40,6 +40,9 @@ public class Settings {
     public static final ConfigSetting DISABLE_AUTO_TIL_LAND = new ConfigSetting(config, "Main.Disable Auto Til Land", false,
             "Should farms not auto til land around them?");
 
+    public static final ConfigSetting USE_PROTECTION_PLUGINS = new ConfigSetting(config, "Main.Use Protection Plugins", true,
+            "Should we use protection plugins?");
+
     public static final ConfigSetting ECONOMY_PLUGIN = new ConfigSetting(config, "Main.Economy", EconomyManager.getEconomy() == null ? "Vault" : EconomyManager.getEconomy().getName(),
             "Which economy plugin should be used?",
             "Supported plugins you have installed: \"" + EconomyManager.getManager().getRegisteredPlugins().stream().collect(Collectors.joining("\", \"")) + "\".");

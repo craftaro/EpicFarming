@@ -11,6 +11,7 @@ import com.songoda.core.database.SQLiteConnector;
 import com.songoda.core.gui.GuiManager;
 import com.songoda.core.hooks.EconomyManager;
 import com.songoda.core.hooks.EntityStackerManager;
+import com.songoda.core.hooks.ProtectionManager;
 import com.songoda.core.nms.NmsManager;
 import com.songoda.core.nms.nbt.NBTItem;
 import com.songoda.core.utils.TextUtils;
@@ -110,6 +111,9 @@ public class EpicFarming extends SongodaPlugin {
 
         // Load Economy
         EconomyManager.load();
+
+        // Load protection manager.
+        ProtectionManager.load(this);
 
         // Setup Config
         Settings.setupConfig();
