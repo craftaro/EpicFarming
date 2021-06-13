@@ -19,7 +19,7 @@
         <img alt="Patreon" src="https://img.shields.io/badge/-Support_on_Patreon-F96854.svg?logo=patreon&style=flat&logoColor=white">
     </a> 
     <br>
-    <img alt="Latest" src="https://img.shields.io/badge/-ver_3.1.1-4078C0.svg?logo=github&style=flat&logoColor=white&color=blue&label=Latest&labelColor=black">
+    <img alt="Latest" src="https://img.shields.io/badge/dynamic/xml?label=version&query=string%28%2F%2F%2A%5Blocal-name%28.%29%3D%27version%27%20and%20namespace-uri%28.%29%3D%27http%3A%2F%2Fmaven.apache.org%2FPOM%2F4.0.0%27%5D%5B1%5D%29&url=https%3A%2F%2Fraw.githubusercontent.com%2Fsongoda%2FEpicFarming%2Fmaster%2Fpom.xml&logo=github&style=flat&logoColor=white&color=blue&labelColor=black">
     <a href="https://app.codacy.com/gh/songoda/EpicFarming/dashboard">
         <img alt="quality" src="https://img.shields.io/codacy/grade/88eb57700298485482781b1bff439fec">
     </a>

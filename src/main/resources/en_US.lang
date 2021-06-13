@@ -50,6 +50,7 @@ command:
 event:
   general:
     nopermission: '&cYou do not have permission to do that.'
+    protected: '&cThis farm is protected and you cannot access it.'
   upgrade:
     cannotafford: '&cYou cannot afford this upgrade.'
     success: '&7You successfully upgraded this farm to &6level %level%&7!'
