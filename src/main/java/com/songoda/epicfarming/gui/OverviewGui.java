@@ -2,7 +2,6 @@ package com.songoda.epicfarming.gui;
 
 import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.core.gui.CustomizableGui;
-import com.songoda.core.gui.Gui;
 import com.songoda.core.gui.GuiUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
@@ -113,7 +112,7 @@ public class OverviewGui extends CustomizableGui {
                 farmLore.add(Methods.formatText(line));
         }
 
-        setItem("farm",13, GuiUtils.createButtonItem(Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD),
+        setItem("farm", 13, GuiUtils.createButtonItem(Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD),
                 plugin.getLocale().getMessage("general.nametag.farm")
                         .processPlaceholder("level", level.getLevel()).getMessage(),
                 farmLore));
@@ -121,17 +120,16 @@ public class OverviewGui extends CustomizableGui {
         if (player != null && Settings.UPGRADE_WITH_XP.getBoolean() && player.hasPermission("EpicFarming.Upgrade.XP")) {
 
             setButton("xp", 11, GuiUtils.createButtonItem(Settings.XP_ICON.getMaterial(CompatibleMaterial.EXPERIENCE_BOTTLE),
-                    plugin.getLocale().getMessage("interface.button.upgradewithxp").getMessage(),
-                    nextLevel != null
-                            ? plugin.getLocale().getMessage("interface.button.upgradewithxplore")
-                            .processPlaceholder("cost", nextLevel.getCostExperiance()).getMessage()
-                            : plugin.getLocale().getMessage("event.upgrade.maxed").getMessage()),
+                            plugin.getLocale().getMessage("interface.button.upgradewithxp").getMessage(),
+                            nextLevel != null
+                                    ? plugin.getLocale().getMessage("interface.button.upgradewithxplore")
+                                    .processPlaceholder("cost", nextLevel.getCostExperiance()).getMessage()
+                                    : plugin.getLocale().getMessage("event.upgrade.maxed").getMessage()),
                     event -> {
                         farm.upgrade(UpgradeType.EXPERIENCE, player);
                         onClose(guiManager, player);
                         farm.view(player, true);
                     });
-
         }
 
         if (Settings.UPGRADE_WITH_ECONOMY.getBoolean() && player != null && player.hasPermission("EpicFarming.Upgrade.ECO")) {
@@ -146,7 +144,6 @@ public class OverviewGui extends CustomizableGui {
                 onClose(guiManager, player);
                 farm.view(player, true);
             });
-
         }
 
         Material farmTypeMaterial = CompatibleMaterial.WHEAT.getMaterial();
@@ -165,17 +162,16 @@ public class OverviewGui extends CustomizableGui {
         farmType.setItemMeta(farmTypeMeta);
 
         Map<Integer, Integer[]> layouts = new HashMap<>();
-        layouts.put(1, new Integer[]{22});
-        layouts.put(2, new Integer[]{22, 4});
-        layouts.put(3, new Integer[]{22, 3, 5});
-        layouts.put(4, new Integer[]{23, 3, 5, 21});
-        layouts.put(5, new Integer[]{23, 3, 5, 21, 22});
-        layouts.put(6, new Integer[]{23, 3, 4, 5, 21, 22});
-        layouts.put(7, new Integer[]{23, 3, 4, 5, 21, 22, 12});
-        layouts.put(8, new Integer[]{23, 3, 4, 5, 21, 22, 12, 14});
-        layouts.put(9, new Integer[]{23, 3, 4, 5, 21, 22, 12, 14, 20});
-        layouts.put(10, new Integer[]{23, 3, 4, 5, 21, 22, 12, 14, 20, 24});
-
+        layouts.put(1, new Integer[] {22});
+        layouts.put(2, new Integer[] {22, 4});
+        layouts.put(3, new Integer[] {22, 3, 5});
+        layouts.put(4, new Integer[] {23, 3, 5, 21});
+        layouts.put(5, new Integer[] {23, 3, 5, 21, 22});
+        layouts.put(6, new Integer[] {23, 3, 4, 5, 21, 22});
+        layouts.put(7, new Integer[] {23, 3, 4, 5, 21, 22, 12});
+        layouts.put(8, new Integer[] {23, 3, 4, 5, 21, 22, 12, 14});
+        layouts.put(9, new Integer[] {23, 3, 4, 5, 21, 22, 12, 14, 20});
+        layouts.put(10, new Integer[] {23, 3, 4, 5, 21, 22, 12, 14, 20, 24});
 
         List<Module> modules = level.getRegisteredModules().stream().filter(module ->
                 module.getGUIButton(farm) != null).collect(Collectors.toList());
@@ -220,12 +216,14 @@ public class OverviewGui extends CustomizableGui {
         List<ItemStack> items = farm.getItems();
 
         int j = (page - 1) * 27;
-        for (int i = 27; i <= 54; i++) {
-            if (items.size() <= (j))
+        for (int i = 27; i <= 54; ++i) {
+            if (items.size() <= j) {
                 setItem(i, null);
-            else
+            } else {
                 setItem(i, items.get(j));
-            j++;
+            }
+
+            ++j;
         }
     }
 
@@ -237,11 +235,13 @@ public class OverviewGui extends CustomizableGui {
             if (i >= start && i < start + 27) {
                 ItemStack item = getItem(j);
                 j++;
-                if (item != null && item.getType() != Material.AIR)
+                if (item != null && item.getType() != Material.AIR) {
                     items.add(item);
+                }
             } else {
-                if (i >= farm.getItems().size())
+                if (i >= farm.getItems().size()) {
                     continue;
+                }
                 items.add(farm.getItems().get(i));
             }
         }

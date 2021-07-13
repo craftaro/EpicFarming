@@ -88,7 +88,7 @@ public class DataManager extends DataManagerAbstract {
 
             String createItem = "INSERT INTO " + this.getTablePrefix() + "items (farm_id, item) VALUES (?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(createItem)) {
-                for (ItemStack item : farm.getItems()) {
+                for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
                     statement.setInt(1, farm.getId());
                     statement.setBytes(2, ItemSerializer.serializeItem(item));
                     statement.addBatch();
@@ -146,7 +146,7 @@ public class DataManager extends DataManagerAbstract {
 
             String createItem = "INSERT INTO " + this.getTablePrefix() + "items (farm_id, item) VALUES (?, ?)";
             try (PreparedStatement statement = connection.prepareStatement(createItem)) {
-                for (ItemStack item : farm.getItems()) {
+                for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
                     statement.setInt(1, farm.getId());
                     statement.setBytes(2, ItemSerializer.serializeItem(item));
 

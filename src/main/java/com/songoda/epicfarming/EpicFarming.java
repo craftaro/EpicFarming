@@ -99,6 +99,9 @@ public class EpicFarming extends SongodaPlugin {
 
     @Override
     public void onPluginDisable() {
+        this.farmTask.cancel();
+        this.growthTask.cancel();
+
         saveToFile();
         for (Farm farm : farmManager.getFarms().values())
             dataManager.updateItems(farm);
@@ -169,8 +172,8 @@ public class EpicFarming extends SongodaPlugin {
         }
 
         // Start tasks
-        this.growthTask = GrowthTask.startTask(this);
-        this.farmTask = FarmTask.startTask(this);
+        this.growthTask = new GrowthTask(this);
+        this.farmTask = new FarmTask(this);
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
             if (!Bukkit.getPluginManager().isPluginEnabled("EpicHoppers"))

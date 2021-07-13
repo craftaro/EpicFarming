@@ -5,7 +5,6 @@ import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmType;
 import com.songoda.epicfarming.settings.Settings;
-import com.songoda.epicfarming.tasks.FarmTask;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -114,7 +113,7 @@ public class BlockListeners implements Listener {
         plugin.getDataManager().deleteFarm(farm);
         farm.forceMenuClose();
 
-        FarmTask.getCrops(farm, false);
+        plugin.getFarmTask().getCrops(farm, false);
 
         event.setCancelled(true);
 
@@ -125,7 +124,7 @@ public class BlockListeners implements Listener {
         block.setType(Material.AIR);
         block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
 
-        for (ItemStack itemStack : farm.getItems()) {
+        for (ItemStack itemStack : farm.getItems().toArray(new ItemStack[0])) {
             farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
         }
     }
@@ -138,7 +137,7 @@ public class BlockListeners implements Listener {
         Farm farm = plugin.getFarmManager().removeFarm(event.getBlock().getLocation());
 
         if (farm == null) return;
-        FarmTask.getCrops(farm, false);
+        plugin.getFarmTask().getCrops(farm, false);
 
         plugin.getDataManager().deleteFarm(farm);
         farm.forceMenuClose();
@@ -152,7 +151,7 @@ public class BlockListeners implements Listener {
         block.setType(Material.AIR);
         block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
 
-        for (ItemStack itemStack : farm.getItems()) {
+        for (ItemStack itemStack : farm.getItems().toArray(new ItemStack[0])) {
             farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
         }
     }

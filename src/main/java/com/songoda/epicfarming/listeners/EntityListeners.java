@@ -6,7 +6,6 @@ import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.levels.modules.Module;
 import com.songoda.epicfarming.farming.levels.modules.ModuleAutoCollect;
 import com.songoda.epicfarming.settings.Settings;
-import com.songoda.epicfarming.tasks.FarmTask;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -112,14 +111,14 @@ public class EntityListeners implements Listener {
             plugin.getDataManager().deleteFarm(farm);
             farm.forceMenuClose();
 
-            FarmTask.getCrops(farm, false);
+            plugin.getFarmTask().getCrops(farm, false);
 
             ItemStack item = plugin.makeFarmItem(farm.getLevel());
 
             block.setType(Material.AIR);
             block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);
 
-            for (ItemStack itemStack : farm.getItems()) {
+            for (ItemStack itemStack : farm.getItems().toArray(new ItemStack[0])) {
                 farm.getLocation().getWorld().dropItemNaturally(farm.getLocation().add(.5, .5, .5), itemStack);
             }
         }

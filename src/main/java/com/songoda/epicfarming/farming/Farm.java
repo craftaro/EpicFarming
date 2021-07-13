@@ -30,7 +30,7 @@ public class Farm {
 
     // This is the unique identifier for this farm.
     // It is reset on every plugin load.
-    private UUID uniqueId = UUID.randomUUID();
+    private final UUID uniqueId = UUID.randomUUID();
 
     // Id for database usage.
     private int id;
@@ -41,7 +41,7 @@ public class Farm {
     private Location location;
     private Level level;
     private OverviewGui opened = null;
-    private UUID placedBy;
+    private final UUID placedBy;
     private UUID viewing = null;
     private long lastCached = 0;
 
@@ -175,7 +175,6 @@ public class Farm {
                             b2.getWorld().playSound(b2.getLocation(), CompatibleSound.BLOCK_GRASS_BREAK.getSound(), 10, 15);
                         }, random.nextInt(30) + 1);
                     }
-
                 }
             }
         }
@@ -192,50 +191,61 @@ public class Farm {
 
     // Should be used in sync.
     public void addItem(ItemStack toAdd) {
-        for (ItemStack item : new ArrayList<>(items)) {
-            if (item.getType() != toAdd.getType()
-                    || item.getAmount() + toAdd.getAmount() > item.getMaxStackSize()) continue;
-            item.setAmount(item.getAmount() + toAdd.getAmount());
-            if (opened != null)
-                opened.updateInventory();
-            return;
-        }
-        items.add(toAdd);
-        if (opened != null)
-            opened.updateInventory();
-    }
-
-
-    public void removeMaterial(Material material, int amount) {
-        for (ItemStack item : getItems()) {
-            if (material == item.getType()) {
-                item.setAmount(item.getAmount() - amount);
-
-                if (item.getAmount() <= 0)
-                    this.items.remove(item);
+        synchronized (items) {
+            for (ItemStack item : new ArrayList<>(items)) {
+                if (item.getType() != toAdd.getType()
+                        || item.getAmount() + toAdd.getAmount() > item.getMaxStackSize()) continue;
+                item.setAmount(item.getAmount() + toAdd.getAmount());
                 if (opened != null)
                     opened.updateInventory();
                 return;
             }
+            items.add(toAdd);
+            if (opened != null)
+                opened.updateInventory();
         }
     }
 
-    public boolean willFit(ItemStack item) {
-        if (items.size() < 27 * level.getPages()) return true;
+    public void removeMaterial(Material material, int amount) {
+        synchronized (items) {
+            for (ItemStack item : getItems().toArray(new ItemStack[0])) {
+                if (material == item.getType()) {
+                    item.setAmount(item.getAmount() - amount);
 
-        for (ItemStack stack : items) {
-            if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {
-                return true;
+                    if (item.getAmount() <= 0)
+                        this.items.remove(item);
+                    if (opened != null)
+                        opened.updateInventory();
+                    return;
+                }
             }
         }
+    }
+
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    public boolean willFit(ItemStack item) {
+        synchronized (items) {
+            if (items.size() < 27 * level.getPages()) return true;
+
+            for (ItemStack stack : items) {
+                if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {
+                    return true;
+                }
+            }
+        }
+
         return false;
     }
 
     public void setItems(List<ItemStack> items) {
-        this.items.clear();
-        this.items.addAll(items);
-        if (opened != null)
-            opened.updateInventory();
+        synchronized (this.items) {
+            this.items.clear();
+            this.items.addAll(items);
+
+            if (opened != null) {
+                opened.updateInventory();
+            }
+        }
     }
 
     public UUID getViewing() {
@@ -270,6 +280,7 @@ public class Farm {
         this.lastCached = lastCached;
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isInLoadedChunk() {
         return location != null && location.getWorld() != null && location.getWorld().isChunkLoaded(((int) location.getX()) >> 4, ((int) location.getZ()) >> 4);
     }

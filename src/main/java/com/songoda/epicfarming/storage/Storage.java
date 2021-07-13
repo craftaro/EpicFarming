@@ -59,5 +59,4 @@ public abstract class Storage {
     public abstract void makeBackup();
 
     public abstract void closeConnection();
-
 }

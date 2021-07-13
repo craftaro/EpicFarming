@@ -16,20 +16,12 @@ import java.util.Map;
 import java.util.Random;
 
 public class GrowthTask extends BukkitRunnable {
-
-    private static GrowthTask instance;
-
     private final Map<Location, Crop> liveCrops = new HashMap<>();
 
     private static final Random random = new Random();
 
-    public static GrowthTask startTask(EpicFarming plugin) {
-        if (instance != null) {
-            instance.cancel();
-        }
-        instance = new GrowthTask();
-        instance.runTaskTimer(plugin, 0, Settings.GROWTH_TICK_SPEED.getInt());
-        return instance;
+    public GrowthTask(EpicFarming plugin) {
+        runTaskTimer(plugin, 0, Settings.GROWTH_TICK_SPEED.getInt());
     }
 
     @Override
@@ -64,7 +56,6 @@ public class GrowthTask extends BukkitRunnable {
             liveCrops.remove(crop.getLocation());
     }
 
-
     public synchronized void addLiveCrop(Location location, Crop crop) {
         if (!liveCrops.containsKey(location))
             liveCrops.put(location, crop);
@@ -73,5 +64,4 @@ public class GrowthTask extends BukkitRunnable {
     public synchronized void removeCropByLocation(Location location) {
         liveCrops.remove(location);
     }
-
 }
