@@ -25,24 +25,19 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 public class FarmTask extends BukkitRunnable {
+    private final EpicFarming plugin;
 
-    private static FarmTask instance;
-    private static EpicFarming plugin;
+    private final Map<UUID, Collection<LivingEntity>> entityCache = new HashMap<>();
 
-    private static Map<UUID, Collection<LivingEntity>> entityCache = new HashMap<>();
+    public FarmTask(EpicFarming plugin) {
+        this.plugin = plugin;
 
-    public static FarmTask startTask(EpicFarming pl) {
-        if (instance != null) {
-            instance.cancel();
-        }
-        instance = new FarmTask();
-        instance.runTaskTimerAsynchronously(plugin = pl, 0, Settings.FARM_TICK_SPEED.getInt());
-        return instance;
+        runTaskTimerAsynchronously(this.plugin, 0, Settings.FARM_TICK_SPEED.getInt());
     }
 
-    public static List<Block> getCrops(Farm farm, boolean add) {
+    public List<Block> getCrops(Farm farm, boolean add) {
         if (((System.currentTimeMillis() - farm.getLastCached()) > (30 * 1000)) || !add) {
-            Bukkit.getScheduler().runTask(plugin, () -> {
+            Bukkit.getScheduler().runTask(this.plugin, () -> {
                 farm.setLastCached(System.currentTimeMillis());
                 if (add) farm.clearCache();
                 Block block = farm.getLocation().getBlock();
@@ -67,18 +62,25 @@ public class FarmTask extends BukkitRunnable {
                                 continue;
                             }
                             farm.removeCachedCrop(b2);
-                            plugin.getGrowthTask().removeCropByLocation(b2.getLocation());
+                            this.plugin.getGrowthTask().removeCropByLocation(b2.getLocation());
                         }
                     }
                 }
             });
         }
+
         return farm.getCachedCrops();
     }
 
     @Override
     public void run() {
+        GrowthTask growthTask = plugin.getGrowthTask();
+
+        if (growthTask.isCancelled()) return;
+
         for (Farm farm : new ArrayList<>(plugin.getFarmManager().getFarms().values())) {
+            if (!plugin.isEnabled()) return;    // Prevent registering a task on plugin disable
+
             try {
                 if (!farm.isInLoadedChunk()) continue;
 
@@ -93,7 +95,6 @@ public class FarmTask extends BukkitRunnable {
                             .collect(Collectors.toCollection(ArrayList::new)));
                 });
 
-
                 Collection<LivingEntity> entitiesAroundFarm = entityCache.get(farm.getUniqueId());
 
                 if (entitiesAroundFarm == null) continue;
@@ -101,11 +102,12 @@ public class FarmTask extends BukkitRunnable {
                 List<Block> crops = getCrops(farm, true);
 
                 if (farm.getFarmType() != FarmType.LIVESTOCK)
-                    for (Block block : crops)
+                    for (Block block : crops) {
                         if (!BlockUtils.isCropFullyGrown(block)) {
                             // Add to GrowthTask
-                            plugin.getGrowthTask().addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
+                            growthTask.addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
                         }
+                    }
 
                 // Cycle through modules.
                 farm.getLevel().getRegisteredModules().stream()
@@ -114,11 +116,11 @@ public class FarmTask extends BukkitRunnable {
                             // Run Module
                             module.run(farm, entitiesAroundFarm, crops);
                         });
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (Exception ex) {
+                ex.printStackTrace();
             }
         }
-        Bukkit.getScheduler().runTask(plugin, () ->
-                plugin.getEntityUtils().clearChunkCache());
+
+        Bukkit.getScheduler().runTask(plugin, () -> plugin.getEntityUtils().clearChunkCache());
     }
 }

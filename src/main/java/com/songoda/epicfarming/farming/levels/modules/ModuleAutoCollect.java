@@ -144,18 +144,20 @@ public class ModuleAutoCollect extends Module {
 
     @Override
     public void runButtonPress(Player player, Farm farm, ClickType type) {
-        if (type == ClickType.LEFT)
+        if (type == ClickType.LEFT) {
             toggleEnabled(farm);
-        else if (type == ClickType.RIGHT)
+        } else if (type == ClickType.RIGHT) {
             toggleCollectionType(farm);
+        }
     }
 
     @Override
     public String getDescription() {
-        return plugin.getLocale().getMessage("interface.button.autocollect")
+        return plugin.getLocale()
+                .getMessage("interface.button.autocollect")
                 .processPlaceholder("status",
-                        plugin.getLocale().getMessage("general.interface.unlocked")
-                                .getMessage()).getMessage();
+                        plugin.getLocale().getMessage("general.interface.unlocked").getMessage())
+                .getMessage();
     }
 
     public boolean isEnabled(Farm farm) {
@@ -178,11 +180,12 @@ public class ModuleAutoCollect extends Module {
     }
 
     private boolean useBoneMeal(Farm farm) {
-        for (ItemStack item : farm.getItems()) {
-            if (item.getType() != CompatibleMaterial.BONE_MEAL.getMaterial()) continue;
+        for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
+            if (item == null || item.getType() != CompatibleMaterial.BONE_MEAL.getMaterial()) continue;
             farm.removeMaterial(CompatibleMaterial.BONE_MEAL.getMaterial(), 1);
             return true;
         }
+
         return false;
     }
 
@@ -209,8 +212,7 @@ public class ModuleAutoCollect extends Module {
     }
 
     private boolean doCropDrop(Farm farm, CompatibleMaterial material) {
-
-        if (material == null || farm == null || !material.isCrop()) return false;
+        if (material == null || farm == null || !material.isCrop() || !plugin.isEnabled()) return false;
 
         BoostData boostData = plugin.getBoostManager().getBoost(farm.getPlacedBy());
 
@@ -224,8 +226,11 @@ public class ModuleAutoCollect extends Module {
             Methods.animate(farm.getLocation(), yield);
             farm.addItem(stack);
         });
-        if (getCollectionType(farm) != CollectionType.NO_SEEDS)
+
+        if (getCollectionType(farm) != CollectionType.NO_SEEDS) {
             farm.addItem(seedStack);
+        }
+
         return true;
     }
 
@@ -250,5 +255,4 @@ public class ModuleAutoCollect extends Module {
             return EpicFarming.getInstance().getLocale().getMessage("general.interface." + name().replace("_", "").toLowerCase()).getMessage();
         }
     }
-
 }

@@ -22,7 +22,6 @@ public class HopperTask extends BukkitRunnable {
         this.manager = plugin.getFarmManager();
     }
 
-
     public static HopperTask startTask(EpicFarming plugin) {
         if (instance != null) {
             instance.cancel();
@@ -56,7 +55,7 @@ public class HopperTask extends BukkitRunnable {
 
             Inventory hopperInventory = ((Hopper) block.getState()).getInventory();
 
-            for (ItemStack item : farm.getItems()) {
+            for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
                 if (item.getType() == CompatibleMaterial.BONE_MEAL.getMaterial()) continue;
 
                 ItemStack toMove = item.clone();

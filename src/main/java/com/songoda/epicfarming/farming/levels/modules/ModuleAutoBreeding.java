@@ -11,7 +11,6 @@ import com.songoda.epicfarming.utils.EntityInfo;
 import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
-import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Ageable;
 import org.bukkit.entity.Entity;
@@ -69,7 +68,6 @@ public class ModuleAutoBreeding extends Module {
                     counts.get(entity.getType()) - 1 + stackSize);
         }
 
-
         boolean mate1 = false;
         for (Map.Entry<EntityType, Long> entry : counts.entrySet()) {
 
@@ -89,8 +87,7 @@ public class ModuleAutoBreeding extends Module {
                 if (entry.getValue() >= 2) {
                     EntityType entityType = entry.getKey();
 
-                    for (ItemStack item : new ArrayList<>(farm.getItems())) {
-
+                    for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
                         EntityInfo info = EntityInfo.of(entityType);
                         try {
                             if (info == null || item.getType() != info.getMaterial() || item.getAmount() < 2)
