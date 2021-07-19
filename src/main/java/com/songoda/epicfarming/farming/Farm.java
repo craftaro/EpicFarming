@@ -85,7 +85,7 @@ public class Farm {
             Level level = instance.getLevelManager().getLevel(this.level.getLevel() + 1);
             int cost;
             if (type == UpgradeType.EXPERIENCE) {
-                cost = level.getCostExperiance();
+                cost = level.getCostExperience();
             } else {
                 cost = level.getCostEconomy();
             }

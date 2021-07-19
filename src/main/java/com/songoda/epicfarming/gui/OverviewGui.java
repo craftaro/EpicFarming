@@ -123,7 +123,7 @@ public class OverviewGui extends CustomizableGui {
                             plugin.getLocale().getMessage("interface.button.upgradewithxp").getMessage(),
                             nextLevel != null
                                     ? plugin.getLocale().getMessage("interface.button.upgradewithxplore")
-                                    .processPlaceholder("cost", nextLevel.getCostExperiance()).getMessage()
+                                    .processPlaceholder("cost", nextLevel.getCostExperience()).getMessage()
                                     : plugin.getLocale().getMessage("event.upgrade.maxed").getMessage()),
                     event -> {
                         farm.upgrade(UpgradeType.EXPERIENCE, player);
