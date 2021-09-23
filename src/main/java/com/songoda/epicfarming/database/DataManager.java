@@ -155,6 +155,7 @@ public class DataManager extends DataManagerAbstract {
                 statement.executeBatch();
             }
         });
+        farm.setNeedsToBeSaved(false);
     }
 
     public void getFarms(Consumer<Map<Integer, Farm>> callback) {

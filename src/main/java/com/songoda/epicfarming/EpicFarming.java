@@ -104,7 +104,8 @@ public class EpicFarming extends SongodaPlugin {
 
         saveToFile();
         for (Farm farm : farmManager.getFarms().values())
-            dataManager.updateItems(farm);
+            if (farm.needsToBeSaved())
+                dataManager.updateItems(farm);
     }
 
     @Override
@@ -185,7 +186,8 @@ public class EpicFarming extends SongodaPlugin {
             saveToFile();
 
             for (Farm farm : farmManager.getFarms().values())
-                dataManager.updateItemsAsync(farm);
+                if (farm.needsToBeSaved())
+                    dataManager.updateItemsAsync(farm);
         }, 6000, 6000);
     }
 

@@ -35,6 +35,8 @@ public class Farm {
     // Id for database usage.
     private int id;
 
+    private boolean needsToBeSaved = false;
+
     private static final Random random = new Random();
     private final List<Block> cachedCrops = new ArrayList<>();
     private final List<ItemStack> items = new ArrayList<>();
@@ -191,6 +193,7 @@ public class Farm {
 
     // Should be used in sync.
     public void addItem(ItemStack toAdd) {
+        needsToBeSaved = true;
         synchronized (items) {
             for (ItemStack item : new ArrayList<>(items)) {
                 if (item.getType() != toAdd.getType()
@@ -207,6 +210,7 @@ public class Farm {
     }
 
     public void removeMaterial(Material material, int amount) {
+        needsToBeSaved = true;
         synchronized (items) {
             for (ItemStack item : getItems().toArray(new ItemStack[0])) {
                 if (material == item.getType()) {
@@ -238,6 +242,7 @@ public class Farm {
     }
 
     public void setItems(List<ItemStack> items) {
+        needsToBeSaved = true;
         synchronized (this.items) {
             this.items.clear();
             this.items.addAll(items);
@@ -355,5 +360,13 @@ public class Farm {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public boolean needsToBeSaved() {
+        return needsToBeSaved;
+    }
+
+    public void setNeedsToBeSaved(boolean needsToBeSaved) {
+        this.needsToBeSaved = needsToBeSaved;
     }
 }
