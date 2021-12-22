@@ -1,6 +1,7 @@
 package com.songoda.epicfarming.tasks;
 
 import com.songoda.core.compatibility.CompatibleMaterial;
+import com.songoda.core.compatibility.ServerVersion;
 import com.songoda.core.utils.BlockUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Crop;
@@ -76,7 +77,7 @@ public class FarmTask extends BukkitRunnable {
     public void run() {
         GrowthTask growthTask = plugin.getGrowthTask();
 
-        if (growthTask.isCancelled()) return;
+        if (ServerVersion.isServerVersionAtLeast(ServerVersion.V1_9) && growthTask.isCancelled()) return;
 
         for (Farm farm : new ArrayList<>(plugin.getFarmManager().getFarms().values())) {
             if (!plugin.isEnabled()) return;    // Prevent registering a task on plugin disable

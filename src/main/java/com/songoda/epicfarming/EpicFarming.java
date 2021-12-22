@@ -71,7 +71,6 @@ public class EpicFarming extends SongodaPlugin {
 
     private static EpicFarming INSTANCE;
 
-    private final Config dataConfig = new Config(this, "data.yml");
     private final Config levelsFile = new Config(this, "levels.yml");
 
     private final GuiManager guiManager = new GuiManager(this);
@@ -104,7 +103,8 @@ public class EpicFarming extends SongodaPlugin {
 
         saveToFile();
         for (Farm farm : farmManager.getFarms().values())
-            dataManager.updateItems(farm);
+            if (farm.needsToBeSaved())
+                dataManager.updateItems(farm);
     }
 
     @Override
@@ -185,7 +185,8 @@ public class EpicFarming extends SongodaPlugin {
             saveToFile();
 
             for (Farm farm : farmManager.getFarms().values())
-                dataManager.updateItemsAsync(farm);
+                if (farm.needsToBeSaved())
+                    dataManager.updateItemsAsync(farm);
         }, 6000, 6000);
     }
 

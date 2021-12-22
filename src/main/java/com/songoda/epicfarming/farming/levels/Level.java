@@ -10,20 +10,21 @@ public class Level {
 
     private final ArrayList<Module> registeredModules;
     private List<String> description = new ArrayList<>();
-    private int level, costExperiance, costEconomy, radius, pages;
+    private int level, costExperience, costEconomy, radius, pages;
     private double speedMultiplier;
     private boolean autoReplant;
 
 
-    Level(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoReplant, int pages, ArrayList<Module> registeredModules) {
+    Level(int level, int costExperience, int costEconomy, double speedMultiplier, int radius, boolean autoReplant, int pages, ArrayList<Module> registeredModules) {
         this.level = level;
-        this.costExperiance = costExperiance;
+        this.costExperience = costExperience;
         this.costEconomy = costEconomy;
         this.speedMultiplier = speedMultiplier;
         this.radius = radius;
         this.autoReplant = autoReplant;
         this.pages = pages;
         this.registeredModules = registeredModules;
+
         buildDescription();
     }
 
@@ -76,8 +77,8 @@ public class Level {
         return speedMultiplier;
     }
 
-    public int getCostExperiance() {
-        return costExperiance;
+    public int getCostExperience() {
+        return costExperience;
     }
 
     public int getCostEconomy() {
