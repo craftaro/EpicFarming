@@ -71,7 +71,6 @@ public class EpicFarming extends SongodaPlugin {
 
     private static EpicFarming INSTANCE;
 
-    private final Config dataConfig = new Config(this, "data.yml");
     private final Config levelsFile = new Config(this, "levels.yml");
 
     private final GuiManager guiManager = new GuiManager(this);
