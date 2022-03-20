@@ -2,9 +2,6 @@ package com.songoda.epicfarming.database;
 
 import com.songoda.core.database.DataManagerAbstract;
 import com.songoda.core.database.DatabaseConnector;
-import com.songoda.core.nms.NmsManager;
-import com.songoda.core.nms.nbt.NBTCore;
-import com.songoda.core.nms.nbt.NBTItem;
 import com.songoda.core.utils.ItemSerializer;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
@@ -19,7 +16,11 @@ import org.bukkit.plugin.Plugin;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 import java.util.function.Consumer;
 
 public class DataManager extends DataManagerAbstract {
