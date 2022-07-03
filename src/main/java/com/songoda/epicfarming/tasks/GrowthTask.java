@@ -40,6 +40,7 @@ public class GrowthTask extends BukkitRunnable {
             }
 
             // TODO: This should be in config.
+            // TODO: What does cap stand for? What needs to be in the config? (asked by Sprax)
             int cap = (int) Math.ceil(60 / crop.getFarm().getLevel().getSpeedMultiplier()) - crop.getTicksLived();
             if (cap > 2) {
                 int rand = random.nextInt(cap) + 1;
