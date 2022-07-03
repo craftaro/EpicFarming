@@ -4,6 +4,7 @@ import com.songoda.core.SongodaCore;
 import com.songoda.core.SongodaPlugin;
 import com.songoda.core.commands.CommandManager;
 import com.songoda.core.compatibility.CompatibleMaterial;
+import com.songoda.core.compatibility.ServerVersion;
 import com.songoda.core.configuration.Config;
 import com.songoda.core.database.DataMigrationManager;
 import com.songoda.core.database.DatabaseConnector;
@@ -31,11 +32,7 @@ import com.songoda.epicfarming.farming.levels.modules.Module;
 import com.songoda.epicfarming.farming.levels.modules.ModuleAutoBreeding;
 import com.songoda.epicfarming.farming.levels.modules.ModuleAutoButcher;
 import com.songoda.epicfarming.farming.levels.modules.ModuleAutoCollect;
-import com.songoda.epicfarming.listeners.BlockListeners;
-import com.songoda.epicfarming.listeners.EntityListeners;
-import com.songoda.epicfarming.listeners.InteractListeners;
-import com.songoda.epicfarming.listeners.InventoryListeners;
-import com.songoda.epicfarming.listeners.UnloadListeners;
+import com.songoda.epicfarming.listeners.*;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.storage.Storage;
 import com.songoda.epicfarming.storage.StorageRow;
@@ -160,6 +157,9 @@ public class EpicFarming extends SongodaPlugin {
         pluginManager.registerEvents(new InteractListeners(this), this);
         pluginManager.registerEvents(new UnloadListeners(this), this);
         pluginManager.registerEvents(new InventoryListeners(), this);
+        if (ServerVersion.isServerVersionAtLeast(ServerVersion.V1_14)) {
+            pluginManager.registerEvents(new MoistureListeners(this), this);
+        }
 
         if (pluginManager.isPluginEnabled("FabledSkyBlock")) {
             try {

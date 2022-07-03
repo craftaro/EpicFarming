@@ -7,6 +7,7 @@ import com.songoda.core.configuration.ConfigSetting;
 import com.songoda.core.hooks.EconomyManager;
 import com.songoda.epicfarming.EpicFarming;
 
+import java.util.Arrays;
 import java.util.stream.Collectors;
 
 public class Settings {
@@ -42,6 +43,15 @@ public class Settings {
 
     public static final ConfigSetting USE_PROTECTION_PLUGINS = new ConfigSetting(config, "Main.Use Protection Plugins", true,
             "Should we use protection plugins?");
+
+    public static final ConfigSetting BREAKABLE_BLOCKS = new ConfigSetting(config, "Main.Breakable Blocks", Arrays.asList(
+            "TALL_GRASS", "GRASS", "BLUE_ORCHID", "AZURE_BLUET",
+            "ALLIUM", "POPPY", "DANDELION", "SNOW",
+            "CORNFLOWER", "FERN", "LARGE_FERN", "SUNFLOWER",
+            "ROSE_BUSH", "OXEYE_DAISY", "LILY_OF_THE_VALLEY", "PEONY",
+            "LILAC", "WITHER_ROSE", "PINK_TULIP", "RED_TULIP",
+            "WHITE_TULIP", "ORANGE_TULIP", "NETHER_SPROUTS", "GLOW_LICHEN"),
+            "Which blocks should farms be allowed to break when they til the land?");
 
     public static final ConfigSetting ECONOMY_PLUGIN = new ConfigSetting(config, "Main.Economy", EconomyManager.getEconomy() == null ? "Vault" : EconomyManager.getEconomy().getName(),
             "Which economy plugin should be used?",

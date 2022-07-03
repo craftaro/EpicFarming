@@ -18,13 +18,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class Farm {
 
@@ -155,15 +149,7 @@ public class Farm {
                     Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
 
                     // ToDo: enum for all flowers.
-                    if (b2.getType() == CompatibleMaterial.TALL_GRASS.getMaterial()
-                            || b2.getType() == CompatibleMaterial.GRASS.getMaterial()
-                            || b2.getType().name().contains("TULIP")
-                            || b2.getType().name().contains("ORCHID")
-                            || b2.getType() == CompatibleMaterial.AZURE_BLUET.getMaterial()
-                            || b2.getType() == CompatibleMaterial.ALLIUM.getMaterial()
-                            || b2.getType() == CompatibleMaterial.POPPY.getMaterial()
-                            || b2.getType() == CompatibleMaterial.DANDELION.getMaterial()
-                            || b2.getType() == CompatibleMaterial.SNOW.getMaterial()) {
+                    if (Settings.BREAKABLE_BLOCKS.getStringList().contains(CompatibleMaterial.getMaterial(b2.getType()).name())) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
                             b2.getRelative(BlockFace.DOWN).setType(CompatibleMaterial.FARMLAND.getMaterial());
                             b2.breakNaturally();
