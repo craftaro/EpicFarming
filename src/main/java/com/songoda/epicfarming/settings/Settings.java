@@ -68,6 +68,9 @@ public class Settings {
             "The enabled language file.",
             "More language files (if available) can be found in the plugins data folder.");
 
+    public static final ConfigSetting COLLECT_WITH_HOPPER = new ConfigSetting(config, "Main.Collect With Hopper", true,
+            "Should you be able to collect items with an hopper under the farming item?");
+
     /**
      * In order to set dynamic economy comment correctly, this needs to be
      * called after EconomyManager load

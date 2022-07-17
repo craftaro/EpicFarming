@@ -4,6 +4,7 @@ import com.songoda.core.compatibility.CompatibleMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmManager;
+import com.songoda.epicfarming.settings.Settings;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -34,38 +35,40 @@ public class HopperTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        for (Farm farm : manager.getFarms().values()) {
-            Location farmLocation = farm.getLocation();
-            if (farmLocation == null || farmLocation.getWorld() == null) {
-                manager.removeFarm(farm.getLocation());
-                continue;
-            }
-
-            int x = farmLocation.getBlockX() >> 4;
-            int z = farmLocation.getBlockZ() >> 4;
-
-            if (!farmLocation.getWorld().isChunkLoaded(x, z)) {
-                continue;
-            }
-
-            Block block = farmLocation.getBlock().getRelative(BlockFace.DOWN);
-
-            if (block.getType() != Material.HOPPER)
-                continue;
-
-            Inventory hopperInventory = ((Hopper) block.getState()).getInventory();
-
-            for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
-                if (item.getType() == CompatibleMaterial.BONE_MEAL.getMaterial()) continue;
-
-                ItemStack toMove = item.clone();
-                toMove.setAmount(1);
-
-                if (canHop(hopperInventory, toMove)) {
-                    farm.removeMaterial(toMove.getType(), 1);
-                    hopperInventory.addItem(toMove);
+        if(Settings.COLLECT_WITH_HOPPER.getBoolean()) {
+            for (Farm farm : manager.getFarms().values()) {
+                Location farmLocation = farm.getLocation();
+                if (farmLocation == null || farmLocation.getWorld() == null) {
+                    manager.removeFarm(farm.getLocation());
+                    continue;
                 }
-                break;
+
+                int x = farmLocation.getBlockX() >> 4;
+                int z = farmLocation.getBlockZ() >> 4;
+
+                if (!farmLocation.getWorld().isChunkLoaded(x, z)) {
+                    continue;
+                }
+
+                Block block = farmLocation.getBlock().getRelative(BlockFace.DOWN);
+
+                if (block.getType() != Material.HOPPER)
+                    continue;
+
+                Inventory hopperInventory = ((Hopper) block.getState()).getInventory();
+
+                for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
+                    if (item.getType() == CompatibleMaterial.BONE_MEAL.getMaterial()) continue;
+
+                    ItemStack toMove = item.clone();
+                    toMove.setAmount(1);
+
+                    if (canHop(hopperInventory, toMove)) {
+                        farm.removeMaterial(toMove.getType(), 1);
+                        hopperInventory.addItem(toMove);
+                    }
+                    break;
+                }
             }
         }
     }
