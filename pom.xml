@@ -6,7 +6,7 @@
 
     <groupId>com.songoda</groupId>
     <artifactId>EpicFarming</artifactId>
-    <version>3.2.2</version>
+    <version>3.3.0</version>
 
     <build>
         <defaultGoal>clean install</defaultGoal>
@@ -124,7 +124,7 @@
         <dependency>
             <groupId>com.songoda</groupId>
             <artifactId>SongodaCore</artifactId>
-            <version>2.6.13</version>
+            <version>2.6.16</version>
             <scope>compile</scope>
         </dependency>
 
