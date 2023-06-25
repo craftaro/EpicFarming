@@ -8,7 +8,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class StorageItem {
-
     private String key = null;
 
     private Object object;
@@ -23,45 +22,66 @@ public class StorageItem {
     }
 
     public StorageItem(String key, List<ItemStack> items) {
-        if (items == null || items.isEmpty()) return;
+        if (items == null || items.isEmpty()) {
+            return;
+        }
+
         StringBuilder object = new StringBuilder();
         for (ItemStack item : items) {
-            if (item == null) continue;
+            if (item == null) {
+                continue;
+            }
+
             object.append(Serializers.serialize(item));
             object.append(";;");
         }
+
         this.key = key;
         this.object = object.toString();
     }
 
     public String getKey() {
-        return key;
+        return this.key;
     }
 
     public String asString() {
-        if (object == null) return null;
-        return (String) object;
+        if (this.object == null) {
+            return null;
+        }
+        return (String) this.object;
     }
 
     public boolean asBoolean() {
-        if (object == null) return false;
-        return (boolean) object;
+        if (this.object == null) {
+            return false;
+        }
+
+        return (boolean) this.object;
     }
 
     public int asInt() {
-        if (object == null) return 0;
-        return (int) object;
+        if (this.object == null) {
+            return 0;
+        }
+
+        return (int) this.object;
     }
 
     public Object asObject() {
-        return object;
+        return this.object;
     }
 
     public List<ItemStack> asItemStackList() {
         List<ItemStack> list = new ArrayList<>();
-        if (object == null) return list;
-        String obj = (String) object;
-        if (obj.equals("[]")) return list;
+        if (this.object == null) {
+            return list;
+        }
+
+        String obj = (String) this.object;
+        if (obj.equals("[]")) {
+            return list;
+        }
+
         List<String> sers = new ArrayList<>(Arrays.asList(obj.split(";;")));
         for (String ser : sers) {
             list.add(Serializers.deserialize(ser));

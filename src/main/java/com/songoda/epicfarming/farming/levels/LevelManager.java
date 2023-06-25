@@ -12,31 +12,31 @@ public class LevelManager {
 
     private final NavigableMap<Integer, Level> registeredLevels = new TreeMap<>();
 
-    public void addLevel(int level, int costExperiance, int costEconomy, double speedMultiplier, int radius, boolean autoCollect, boolean autoReplant, int pages, ArrayList<Module> modules) {
-        registeredLevels.put(level, new Level(level, costExperiance, costEconomy, speedMultiplier, radius, autoReplant, pages, modules));
+    public void addLevel(int level, int costExperience, int costEconomy, double speedMultiplier, int radius, boolean autoCollect, boolean autoReplant, int pages, ArrayList<Module> modules) {
+        this.registeredLevels.put(level, new Level(level, costExperience, costEconomy, speedMultiplier, radius, autoReplant, pages, modules));
     }
 
     public Level getLevel(int level) {
-        return registeredLevels.get(level);
+        return this.registeredLevels.get(level);
     }
 
     public Level getLowestLevel() {
-        return registeredLevels.firstEntry().getValue();
+        return this.registeredLevels.firstEntry().getValue();
     }
 
     public Level getHighestLevel() {
-        return registeredLevels.lastEntry().getValue();
+        return this.registeredLevels.lastEntry().getValue();
     }
 
     public boolean isLevel(int level) {
-        return registeredLevels.containsKey(level);
+        return this.registeredLevels.containsKey(level);
     }
 
     public Map<Integer, Level> getLevels() {
-        return Collections.unmodifiableMap(registeredLevels);
+        return Collections.unmodifiableMap(this.registeredLevels);
     }
 
     public void clear() {
-        registeredLevels.clear();
+        this.registeredLevels.clear();
     }
 }

@@ -1,5 +1,6 @@
 package com.songoda.epicfarming.utils;
 
+import com.songoda.core.utils.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -19,18 +20,29 @@ public class Serializers {
     public static String serialize(ItemStack item) {
         StringBuilder builder = new StringBuilder();
         builder.append(item.getType().toString());
-        if (item.getDurability() != 0) builder.append(":" + item.getDurability());
-        builder.append(" " + item.getAmount());
-        for (Enchantment enchant : item.getEnchantments().keySet())
-            builder.append(" " + enchant.getName() + ":" + item.getEnchantments().get(enchant));
+        if (item.getDurability() != 0) {
+            builder.append(":").append(item.getDurability());
+        }
+        builder.append(" ").append(item.getAmount());
+        for (Enchantment enchant : item.getEnchantments().keySet()) {
+            builder.append(" ").append(enchant.getName()).append(":").append(item.getEnchantments().get(enchant));
+        }
         String name = getName(item);
-        if (name != null) builder.append(" name:" + name);
+        if (name != null) {
+            builder.append(" name:").append(name);
+        }
         String lore = getLore(item);
-        if (lore != null) builder.append(" lore:" + lore);
+        if (lore != null) {
+            builder.append(" lore:").append(lore);
+        }
         Color color = getArmorColor(item);
-        if (color != null) builder.append(" rgb:" + color.getRed() + "|" + color.getGreen() + "|" + color.getBlue());
+        if (color != null) {
+            builder.append(" rgb:").append(color.getRed()).append("|").append(color.getGreen()).append("|").append(color.getBlue());
+        }
         String owner = getOwner(item);
-        if (owner != null) builder.append(" owner:" + owner);
+        if (owner != null) {
+            builder.append(" owner:").append(owner);
+        }
         return builder.toString();
     }
 
@@ -43,7 +55,9 @@ public class Serializers {
             args = str.split(":");
             if (Material.matchMaterial(args[0]) != null && item.getType() == Material.AIR) {
                 item.setType(Material.matchMaterial(args[0]));
-                if (args.length == 2) item.setDurability(Short.parseShort(args[1]));
+                if (args.length == 2) {
+                    item.setDurability(Short.parseShort(args[1]));
+                }
                 break;
             }
         }
@@ -53,8 +67,12 @@ public class Serializers {
         }
         for (String str : strings) {
             args = str.split(":", 2);
-            if (isNumber(args[0])) item.setAmount(Integer.parseInt(args[0]));
-            if (args.length == 1) continue;
+            if (NumberUtils.isInt(args[0])) {
+                item.setAmount(Integer.parseInt(args[0]));
+            }
+            if (args.length == 1) {
+                continue;
+            }
             if (args[0].equalsIgnoreCase("name:")) {
                 setName(item, ChatColor.translateAlternateColorCodes('&', args[1]));
                 continue;
@@ -77,11 +95,13 @@ public class Serializers {
             }
         }
         item.addUnsafeEnchantments(enchants);
-        return item.getType().equals(Material.AIR) ? null : item;
+        return item.getType() == Material.AIR ? null : item;
     }
 
     private static String getOwner(ItemStack item) {
-        if (!(item.getItemMeta() instanceof SkullMeta)) return null;
+        if (!(item.getItemMeta() instanceof SkullMeta)) {
+            return null;
+        }
         return ((SkullMeta) item.getItemMeta()).getOwner();
     }
 
@@ -96,8 +116,12 @@ public class Serializers {
     }
 
     private static String getName(ItemStack item) {
-        if (!item.hasItemMeta()) return null;
-        if (!item.getItemMeta().hasDisplayName()) return null;
+        if (!item.hasItemMeta()) {
+            return null;
+        }
+        if (!item.getItemMeta().hasDisplayName()) {
+            return null;
+        }
         return item.getItemMeta().getDisplayName().replace(" ", "_").replace(ChatColor.COLOR_CHAR, '&');
     }
 
@@ -109,12 +133,19 @@ public class Serializers {
     }
 
     private static String getLore(ItemStack item) {
-        if (!item.hasItemMeta()) return null;
-        if (!item.getItemMeta().hasLore()) return null;
+        if (!item.hasItemMeta()) {
+            return null;
+        }
+        if (!item.getItemMeta().hasLore()) {
+            return null;
+        }
         StringBuilder builder = new StringBuilder();
         List<String> lore = item.getItemMeta().getLore();
         for (int ind = 0; ind < lore.size(); ind++) {
-            builder.append((ind > 0 ? "|" : "") + lore.get(ind).replace(" ", "_").replace(ChatColor.COLOR_CHAR, '&'));
+            builder.append(ind > 0 ? "|" : "")
+                    .append(lore.get(ind)
+                            .replace(" ", "_")
+                            .replace(ChatColor.COLOR_CHAR, '&'));
         }
         return builder.toString();
     }
@@ -127,7 +158,9 @@ public class Serializers {
     }
 
     private static Color getArmorColor(ItemStack item) {
-        if (!(item.getItemMeta() instanceof LeatherArmorMeta)) return null;
+        if (!(item.getItemMeta() instanceof LeatherArmorMeta)) {
+            return null;
+        }
         return ((LeatherArmorMeta) item.getItemMeta()).getColor();
     }
 
@@ -141,16 +174,6 @@ public class Serializers {
             meta.setColor(Color.fromRGB(red, green, blue));
             item.setItemMeta(meta);
         } catch (Exception exception) {
-            return;
         }
-    }
-
-    private static boolean isNumber(String str) {
-        try {
-            Integer.parseInt(str);
-        } catch (NumberFormatException exception) {
-            return false;
-        }
-        return true;
     }
 }

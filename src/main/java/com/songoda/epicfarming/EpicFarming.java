@@ -33,7 +33,12 @@ import com.songoda.epicfarming.farming.levels.modules.Module;
 import com.songoda.epicfarming.farming.levels.modules.ModuleAutoBreeding;
 import com.songoda.epicfarming.farming.levels.modules.ModuleAutoButcher;
 import com.songoda.epicfarming.farming.levels.modules.ModuleAutoCollect;
-import com.songoda.epicfarming.listeners.*;
+import com.songoda.epicfarming.listeners.BlockListeners;
+import com.songoda.epicfarming.listeners.EntityListeners;
+import com.songoda.epicfarming.listeners.InteractListeners;
+import com.songoda.epicfarming.listeners.InventoryListeners;
+import com.songoda.epicfarming.listeners.MoistureListeners;
+import com.songoda.epicfarming.listeners.UnloadListeners;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.epicfarming.storage.Storage;
 import com.songoda.epicfarming.storage.StorageRow;
@@ -56,18 +61,11 @@ import org.bukkit.plugin.PluginManager;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
-/**
- * Created by songoda on 1/23/2018.
- */
 public class EpicFarming extends SongodaPlugin {
-
-    private static EpicFarming INSTANCE;
-
     private final Config levelsFile = new Config(this, "levels.yml");
 
     private final GuiManager guiManager = new GuiManager(this);
@@ -84,13 +82,8 @@ public class EpicFarming extends SongodaPlugin {
     private DatabaseConnector databaseConnector;
     private DataManager dataManager;
 
-    public static EpicFarming getInstance() {
-        return INSTANCE;
-    }
-
     @Override
     public void onPluginLoad() {
-        INSTANCE = this;
     }
 
     @Override
@@ -99,9 +92,11 @@ public class EpicFarming extends SongodaPlugin {
         this.growthTask.cancel();
 
         saveToFile();
-        for (Farm farm : farmManager.getFarms().values())
-            if (farm.needsToBeSaved())
-                dataManager.updateItems(farm);
+        for (Farm farm : this.farmManager.getFarms().values()) {
+            if (farm.needsToBeSaved()) {
+                this.dataManager.updateItems(farm);
+            }
+        }
     }
 
     @Override
@@ -160,17 +155,16 @@ public class EpicFarming extends SongodaPlugin {
         }
 
         this.dataManager = new DataManager(this.databaseConnector, this);
-        DataMigrationManager dataMigrationManager = new DataMigrationManager(this.databaseConnector, this.dataManager,
-                new _1_InitialMigration());
+        DataMigrationManager dataMigrationManager = new DataMigrationManager(this.databaseConnector, this.dataManager, new _1_InitialMigration());
         dataMigrationManager.runMigrations();
 
         this.loadLevelManager();
 
-        this.farmManager = new FarmManager(levelManager);
+        this.farmManager = new FarmManager(this.levelManager);
         this.boostManager = new BoostManager();
 
         // Register Listeners
-        guiManager.init();
+        this.guiManager.init();
         PluginManager pluginManager = Bukkit.getPluginManager();
         pluginManager.registerEvents(new EntityListeners(this), this);
         pluginManager.registerEvents(new BlockListeners(this), this);
@@ -195,17 +189,20 @@ public class EpicFarming extends SongodaPlugin {
         this.farmTask = new FarmTask(this);
 
         Bukkit.getScheduler().runTaskLater(this, () -> {
-            if (!Bukkit.getPluginManager().isPluginEnabled("EpicHoppers"))
+            if (!Bukkit.getPluginManager().isPluginEnabled("EpicHoppers")) {
                 HopperTask.startTask(this);
+            }
         }, 30L);
 
         // Start auto save
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, () -> {
             saveToFile();
 
-            for (Farm farm : farmManager.getFarms().values())
-                if (farm.needsToBeSaved())
-                    dataManager.updateItemsAsync(farm);
+            for (Farm farm : this.farmManager.getFarms().values()) {
+                if (farm.needsToBeSaved()) {
+                    this.dataManager.updateItemsAsync(farm);
+                }
+            }
         }, 6000, 6000);
     }
 
@@ -221,17 +218,21 @@ public class EpicFarming extends SongodaPlugin {
                 converted = true;
                 Storage storage = new StorageYaml(this);
                 if (storage.containsGroup("farms")) {
-                    console.sendMessage("[" + getDescription().getName() + "] " + ChatColor.RED +
+                    this.console.sendMessage("[" + getDescription().getName() + "] " + ChatColor.RED +
                             "Conversion process starting. Do NOT turn off your server." +
                             "EpicFarming hasn't fully loaded yet, so make sure users don't" +
                             "interact with the plugin until the conversion process is complete.");
 
                     List<Farm> farms = new ArrayList<>();
                     for (StorageRow row : storage.getRowsByGroup("farms")) {
-                        Location location = Methods.unserializeLocation(row.getKey());
-                        if (location == null) continue;
+                        Location location = Methods.deserializeLocation(row.getKey());
+                        if (location == null) {
+                            continue;
+                        }
 
-                        if (row.get("level").asInt() == 0) continue;
+                        if (row.get("level").asInt() == 0) {
+                            continue;
+                        }
 
                         String placedByStr = row.get("placedby").asString();
                         UUID placedBy = placedByStr == null ? null : UUID.fromString(placedByStr);
@@ -247,22 +248,23 @@ public class EpicFarming extends SongodaPlugin {
                             farmType = FarmType.valueOf(farmTypeStr);
                         }
 
-                        Farm farm = new Farm(location, levelManager.getLevel(row.get("level").asInt()), placedBy);
+                        Farm farm = new Farm(location, this.levelManager.getLevel(row.get("level").asInt()), placedBy);
                         farm.setFarmType(farmType);
                         farm.setItems(items);
 
                         farms.add(farm);
                     }
-                    dataManager.createFarms(farms);
+                    this.dataManager.createFarms(farms);
                 }
 
                 // Adding in Boosts
                 if (storage.containsGroup("boosts")) {
                     for (StorageRow row : storage.getRowsByGroup("boosts")) {
-                        if (row.get("uuid").asObject() == null)
+                        if (row.get("uuid").asObject() == null) {
                             continue;
+                        }
 
-                        dataManager.createBoost(new BoostData(
+                        this.dataManager.createBoost(new BoostData(
                                 row.get("amount").asInt(),
                                 Long.parseLong(row.getKey()),
                                 UUID.fromString(row.get("uuid").asString())));
@@ -272,9 +274,9 @@ public class EpicFarming extends SongodaPlugin {
             }
 
             final boolean finalConverted = converted;
-            dataManager.runAsync(() -> {
+            this.dataManager.runAsync(() -> {
                 if (finalConverted) {
-                    console.sendMessage("[" + getDescription().getName() + "] " + ChatColor.GREEN + "Conversion complete :)");
+                    this.console.sendMessage("[" + getDescription().getName() + "] " + ChatColor.GREEN + "Conversion complete :)");
                 }
 
                 this.dataManager.getFarms((farms) -> {
@@ -294,22 +296,23 @@ public class EpicFarming extends SongodaPlugin {
 
     @Override
     public List<Config> getExtraConfig() {
-        return Arrays.asList(levelsFile);
+        return Collections.singletonList(this.levelsFile);
     }
 
     private void loadLevelManager() {
-        if (!new File(this.getDataFolder(), "levels.yml").exists())
+        if (!new File(this.getDataFolder(), "levels.yml").exists()) {
             this.saveResource("levels.yml", false);
-        levelsFile.load();
+        }
+        this.levelsFile.load();
 
         // Load an instance of LevelManager
-        levelManager = new LevelManager();
+        this.levelManager = new LevelManager();
 
         /*
          * Register Levels into LevelManager from configuration.
          */
-        for (String levelName : levelsFile.getKeys(false)) {
-            ConfigurationSection levels = levelsFile.getConfigurationSection(levelName);
+        for (String levelName : this.levelsFile.getKeys(false)) {
+            ConfigurationSection levels = this.levelsFile.getConfigurationSection(levelName);
 
             if (levels.get("Auto-Harvest") != null) {
                 levels.set("Auto-Collect", levels.getBoolean("Auto-Harvest"));
@@ -317,7 +320,7 @@ public class EpicFarming extends SongodaPlugin {
             }
 
             int level = Integer.parseInt(levelName.split("-")[1]);
-            int costExperiance = levels.getInt("Cost-xp");
+            int costExperience = levels.getInt("Cost-xp");
             int costEconomy = levels.getInt("Cost-eco");
             int radius = levels.getInt("Radius");
             double speedMultiplier = levels.getDouble("Speed-Multiplier");
@@ -340,32 +343,37 @@ public class EpicFarming extends SongodaPlugin {
                     modules.add(new ModuleAutoCollect(this));
                 }
             }
-            levelManager.addLevel(level, costExperiance, costEconomy, speedMultiplier, radius, autoCollect, autoReplant, pages, modules);
+            this.levelManager.addLevel(level, costExperience, costEconomy, speedMultiplier, radius, autoCollect, autoReplant, pages, modules);
         }
-        levelsFile.saveChanges();
+        this.levelsFile.saveChanges();
     }
 
     /*
      * Saves registered farms to file.
      */
     private void saveToFile() {
-        if (levelManager != null) {
-            for (Level level : levelManager.getLevels().values())
-                for (Module module : level.getRegisteredModules())
+        if (this.levelManager != null) {
+            for (Level level : this.levelManager.getLevels().values()) {
+                for (Module module : level.getRegisteredModules()) {
                     module.saveDataToFile();
+                }
+            }
         }
     }
 
     public int getLevelFromItem(ItemStack item) {
         NBTItem nbtItem = new NBTItem(item);
 
-        if (nbtItem.hasKey("level"))
+        if (nbtItem.hasTag("level")) {
             return nbtItem.getInteger("level");
+        }
 
         // Legacy trash.
-        if (!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) return 0;
+        if (!item.hasItemMeta() || !item.getItemMeta().hasDisplayName()) {
+            return 0;
+        }
         if (item.getItemMeta().getDisplayName().contains(":")) {
-            return NumberUtils.toInt(item.getItemMeta().getDisplayName().replace("\u00A7", "").split(":")[0], 0);
+            return NumberUtils.toInt(item.getItemMeta().getDisplayName().replace("§", "").split(":")[0], 0);
         }
         return 0;
     }
@@ -375,7 +383,9 @@ public class EpicFarming extends SongodaPlugin {
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(TextUtils.formatText(Methods.formatName(level.getLevel())));
         String line = getLocale().getMessage("general.nametag.lore").getMessage();
-        if (!line.equals("")) meta.setLore(Collections.singletonList(line));
+        if (!line.equals("")) {
+            meta.setLore(Collections.singletonList(line));
+        }
         item.setItemMeta(meta);
 
         NBTItem nbtItem = new NBTItem(item);
@@ -384,42 +394,50 @@ public class EpicFarming extends SongodaPlugin {
     }
 
     public FarmManager getFarmManager() {
-        return farmManager;
+        return this.farmManager;
     }
 
     public LevelManager getLevelManager() {
-        return levelManager;
+        return this.levelManager;
     }
 
     public CommandManager getCommandManager() {
-        return commandManager;
+        return this.commandManager;
     }
 
     public BoostManager getBoostManager() {
-        return boostManager;
+        return this.boostManager;
     }
 
     public GrowthTask getGrowthTask() {
-        return growthTask;
+        return this.growthTask;
     }
 
     public FarmTask getFarmTask() {
-        return farmTask;
+        return this.farmTask;
     }
 
     public GuiManager getGuiManager() {
-        return guiManager;
+        return this.guiManager;
     }
 
     public EntityUtils getEntityUtils() {
-        return entityUtils;
+        return this.entityUtils;
     }
 
     public DatabaseConnector getDatabaseConnector() {
-        return databaseConnector;
+        return this.databaseConnector;
     }
 
     public DataManager getDataManager() {
-        return dataManager;
+        return this.dataManager;
+    }
+
+    /**
+     * @deprecated Use {@link EpicFarming#getPlugin(Class)} instead.
+     */
+    @Deprecated
+    public static EpicFarming getInstance() {
+        return getPlugin(EpicFarming.class);
     }
 }

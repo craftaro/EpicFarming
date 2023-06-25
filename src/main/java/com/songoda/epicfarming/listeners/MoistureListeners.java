@@ -8,8 +8,8 @@ import org.bukkit.event.Listener;
 import org.bukkit.event.block.MoistureChangeEvent;
 
 public class MoistureListeners implements Listener {
-
     private final EpicFarming plugin;
+
     public MoistureListeners(EpicFarming plugin) {
         this.plugin = plugin;
     }
@@ -20,7 +20,7 @@ public class MoistureListeners implements Listener {
             return;
         }
 
-        Farm farm = plugin.getFarmManager().checkForFarm(event.getBlock().getLocation());
+        Farm farm = this.plugin.getFarmManager().checkForFarm(event.getBlock().getLocation());
         if (farm != null) {
             event.setCancelled(true);
         }

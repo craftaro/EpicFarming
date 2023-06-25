@@ -52,8 +52,9 @@ public class ModuleAutoCollect extends Module {
 
     @Override
     public void runFinal(Farm farm, Collection<LivingEntity> entitiesAroundFarm, List<Block> crops) {
-        if (farm.getFarmType() != FarmType.LIVESTOCK)
+        if (farm.getFarmType() != FarmType.LIVESTOCK) {
             collectCrops(farm, crops);
+        }
 
         if (farm.getFarmType() != FarmType.CROPS) {
             collectLivestock(farm, entitiesAroundFarm);
@@ -64,18 +65,20 @@ public class ModuleAutoCollect extends Module {
         for (Block block : crops) {
             if (BlockUtils.isCropFullyGrown(block) && isEnabled(farm) && doCropDrop(farm, CompatibleMaterial.getBlockMaterial(block.getType()))) {
                 if (farm.getLevel().isAutoReplant()) {
-                    Bukkit.getScheduler().runTask(plugin, () ->
+                    Bukkit.getScheduler().runTask(this.plugin, () ->
                             BlockUtils.resetGrowthStage(block));
                     continue;
                 }
-                Bukkit.getScheduler().runTask(plugin, () -> block.setType(Material.AIR));
+                Bukkit.getScheduler().runTask(this.plugin, () -> block.setType(Material.AIR));
             }
         }
     }
 
     private void collectLivestock(Farm farm, Collection<LivingEntity> entitiesAroundFarm) {
         for (Entity entity : new ArrayList<>(entitiesAroundFarm)) {
-            if (!ticksLived.containsKey(entity)) ticksLived.put(entity, 0);
+            if (!ticksLived.containsKey(entity)) {
+                ticksLived.put(entity, 0);
+            }
 
             int lived = ticksLived.get(entity);
 
@@ -86,35 +89,43 @@ public class ModuleAutoCollect extends Module {
 
             int rand = random.nextInt((int) Math.floor(100 / farm.getLevel().getSpeedMultiplier()));
 
-            if (lived < min) continue;
+            if (lived < min) {
+                continue;
+            }
 
-            if (rand != 5 && lived < max) continue;
+            if (rand != 5 && lived < max) {
+                continue;
+            }
 
             if (entity instanceof Chicken) {
-                if (!((Ageable) entity).isAdult()) continue;
+                if (!((Ageable) entity).isAdult()) {
+                    continue;
+                }
                 entity.getLocation().getWorld().playSound(entity.getLocation(), Sound.ENTITY_CHICKEN_EGG, 1, 2);
                 if (!isEnabled(farm)) {
                     ticksLived.remove(entity);
-                    Bukkit.getScheduler().runTask(plugin, () ->
+                    Bukkit.getScheduler().runTask(this.plugin, () ->
                             entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), new ItemStack(Material.EGG)));
                 } else {
                     doLivestockDrop(farm, new ItemStack(Material.EGG, 1));
                 }
-                Bukkit.getScheduler().runTask(plugin, () ->
+                Bukkit.getScheduler().runTask(this.plugin, () ->
                         Methods.animate(farm.getLocation(), CompatibleMaterial.EGG));
             } else if (entity instanceof Sheep) {
-                if (!((Ageable) entity).isAdult()) continue;
+                if (!((Ageable) entity).isAdult()) {
+                    continue;
+                }
                 ((Sheep) entity).setSheared(true);
 
                 Wool woolColor = new Wool(((Sheep) entity).getColor());
                 ItemStack wool = woolColor.toItemStack((int) Math.round(1 + (Math.random() * 3)));
                 if (!isEnabled(farm)) {
-                    Bukkit.getScheduler().runTask(plugin, () ->
+                    Bukkit.getScheduler().runTask(this.plugin, () ->
                             entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), wool));
                 } else {
                     doLivestockDrop(farm, wool);
                 }
-                Bukkit.getScheduler().runTask(plugin, () ->
+                Bukkit.getScheduler().runTask(this.plugin, () ->
                         Methods.animate(farm.getLocation(), wool));
             }
             ticksLived.put(entity, 0);
@@ -122,7 +133,9 @@ public class ModuleAutoCollect extends Module {
 
         for (Map.Entry<Entity, Integer> entry : lastTicksLived.entrySet()) {
             int last = entry.getValue();
-            if (!ticksLived.containsKey(entry.getKey())) continue;
+            if (!ticksLived.containsKey(entry.getKey())) {
+                continue;
+            }
             int current = ticksLived.get(entry.getKey());
 
             if (last == current) {
@@ -134,12 +147,12 @@ public class ModuleAutoCollect extends Module {
 
     @Override
     public ItemStack getGUIButton(Farm farm) {
-        return GuiUtils.createButtonItem(CompatibleMaterial.BUCKET, plugin.getLocale().getMessage("interface.button.autocollect")
+        return GuiUtils.createButtonItem(CompatibleMaterial.BUCKET, this.plugin.getLocale().getMessage("interface.button.autocollect")
                         .processPlaceholder("status", isEnabled(farm)
-                                ? plugin.getLocale().getMessage("general.interface.on").getMessage()
-                                : plugin.getLocale().getMessage("general.interface.off").getMessage()).getMessage(),
-                plugin.getLocale().getMessage("interface.button.collectiontype").processPlaceholder("status", getCollectionType(farm).translate()).getMessage(),
-                plugin.getLocale().getMessage("interface.button.functiontoggle").getMessage());
+                                ? this.plugin.getLocale().getMessage("general.interface.on").getMessage()
+                                : this.plugin.getLocale().getMessage("general.interface.off").getMessage()).getMessage(),
+                this.plugin.getLocale().getMessage("interface.button.collectiontype").processPlaceholder("status", getCollectionType(farm).translate()).getMessage(),
+                this.plugin.getLocale().getMessage("interface.button.functiontoggle").getMessage());
     }
 
     @Override
@@ -153,10 +166,10 @@ public class ModuleAutoCollect extends Module {
 
     @Override
     public String getDescription() {
-        return plugin.getLocale()
+        return this.plugin.getLocale()
                 .getMessage("interface.button.autocollect")
                 .processPlaceholder("status",
-                        plugin.getLocale().getMessage("general.interface.unlocked").getMessage())
+                        this.plugin.getLocale().getMessage("general.interface.unlocked").getMessage())
                 .getMessage();
     }
 
@@ -181,7 +194,9 @@ public class ModuleAutoCollect extends Module {
 
     private boolean useBoneMeal(Farm farm) {
         for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
-            if (item == null || item.getType() != CompatibleMaterial.BONE_MEAL.getMaterial()) continue;
+            if (item == null || item.getType() != CompatibleMaterial.BONE_MEAL.getMaterial()) {
+                continue;
+            }
             farm.removeMaterial(CompatibleMaterial.BONE_MEAL.getMaterial(), 1);
             return true;
         }
@@ -191,10 +206,9 @@ public class ModuleAutoCollect extends Module {
 
     private int getMin(Entity entity) {
         switch (entity.getType()) {
-            case SHEEP:
-                return 0;
             case CHICKEN:
                 return 6000;
+            case SHEEP:
             default:
                 return 0;
         }
@@ -212,17 +226,21 @@ public class ModuleAutoCollect extends Module {
     }
 
     private boolean doCropDrop(Farm farm, CompatibleMaterial material) {
-        if (material == null || farm == null || !material.isCrop() || !plugin.isEnabled()) return false;
+        if (material == null || farm == null || !material.isCrop() || !this.plugin.isEnabled()) {
+            return false;
+        }
 
-        BoostData boostData = plugin.getBoostManager().getBoost(farm.getPlacedBy());
+        BoostData boostData = this.plugin.getBoostManager().getBoost(farm.getPlacedBy());
 
         CompatibleMaterial yield = material.getCropYield();
 
         ItemStack stack = yield.getItem((useBoneMeal(farm) ? random.nextInt(2) + 2 : 1) * (boostData == null ? 1 : boostData.getMultiplier()));
         ItemStack seedStack = material.getCropSeed().getItem(random.nextInt(3) + 1 + (useBoneMeal(farm) ? 1 : 0));
 
-        if (!farm.willFit(stack) || !farm.willFit(seedStack)) return false;
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        if (!farm.willFit(stack) || !farm.willFit(seedStack)) {
+            return false;
+        }
+        Bukkit.getScheduler().runTask(this.plugin, () -> {
             Methods.animate(farm.getLocation(), yield);
             farm.addItem(stack);
         });
@@ -235,11 +253,13 @@ public class ModuleAutoCollect extends Module {
     }
 
     private boolean doLivestockDrop(Farm farm, ItemStack stack) {
-        BoostData boostData = plugin.getBoostManager().getBoost(farm.getPlacedBy());
+        BoostData boostData = this.plugin.getBoostManager().getBoost(farm.getPlacedBy());
 
         stack.setAmount(stack.getAmount() * (boostData == null ? 1 : boostData.getMultiplier()));
 
-        if (!farm.willFit(stack)) return false;
+        if (!farm.willFit(stack)) {
+            return false;
+        }
         farm.addItem(stack);
         return true;
     }
@@ -252,7 +272,10 @@ public class ModuleAutoCollect extends Module {
         ALL, NO_SEEDS;
 
         public String translate() {
-            return EpicFarming.getInstance().getLocale().getMessage("general.interface." + name().replace("_", "").toLowerCase()).getMessage();
+            return EpicFarming.getPlugin(EpicFarming.class)
+                    .getLocale()
+                    .getMessage("general.interface." + name().replace("_", "").toLowerCase())
+                    .getMessage();
         }
     }
 }

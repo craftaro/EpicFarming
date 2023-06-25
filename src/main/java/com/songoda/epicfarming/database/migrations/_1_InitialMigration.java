@@ -9,14 +9,13 @@ import java.sql.SQLException;
 import java.sql.Statement;
 
 public class _1_InitialMigration extends DataMigration {
-
     public _1_InitialMigration() {
         super(1);
     }
 
     @Override
     public void migrate(Connection connection, String tablePrefix) throws SQLException {
-        String autoIncrement = EpicFarming.getInstance().getDatabaseConnector() instanceof MySQLConnector ? " AUTO_INCREMENT" : "";
+        String autoIncrement = EpicFarming.getPlugin(EpicFarming.class).getDatabaseConnector() instanceof MySQLConnector ? " AUTO_INCREMENT" : "";
 
         // Create farms table.
         try (Statement statement = connection.createStatement()) {

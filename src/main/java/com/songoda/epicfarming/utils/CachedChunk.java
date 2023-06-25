@@ -9,7 +9,6 @@ import org.bukkit.entity.Entity;
 import java.util.Objects;
 
 public class CachedChunk {
-
     private final String world;
     private final int x;
     private final int z;
@@ -42,13 +41,15 @@ public class CachedChunk {
 
     public Chunk getChunk() {
         World world = Bukkit.getWorld(this.world);
-        if (world == null)
+        if (world == null) {
             return null;
+        }
         return world.getChunkAt(this.x, this.z);
     }
 
     public Entity[] getEntities() {
-        if (!Bukkit.getWorld(world).isChunkLoaded(x, z)) {
+        World world = Bukkit.getWorld(this.world);
+        if (world == null || !world.isChunkLoaded(this.x, this.z)) {
             return new Entity[0];
         }
         return getChunk().getEntities();
@@ -59,15 +60,17 @@ public class CachedChunk {
         if (o instanceof Chunk) {
             Chunk other = (Chunk) o;
             return this.world.equals(other.getWorld().getName()) && this.x == other.getX() && this.z == other.getZ();
-        } else if (o instanceof CachedChunk) {
+        }
+        if (o instanceof CachedChunk) {
             CachedChunk other = (CachedChunk) o;
             return this.world.equals(other.getWorld()) && this.x == other.getX() && this.z == other.getZ();
-        } else return false;
+        }
+
+        return false;
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(this.world, this.x, this.z);
     }
-
 }

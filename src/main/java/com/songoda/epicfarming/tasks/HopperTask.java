@@ -14,7 +14,6 @@ import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
 public class HopperTask extends BukkitRunnable {
-
     private static HopperTask instance;
     private final FarmManager manager;
 
@@ -22,22 +21,12 @@ public class HopperTask extends BukkitRunnable {
         this.manager = plugin.getFarmManager();
     }
 
-    public static HopperTask startTask(EpicFarming plugin) {
-        if (instance != null) {
-            instance.cancel();
-        }
-
-        instance = new HopperTask(plugin);
-        instance.runTaskTimer(plugin, 0, 8);
-        return instance;
-    }
-
     @Override
     public void run() {
-        for (Farm farm : manager.getFarms().values()) {
+        for (Farm farm : this.manager.getFarms().values()) {
             Location farmLocation = farm.getLocation();
             if (farmLocation == null || farmLocation.getWorld() == null) {
-                manager.removeFarm(farm.getLocation());
+                this.manager.removeFarm(farm.getLocation());
                 continue;
             }
 
@@ -70,13 +59,27 @@ public class HopperTask extends BukkitRunnable {
         }
     }
 
-    private boolean canHop(Inventory i, ItemStack item) {
-        if (i.firstEmpty() != -1) return true;
-        for (ItemStack it : i.getContents()) {
+    private boolean canHop(Inventory inventory, ItemStack item) {
+        if (inventory.firstEmpty() != -1) {
+            return true;
+        }
+
+        for (ItemStack it : inventory.getContents()) {
             if (it == null || it.isSimilar(item) && (it.getAmount() + item.getAmount()) <= it.getMaxStackSize()) {
                 return true;
             }
         }
+
         return false;
+    }
+
+    public static HopperTask startTask(EpicFarming plugin) {
+        if (instance != null) {
+            instance.cancel();
+        }
+
+        instance = new HopperTask(plugin);
+        instance.runTaskTimer(plugin, 0, 8);
+        return instance;
     }
 }

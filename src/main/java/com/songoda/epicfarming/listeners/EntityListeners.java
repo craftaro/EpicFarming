@@ -30,7 +30,6 @@ import java.util.Iterator;
 import java.util.List;
 
 public class EntityListeners implements Listener {
-
     private final EpicFarming plugin;
 
     public EntityListeners(EpicFarming plugin) {
@@ -40,19 +39,23 @@ public class EntityListeners implements Listener {
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDeath(EntityDeathEvent event) {
         LivingEntity entity = event.getEntity();
-        if (!entity.hasMetadata("EFA-TAGGED")) return;
+        if (!entity.hasMetadata("EFA-TAGGED")) {
+            return;
+        }
         Location location = (Location) entity.getMetadata("EFA-TAGGED").get(0).value();
-        Farm farm = plugin.getFarmManager().getFarm(location);
+        Farm farm = this.plugin.getFarmManager().getFarm(location);
 
         boolean autoCollect = false;
         for (Module module : farm.getLevel().getRegisteredModules()) {
-            if (module instanceof ModuleAutoCollect && ((ModuleAutoCollect) module).isEnabled(farm))
+            if (module instanceof ModuleAutoCollect && ((ModuleAutoCollect) module).isEnabled(farm)) {
                 autoCollect = true;
+            }
         }
 
         if (autoCollect) {
-            for (ItemStack item : event.getDrops())
+            for (ItemStack item : event.getDrops()) {
                 farm.addItem(item);
+            }
             event.getDrops().clear();
         }
     }
@@ -61,15 +64,21 @@ public class EntityListeners implements Listener {
     public void onSpawn(ItemSpawnEvent event) {
         Item item = event.getEntity();
 
-        if (item.getItemStack().getType() != Material.EGG) return;
+        if (item.getItemStack().getType() != Material.EGG) {
+            return;
+        }
 
         Location location = event.getEntity().getLocation();
         Collection<Entity> nearby = location.getWorld().getNearbyEntities(location, 0.01, 0.3, 0.01);
 
         Entity entity = null;
         for (Entity e : nearby) {
-            if (e instanceof Player) return;
-            if (e instanceof Chicken) entity = e;
+            if (e instanceof Player) {
+                return;
+            }
+            if (e instanceof Chicken) {
+                entity = e;
+            }
         }
 
         if (ModuleAutoCollect.getTicksLived().containsKey(entity)) {
@@ -95,11 +104,14 @@ public class EntityListeners implements Listener {
         List<Block> toCancel = new ArrayList<>();
         while (it.hasNext()) {
             Block block = it.next();
-            if (block.getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial())
+            if (block.getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial()) {
                 continue;
+            }
 
-            Farm farm = plugin.getFarmManager().getFarm(block.getLocation());
-            if (farm == null) continue;
+            Farm farm = this.plugin.getFarmManager().getFarm(block.getLocation());
+            if (farm == null) {
+                continue;
+            }
 
             toCancel.add(block);
         }
@@ -107,13 +119,13 @@ public class EntityListeners implements Listener {
         for (Block block : toCancel) {
             event.blockList().remove(block);
 
-            Farm farm = plugin.getFarmManager().removeFarm(block.getLocation());
-            plugin.getDataManager().deleteFarm(farm);
+            Farm farm = this.plugin.getFarmManager().removeFarm(block.getLocation());
+            this.plugin.getDataManager().deleteFarm(farm);
             farm.forceMenuClose();
 
-            plugin.getFarmTask().getCrops(farm, false);
+            this.plugin.getFarmTask().getCrops(farm, false);
 
-            ItemStack item = plugin.makeFarmItem(farm.getLevel());
+            ItemStack item = this.plugin.makeFarmItem(farm.getLevel());
 
             block.setType(Material.AIR);
             block.getLocation().getWorld().dropItemNaturally(block.getLocation().add(.5, .5, .5), item);

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 public abstract class Storage {
-
     protected final EpicFarming plugin;
     protected final Config dataFile;
 
@@ -31,8 +30,9 @@ public abstract class Storage {
          * Dump FarmManager to file.
          */
         for (Farm farm : new ArrayList<>(instance.getFarmManager().getFarms().values())) {
-            if (farm.getLocation() == null
-                    || farm.getLocation().getWorld() == null) continue;
+            if (farm.getLocation() == null || farm.getLocation().getWorld() == null) {
+                continue;
+            }
             String locstr = Methods.serializeLocation(farm.getLocation());
             prepareSaveItem("farms", new StorageItem("location", locstr),
                     new StorageItem("farmtype", farm.getFarmType().name()),

@@ -12,7 +12,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CommandGiveFarmItem extends AbstractCommand {
-
     private final EpicFarming plugin;
 
     public CommandGiveFarmItem(EpicFarming plugin) {
@@ -22,16 +21,18 @@ public class CommandGiveFarmItem extends AbstractCommand {
 
     @Override
     protected ReturnType runCommand(CommandSender sender, String... args) {
-        if (args.length == 1) return ReturnType.SYNTAX_ERROR;
+        if (args.length == 1) {
+            return ReturnType.SYNTAX_ERROR;
+        }
 
-        Level level = plugin.getLevelManager().getLowestLevel();
+        Level level = this.plugin.getLevelManager().getLowestLevel();
         Player player;
         if (args.length != 0 && Bukkit.getPlayer(args[0]) == null) {
-            plugin.getLocale().newMessage("&cThat player does not exist or is currently offline.").sendPrefixedMessage(sender);
+            this.plugin.getLocale().newMessage("&cThat player does not exist or is currently offline.").sendPrefixedMessage(sender);
             return ReturnType.FAILURE;
         } else if (args.length == 0) {
             if (!(sender instanceof Player)) {
-                plugin.getLocale().newMessage("&cYou need to be a player to give a farm item to yourself.").sendPrefixedMessage(sender);
+                this.plugin.getLocale().newMessage("&cYou need to be a player to give a farm item to yourself.").sendPrefixedMessage(sender);
                 return ReturnType.FAILURE;
             }
             player = (Player) sender;
@@ -40,17 +41,17 @@ public class CommandGiveFarmItem extends AbstractCommand {
         }
 
 
-        if (args.length >= 2 && !plugin.getLevelManager().isLevel(Integer.parseInt(args[1]))) {
-            plugin.getLocale().newMessage("&cNot a valid level... The current valid levels are: &4"
-                    + plugin.getLevelManager().getLowestLevel().getLevel() + "-"
-                    + plugin.getLevelManager().getHighestLevel().getLevel() + "&c.").sendPrefixedMessage(sender);
+        if (args.length >= 2 && !this.plugin.getLevelManager().isLevel(Integer.parseInt(args[1]))) {
+            this.plugin.getLocale().newMessage("&cNot a valid level... The current valid levels are: &4"
+                    + this.plugin.getLevelManager().getLowestLevel().getLevel() + "-"
+                    + this.plugin.getLevelManager().getHighestLevel().getLevel() + "&c.").sendPrefixedMessage(sender);
             return ReturnType.FAILURE;
         } else if (args.length != 0) {
 
-            level = plugin.getLevelManager().getLevel(Integer.parseInt(args[1]));
+            level = this.plugin.getLevelManager().getLevel(Integer.parseInt(args[1]));
         }
-        player.getInventory().addItem(plugin.makeFarmItem(level));
-        plugin.getLocale().getMessage("command.give.success")
+        player.getInventory().addItem(this.plugin.makeFarmItem(level));
+        this.plugin.getLocale().getMessage("command.give.success")
                 .processPlaceholder("level", level.getLevel()).sendPrefixedMessage(player);
 
         return ReturnType.SUCCESS;

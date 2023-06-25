@@ -1,9 +1,10 @@
 package com.songoda.epicfarming.commands;
 
 import com.songoda.core.commands.AbstractCommand;
+import com.songoda.core.utils.NumberUtils;
+import com.songoda.core.utils.TimeUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
-import com.songoda.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
@@ -13,7 +14,6 @@ import java.util.Arrays;
 import java.util.List;
 
 public class CommandBoost extends AbstractCommand {
-
     private final EpicFarming plugin;
 
     public CommandBoost(EpicFarming plugin) {
@@ -24,36 +24,35 @@ public class CommandBoost extends AbstractCommand {
     @Override
     protected ReturnType runCommand(CommandSender sender, String... args) {
         if (args.length < 2) {
-            plugin.getLocale().newMessage("&7Syntax error...").sendPrefixedMessage(sender);
+            this.plugin.getLocale().newMessage("&7Syntax error...").sendPrefixedMessage(sender);
             return ReturnType.SYNTAX_ERROR;
         }
-        if (!Methods.isInt(args[1])) {
-            plugin.getLocale().newMessage("&6" + args[1] + " &7is not a number...").sendPrefixedMessage(sender);
+        if (!NumberUtils.isInt(args[1])) {
+            this.plugin.getLocale().newMessage("&6" + args[1] + " &7is not a number...").sendPrefixedMessage(sender);
             return ReturnType.SYNTAX_ERROR;
         }
 
         long duration = 0L;
 
         if (args.length > 2) {
-            for (int i = 0; i < args.length; i++) {
-                String line = args[i];
-                long time = Methods.parseTime(line);
+            for (String line : args) {
+                long time = TimeUtils.parseTime(line);
                 duration += time;
-
             }
         }
 
         Player player = Bukkit.getPlayer(args[0]);
         if (player == null) {
-            plugin.getLocale().newMessage("&cThat player does not exist or is not online...").sendPrefixedMessage(sender);
+            this.plugin.getLocale().newMessage("&cThat player does not exist or is not online...").sendPrefixedMessage(sender);
             return ReturnType.FAILURE;
         }
 
         BoostData boostData = new BoostData(Integer.parseInt(args[1]), duration == 0L ? Long.MAX_VALUE : System.currentTimeMillis() + duration, player.getUniqueId());
-        plugin.getDataManager().createBoost(boostData);
-        plugin.getBoostManager().addBoostToPlayer(boostData);
-        plugin.getLocale().newMessage("&7Successfully boosted &6" + Bukkit.getPlayer(args[0]).getName()
-                + "'s &7farms by &6" + args[1] + "x" + (duration == 0L ? "" : (" for " + Methods.makeReadable(duration))) + "&7.").sendPrefixedMessage(sender);
+        this.plugin.getDataManager().createBoost(boostData);
+        this.plugin.getBoostManager().addBoostToPlayer(boostData);
+        this.plugin.getLocale().newMessage("&7Successfully boosted &6" + Bukkit.getPlayer(args[0]).getName()
+                        + "'s &7farms by &6" + args[1] + "x" + (duration == 0L ? "" : (" for " + TimeUtils.makeReadable(duration))) + "&7.")
+                .sendPrefixedMessage(sender);
         return ReturnType.SUCCESS;
     }
 

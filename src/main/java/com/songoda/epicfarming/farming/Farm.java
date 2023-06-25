@@ -21,7 +21,6 @@ import org.bukkit.inventory.ItemStack;
 import java.util.*;
 
 public class Farm {
-
     // This is the unique identifier for this farm.
     // It is reset on every plugin load.
     private final UUID uniqueId = UUID.randomUUID();
@@ -52,27 +51,30 @@ public class Farm {
     }
 
     public void view(Player player, boolean force) {
-        if (!player.hasPermission("epicfarming.view") && !force)
+        if (!player.hasPermission("epicfarming.view") && !force) {
             return;
+        }
 
-        if (opened != null && !force) return;
+        if (this.opened != null && !force) {
+            return;
+        }
 
-        if (Settings.USE_PROTECTION_PLUGINS.getBoolean() && !ProtectionManager.canInteract(player, location)) {
+        if (Settings.USE_PROTECTION_PLUGINS.getBoolean() && !ProtectionManager.canInteract(player, this.location)) {
             player.sendMessage(EpicFarming.getInstance().getLocale().getMessage("event.general.protected").getPrefixedMessage());
             return;
         }
 
-        opened = new OverviewGui(this, player);
+        this.opened = new OverviewGui(this, player);
 
-        EpicFarming.getInstance().getGuiManager().showGUI(player, opened);
+        EpicFarming.getInstance().getGuiManager().showGUI(player, this.opened);
     }
 
     public void forceMenuClose() {
-        if (opened == null) {
+        if (this.opened == null) {
             return;
         }
 
-        opened.close();
+        this.opened.close();
     }
 
     public void upgrade(UpgradeType type, Player player) {
@@ -122,7 +124,7 @@ public class Farm {
                     .processPlaceholder("level", level.getLevel()).sendPrefixedMessage(player);
         }
         tillLand();
-        Location loc = location.clone().add(.5, .5, .5);
+        Location loc = this.location.clone().add(.5, .5, .5);
         CompatibleParticleHandler.spawnParticles(Settings.PARTICLE_TYPE.getString(), loc, 200, .5, .5, .5);
 
         if (instance.getLevelManager().getHighestLevel() != level) {
@@ -137,9 +139,11 @@ public class Farm {
     }
 
     public boolean tillLand() {
-        if (Settings.DISABLE_AUTO_TIL_LAND.getBoolean()) return true;
-        Block block = location.getBlock();
-        int radius = level.getRadius();
+        if (Settings.DISABLE_AUTO_TIL_LAND.getBoolean()) {
+            return true;
+        }
+        Block block = this.location.getBlock();
+        int radius = this.level.getRadius();
         int bx = block.getX();
         int by = block.getY();
         int bz = block.getZ();
@@ -170,42 +174,48 @@ public class Farm {
     }
 
     public UUID getUniqueId() {
-        return uniqueId;
+        return this.uniqueId;
     }
 
     public List<ItemStack> getItems() {
-        return Collections.unmodifiableList(items);
+        return Collections.unmodifiableList(this.items);
     }
 
     // Should be used in sync.
     public void addItem(ItemStack toAdd) {
-        needsToBeSaved = true;
-        synchronized (items) {
-            for (ItemStack item : new ArrayList<>(items)) {
+        this.needsToBeSaved = true;
+        synchronized (this.items) {
+            for (ItemStack item : new ArrayList<>(this.items)) {
                 if (item.getType() != toAdd.getType()
-                        || item.getAmount() + toAdd.getAmount() > item.getMaxStackSize()) continue;
+                        || item.getAmount() + toAdd.getAmount() > item.getMaxStackSize()) {
+                    continue;
+                }
                 item.setAmount(item.getAmount() + toAdd.getAmount());
-                if (opened != null)
-                    opened.updateInventory();
+                if (this.opened != null) {
+                    this.opened.updateInventory();
+                }
                 return;
             }
-            items.add(toAdd);
-            if (opened != null)
-                opened.updateInventory();
+            this.items.add(toAdd);
+            if (this.opened != null) {
+                this.opened.updateInventory();
+            }
         }
     }
 
     public void removeMaterial(Material material, int amount) {
-        needsToBeSaved = true;
-        synchronized (items) {
+        this.needsToBeSaved = true;
+        synchronized (this.items) {
             for (ItemStack item : getItems().toArray(new ItemStack[0])) {
                 if (material == item.getType()) {
                     item.setAmount(item.getAmount() - amount);
 
-                    if (item.getAmount() <= 0)
+                    if (item.getAmount() <= 0) {
                         this.items.remove(item);
-                    if (opened != null)
-                        opened.updateInventory();
+                    }
+                    if (this.opened != null) {
+                        this.opened.updateInventory();
+                    }
                     return;
                 }
             }
@@ -214,10 +224,12 @@ public class Farm {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean willFit(ItemStack item) {
-        synchronized (items) {
-            if (items.size() < 27 * level.getPages()) return true;
+        synchronized (this.items) {
+            if (this.items.size() < 27 * this.level.getPages()) {
+                return true;
+            }
 
-            for (ItemStack stack : items) {
+            for (ItemStack stack : this.items) {
                 if (stack.isSimilar(item) && stack.getAmount() < stack.getMaxStackSize()) {
                     return true;
                 }
@@ -228,19 +240,19 @@ public class Farm {
     }
 
     public void setItems(List<ItemStack> items) {
-        needsToBeSaved = true;
+        this.needsToBeSaved = true;
         synchronized (this.items) {
             this.items.clear();
             this.items.addAll(items);
 
-            if (opened != null) {
-                opened.updateInventory();
+            if (this.opened != null) {
+                this.opened.updateInventory();
             }
         }
     }
 
     public UUID getViewing() {
-        return viewing;
+        return this.viewing;
     }
 
     public void setViewing(UUID viewing) {
@@ -248,23 +260,23 @@ public class Farm {
     }
 
     public void addCachedCrop(Block block) {
-        cachedCrops.add(block);
+        this.cachedCrops.add(block);
     }
 
     public void removeCachedCrop(Block block) {
-        cachedCrops.remove(block);
+        this.cachedCrops.remove(block);
     }
 
     public List<Block> getCachedCrops() {
-        return new ArrayList<>(cachedCrops);
+        return new ArrayList<>(this.cachedCrops);
     }
 
     public void clearCache() {
-        cachedCrops.clear();
+        this.cachedCrops.clear();
     }
 
     public long getLastCached() {
-        return lastCached;
+        return this.lastCached;
     }
 
     public void setLastCached(long lastCached) {
@@ -273,11 +285,11 @@ public class Farm {
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean isInLoadedChunk() {
-        return location != null && location.getWorld() != null && location.getWorld().isChunkLoaded(((int) location.getX()) >> 4, ((int) location.getZ()) >> 4);
+        return this.location != null && this.location.getWorld() != null && this.location.getWorld().isChunkLoaded(((int) this.location.getX()) >> 4, ((int) this.location.getZ()) >> 4);
     }
 
     public Location getLocation() {
-        return location.clone();
+        return this.location.clone();
     }
 
     public void setLocation(Location location) {
@@ -285,11 +297,11 @@ public class Farm {
     }
 
     public UUID getPlacedBy() {
-        return placedBy;
+        return this.placedBy;
     }
 
     public Level getLevel() {
-        return level;
+        return this.level;
     }
 
     public void close() {
@@ -317,19 +329,19 @@ public class Farm {
     }
 
     public FarmType getFarmType() {
-        return farmType;
+        return this.farmType;
     }
 
     public void toggleFarmType() {
-        switch (farmType) {
+        switch (this.farmType) {
             case CROPS:
-                farmType = FarmType.LIVESTOCK;
+                this.farmType = FarmType.LIVESTOCK;
                 break;
             case LIVESTOCK:
-                farmType = FarmType.BOTH;
+                this.farmType = FarmType.BOTH;
                 break;
             case BOTH:
-                farmType = FarmType.CROPS;
+                this.farmType = FarmType.CROPS;
                 break;
         }
         EpicFarming.getInstance().getDataManager().updateFarm(this);
@@ -341,7 +353,7 @@ public class Farm {
     }
 
     public int getId() {
-        return id;
+        return this.id;
     }
 
     public void setId(int id) {
@@ -349,7 +361,7 @@ public class Farm {
     }
 
     public boolean needsToBeSaved() {
-        return needsToBeSaved;
+        return this.needsToBeSaved;
     }
 
     public void setNeedsToBeSaved(boolean needsToBeSaved) {

@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Map;
 
 public abstract class Module {
-
-    private static final Map<String, Config> configs = new HashMap<>();
+    private static final Map<String, Config> CONFIGS = new HashMap<>();
 
     protected final EpicFarming plugin;
     private final Config config;
@@ -26,13 +25,13 @@ public abstract class Module {
 
     public Module(EpicFarming plugin) {
         this.plugin = plugin;
-        if (!configs.containsKey(getName())) {
+        if (!CONFIGS.containsKey(getName())) {
             Config config = new Config(plugin, File.separator + "modules", getName() + ".yml");
-            configs.put(getName(), config);
+            CONFIGS.put(getName(), config);
             config.load();
 
         }
-        this.config = configs.get(getName());
+        this.config = CONFIGS.get(getName());
     }
 
     public abstract String getName();
@@ -40,14 +39,16 @@ public abstract class Module {
     public abstract int runEveryXTicks();
 
     public void run(Farm farm, Collection<LivingEntity> entitiesAroundFarm, List<Block> crops) {
-        if (!currentTicks.containsKey(farm))
-            currentTicks.put(farm, 1);
-        int currentTick = currentTicks.get(farm);
+        if (!this.currentTicks.containsKey(farm)) {
+            this.currentTicks.put(farm, 1);
+        }
+
+        int currentTick = this.currentTicks.get(farm);
         if (currentTick >= runEveryXTicks()) {
             runFinal(farm, entitiesAroundFarm, crops);
             currentTick = 0;
         }
-        currentTicks.put(farm, currentTick + 1);
+        this.currentTicks.put(farm, currentTick + 1);
     }
 
     public abstract void runFinal(Farm farm, Collection<LivingEntity> entitiesAroundFarm, List<Block> crops);
@@ -58,12 +59,12 @@ public abstract class Module {
 
     public abstract String getDescription();
 
-    public void saveData(Farm farm, String setting, Object value) {
-        saveData(farm, setting, value, value);
+    public void saveData(Farm farm, String setting, Object toCache) {
+        saveData(farm, setting, toCache, toCache);
     }
 
     public void saveData(Farm farm, String setting, Object value, Object toCache) {
-        config.set("data." + Methods.serializeLocation(farm.getLocation()) + "." + setting, value);
+        this.config.set("data." + Methods.serializeLocation(farm.getLocation()) + "." + setting, value);
         modifyDataCache(farm, setting, toCache);
     }
 
@@ -73,20 +74,21 @@ public abstract class Module {
 
     protected Object getData(Farm farm, String setting) {
         String cacheStr = getName() + "." + setting;
-        if (farm.isDataCachedInModuleCache(cacheStr))
+        if (farm.isDataCachedInModuleCache(cacheStr)) {
             return farm.getDataFromModuleCache(cacheStr);
+        }
 
-        Object data = config.get("data." + Methods.serializeLocation(farm.getLocation()) + "." + setting);
+        Object data = this.config.get("data." + Methods.serializeLocation(farm.getLocation()) + "." + setting);
         modifyDataCache(farm, setting, data);
         return data;
     }
 
     public void clearData(Farm farm) {
-        config.set("data." + Methods.serializeLocation(farm.getLocation()), null);
+        this.config.set("data." + Methods.serializeLocation(farm.getLocation()), null);
         farm.clearModuleCache();
     }
 
     public void saveDataToFile() {
-        config.save();
+        this.config.save();
     }
 }

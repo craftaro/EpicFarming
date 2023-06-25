@@ -25,7 +25,6 @@ import java.util.UUID;
 import java.util.function.Consumer;
 
 public class DataManager extends DataManagerAbstract {
-
     public DataManager(DatabaseConnector connector, Plugin plugin) {
         super(connector, plugin);
     }

@@ -4,7 +4,6 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class BoostData {
-
     private final int multiplier;
     private final long endTime;
     private final UUID player;
@@ -16,35 +15,39 @@ public class BoostData {
     }
 
     public int getMultiplier() {
-        return multiplier;
+        return this.multiplier;
     }
 
     public UUID getPlayer() {
-        return player;
+        return this.player;
     }
 
     public long getEndTime() {
-        return endTime;
+        return this.endTime;
     }
 
     @Override
     public int hashCode() {
-        int result = 31 * multiplier;
+        int result = 31 * this.multiplier;
 
-        result = 31 * result + (this.player == null ? 0 : player.hashCode());
-        result = 31 * result + (int) (endTime ^ (endTime >>> 32));
+        result = 31 * result + (this.player == null ? 0 : this.player.hashCode());
+        result = 31 * result + (int) (this.endTime ^ (this.endTime >>> 32));
 
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (!(obj instanceof BoostData)) return false;
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof BoostData)) {
+            return false;
+        }
 
         BoostData other = (BoostData) obj;
-        return multiplier == other.multiplier && endTime == other.endTime
-                && Objects.equals(player, other.player);
+        return this.multiplier == other.multiplier && this.endTime == other.endTime
+                && Objects.equals(this.player, other.player);
     }
 
 }

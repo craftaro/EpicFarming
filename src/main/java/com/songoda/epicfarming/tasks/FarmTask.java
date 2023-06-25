@@ -40,7 +40,9 @@ public class FarmTask extends BukkitRunnable {
         if (((System.currentTimeMillis() - farm.getLastCached()) > (30 * 1000)) || !add) {
             Bukkit.getScheduler().runTask(this.plugin, () -> {
                 farm.setLastCached(System.currentTimeMillis());
-                if (add) farm.clearCache();
+                if (add) {
+                    farm.clearCache();
+                }
                 Block block = farm.getLocation().getBlock();
                 int radius = farm.getLevel().getRadius();
                 int bx = block.getX();
@@ -53,8 +55,6 @@ public class FarmTask extends BukkitRunnable {
                             CompatibleMaterial mat = CompatibleMaterial.getBlockMaterial(b2.getType());
 
                             if (mat == null || !mat.isCrop()) {
-                                if (mat == CompatibleMaterial.STONE || mat == CompatibleMaterial.DIRT || mat == CompatibleMaterial.GRASS_BLOCK)
-                                    continue;
                                 continue;
                             }
 
@@ -75,40 +75,49 @@ public class FarmTask extends BukkitRunnable {
 
     @Override
     public void run() {
-        GrowthTask growthTask = plugin.getGrowthTask();
+        GrowthTask growthTask = this.plugin.getGrowthTask();
 
-        if (ServerVersion.isServerVersionAtLeast(ServerVersion.V1_9) && growthTask.isCancelled()) return;
+        if (ServerVersion.isServerVersionAtLeast(ServerVersion.V1_9) && growthTask.isCancelled()) {
+            return;
+        }
 
-        for (Farm farm : new ArrayList<>(plugin.getFarmManager().getFarms().values())) {
-            if (!plugin.isEnabled()) return;    // Prevent registering a task on plugin disable
+        for (Farm farm : new ArrayList<>(this.plugin.getFarmManager().getFarms().values())) {
+            if (!this.plugin.isEnabled()) {
+                return;    // Prevent registering a task on plugin disable
+            }
 
             try {
-                if (!farm.isInLoadedChunk()) continue;
+                if (!farm.isInLoadedChunk()) {
+                    continue;
+                }
 
                 Location location = farm.getLocation();
                 location.add(.5, .5, .5);
 
                 double radius = farm.getLevel().getRadius() + .5;
-                Bukkit.getScheduler().runTask(plugin, () -> {
-                    entityCache.remove(farm.getUniqueId());
-                    entityCache.put(farm.getUniqueId(), plugin.getEntityUtils().getNearbyEntities(location, radius, false)
+                Bukkit.getScheduler().runTask(this.plugin, () -> {
+                    this.entityCache.remove(farm.getUniqueId());
+                    this.entityCache.put(farm.getUniqueId(), this.plugin.getEntityUtils().getNearbyEntities(location, radius, false)
                             .stream().filter(e -> !(e instanceof Player) && e != null && !(e instanceof ArmorStand))
                             .collect(Collectors.toCollection(ArrayList::new)));
                 });
 
-                Collection<LivingEntity> entitiesAroundFarm = entityCache.get(farm.getUniqueId());
+                Collection<LivingEntity> entitiesAroundFarm = this.entityCache.get(farm.getUniqueId());
 
-                if (entitiesAroundFarm == null) continue;
+                if (entitiesAroundFarm == null) {
+                    continue;
+                }
 
                 List<Block> crops = getCrops(farm, true);
 
-                if (farm.getFarmType() != FarmType.LIVESTOCK)
+                if (farm.getFarmType() != FarmType.LIVESTOCK) {
                     for (Block block : crops) {
                         if (!BlockUtils.isCropFullyGrown(block)) {
                             // Add to GrowthTask
                             growthTask.addLiveCrop(block.getLocation(), new Crop(block.getLocation(), farm));
                         }
                     }
+                }
 
                 // Cycle through modules.
                 farm.getLevel().getRegisteredModules().stream()
@@ -122,6 +131,6 @@ public class FarmTask extends BukkitRunnable {
             }
         }
 
-        Bukkit.getScheduler().runTask(plugin, () -> plugin.getEntityUtils().clearChunkCache());
+        Bukkit.getScheduler().runTask(this.plugin, () -> this.plugin.getEntityUtils().clearChunkCache());
     }
 }

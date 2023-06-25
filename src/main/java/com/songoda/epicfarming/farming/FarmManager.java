@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class FarmManager {
-
     private final LevelManager levelManager;
 
     public FarmManager(LevelManager levelManager) {
@@ -24,20 +23,21 @@ public class FarmManager {
     private final Map<Location, Farm> registeredFarms = new HashMap<>();
 
     public void addFarm(Location location, Farm farm) {
-        registeredFarms.put(roundLocation(location), farm);
+        this.registeredFarms.put(roundLocation(location), farm);
     }
 
     public void addFarms(Collection<Farm> farms) {
-        for (Farm farm : farms)
-            registeredFarms.put(farm.getLocation(), farm);
+        for (Farm farm : farms) {
+            this.registeredFarms.put(farm.getLocation(), farm);
+        }
     }
 
     public Farm removeFarm(Location location) {
-        return registeredFarms.remove(roundLocation(location));
+        return this.registeredFarms.remove(roundLocation(location));
     }
 
     public Farm getFarm(Location location) {
-        return registeredFarms.get(roundLocation(location));
+        return this.registeredFarms.get(roundLocation(location));
     }
 
     public Farm getFarm(Block block) {
@@ -49,7 +49,7 @@ public class FarmManager {
 
 
         Block block = location.getBlock();
-        for (Level level : levelManager.getLevels().values()) {
+        for (Level level : this.levelManager.getLevels().values()) {
             int radius = level.getRadius();
             int bx = block.getX();
             int by = block.getY();
@@ -61,9 +61,12 @@ public class FarmManager {
                         Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
                         if (b2.getType() == farmBlock) {
                             Farm farm = getFarms().get(b2.getLocation());
-                            if (farm == null) continue;
-                            if (level.getRadius() != getFarm(b2.getLocation()).getLevel().getRadius())
+                            if (farm == null) {
                                 continue;
+                            }
+                            if (level.getRadius() != getFarm(b2.getLocation()).getLevel().getRadius()) {
+                                continue;
+                            }
                             return farm;
                         }
                     }
@@ -74,7 +77,7 @@ public class FarmManager {
     }
 
     public Map<Location, Farm> getFarms() {
-        return Collections.unmodifiableMap(registeredFarms);
+        return Collections.unmodifiableMap(this.registeredFarms);
     }
 
     private Location roundLocation(Location location) {

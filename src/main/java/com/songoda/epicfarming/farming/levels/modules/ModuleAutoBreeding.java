@@ -29,7 +29,6 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ModuleAutoBreeding extends Module {
-
     private final int autoBreedCap;
 
     public ModuleAutoBreeding(EpicFarming plugin, int autoBreedCap) {
@@ -49,12 +48,15 @@ public class ModuleAutoBreeding extends Module {
 
     @Override
     public void runFinal(Farm farm, Collection<LivingEntity> entitiesAroundFarm, List<Block> crops) {
-        if (!isEnabled(farm) || farm.getFarmType() == FarmType.CROPS) return;
+        if (!isEnabled(farm) || farm.getFarmType() == FarmType.CROPS) {
+            return;
+        }
 
         List<LivingEntity> entities = new ArrayList<>(entitiesAroundFarm);
         Collections.shuffle(entities);
-        if (entities.size() >= autoBreedCap)
+        if (entities.size() >= this.autoBreedCap) {
             return;
+        }
 
         entities.removeIf(e -> !(e instanceof Ageable) || !((Ageable) e).isAdult() || e.hasMetadata("breedCooldown") || e.isDead());
 
@@ -63,24 +65,26 @@ public class ModuleAutoBreeding extends Module {
 
         for (LivingEntity entity : entities) {
             int stackSize = EntityStackerManager.getSize(entity);
-            if (stackSize == 0) stackSize = 1;
-            counts.put(entity.getType(),
-                    counts.get(entity.getType()) - 1 + stackSize);
+            if (stackSize == 0) {
+                stackSize = 1;
+            }
+            counts.put(entity.getType(), counts.get(entity.getType()) - 1 + stackSize);
         }
 
         boolean mate1 = false;
         for (Map.Entry<EntityType, Long> entry : counts.entrySet()) {
-
             for (LivingEntity entity : entities) {
-                if (entry.getKey() != entity.getType()) continue;
+                if (entry.getKey() != entity.getType()) {
+                    continue;
+                }
                 int count = EntityStackerManager.getSize(entity) == 0 ? 1 : EntityStackerManager.getSize(entity);
                 if (mate1) {
-                    if (count > 1)
+                    if (count > 1) {
                         handleStackedBreed(entity);
-                    else
+                    } else {
                         handleBreed(entity);
-                    Bukkit.getScheduler().runTask(plugin, () ->
-                            Methods.animate(farm.getLocation(), CompatibleMaterial.EGG));
+                    }
+                    Bukkit.getScheduler().runTask(this.plugin, () -> Methods.animate(farm.getLocation(), CompatibleMaterial.EGG));
                     return;
                 }
 
@@ -90,8 +94,9 @@ public class ModuleAutoBreeding extends Module {
                     for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
                         EntityInfo info = EntityInfo.of(entityType);
                         try {
-                            if (info == null || item.getType() != info.getMaterial() || item.getAmount() < 2)
+                            if (info == null || item.getType() != info.getMaterial() || item.getAmount() < 2) {
                                 continue;
+                            }
                         } catch (IllegalArgumentException e) {
                             continue;
                         }
@@ -101,7 +106,7 @@ public class ModuleAutoBreeding extends Module {
                         Location location = entity.getLocation();
                         CompatibleParticleHandler.spawnParticles(CompatibleParticleHandler.ParticleType.HEART,
                                 location, 5, .5, .5, .5);
-                        Bukkit.getScheduler().runTask(plugin, () -> {
+                        Bukkit.getScheduler().runTask(this.plugin, () -> {
                             Entity newSpawn = location.getWorld().spawnEntity(location, entityType);
                             ((Ageable) newSpawn).setBaby();
                         });
@@ -126,11 +131,12 @@ public class ModuleAutoBreeding extends Module {
 
     @Override
     public ItemStack getGUIButton(Farm farm) {
-        return GuiUtils.createButtonItem(CompatibleMaterial.EGG, plugin.getLocale().getMessage("interface.button.autobreeding")
+        return GuiUtils.createButtonItem(CompatibleMaterial.EGG, this.plugin.getLocale().getMessage("interface.button.autobreeding")
                         .processPlaceholder("status", isEnabled(farm)
-                                ? plugin.getLocale().getMessage("general.interface.on").getMessage()
-                                : plugin.getLocale().getMessage("general.interface.off").getMessage()).getMessage(),
-                plugin.getLocale().getMessage("interface.button.functiontoggle").getMessage());
+                                ? this.plugin.getLocale().getMessage("general.interface.on").getMessage()
+                                : this.plugin.getLocale().getMessage("general.interface.off").getMessage())
+                        .getMessage(),
+                this.plugin.getLocale().getMessage("interface.button.functiontoggle").getMessage());
     }
 
     @Override
@@ -140,22 +146,24 @@ public class ModuleAutoBreeding extends Module {
 
     @Override
     public String getDescription() {
-        return plugin.getLocale().getMessage("interface.button.autobreeding")
-                .processPlaceholder("status", autoBreedCap).getMessage();
+        return this.plugin.getLocale()
+                .getMessage("interface.button.autobreeding")
+                .processPlaceholder("status", this.autoBreedCap)
+                .getMessage();
     }
 
     private void handleStackedBreed(LivingEntity entity) {
         EntityStackerManager.removeOne(entity);
-        Bukkit.getScheduler().runTask(plugin, () -> {
+        Bukkit.getScheduler().runTask(this.plugin, () -> {
             LivingEntity spawned = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
             handleBreed(spawned);
         });
     }
 
     private void handleBreed(Entity entity) {
-        Bukkit.getScheduler().scheduleSyncDelayedTask(plugin, () ->
-                entity.removeMetadata("breedCooldown", plugin), 5 * 20 * 60);
-        entity.setMetadata("breedCooldown", new FixedMetadataValue(plugin, true));
+        Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, () ->
+                entity.removeMetadata("breedCooldown", this.plugin), 5 * 20 * 60);
+        entity.setMetadata("breedCooldown", new FixedMetadataValue(this.plugin, true));
     }
 
     private boolean isEnabled(Farm farm) {

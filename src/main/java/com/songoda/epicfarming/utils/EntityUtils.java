@@ -13,7 +13,6 @@ import java.util.Map;
 import java.util.Set;
 
 public class EntityUtils {
-
     private final Map<CachedChunk, Entity[]> cachedChunks = new HashMap<>();
 
     public void clearChunkCache() {
@@ -23,12 +22,15 @@ public class EntityUtils {
     private Set<CachedChunk> getNearbyChunks(Location location, double radius, boolean singleChunk) {
         World world = location.getWorld();
         Set<CachedChunk> chunks = new HashSet<>();
-        if (world == null) return chunks;
+        if (world == null) {
+            return chunks;
+        }
 
         CachedChunk firstChunk = new CachedChunk(location);
         chunks.add(firstChunk);
-
-        if (singleChunk) return chunks;
+        if (singleChunk) {
+            return chunks;
+        }
 
         int minX = (int) Math.floor(((location.getX() - radius) - 2.0D) / 16.0D);
         int maxX = (int) Math.floor(((location.getX() + radius) + 2.0D) / 16.0D);
@@ -37,7 +39,10 @@ public class EntityUtils {
 
         for (int x = minX; x <= maxX; ++x) {
             for (int z = minZ; z <= maxZ; ++z) {
-                if (firstChunk.getX() == x && firstChunk.getZ() == z) continue;
+                if (firstChunk.getX() == x && firstChunk.getZ() == z) {
+                    continue;
+                }
+
                 chunks.add(new CachedChunk(world.getName(), x, z));
             }
         }
@@ -48,16 +53,18 @@ public class EntityUtils {
         List<LivingEntity> entities = new ArrayList<>();
         for (CachedChunk chunk : getNearbyChunks(location, radius, singleChunk)) {
             Entity[] entityArray;
-            if (cachedChunks.containsKey(chunk)) {
-                entityArray = cachedChunks.get(chunk);
+            if (this.cachedChunks.containsKey(chunk)) {
+                entityArray = this.cachedChunks.get(chunk);
             } else {
                 entityArray = chunk.getEntities();
-                cachedChunks.put(chunk, entityArray);
+                this.cachedChunks.put(chunk, entityArray);
             }
             for (Entity e : entityArray) {
-                if (e.getWorld() != location.getWorld()
-                        || !(e instanceof LivingEntity)
-                        || (!singleChunk && location.distanceSquared(e.getLocation()) >= radius * radius)) continue;
+                if (e.getWorld() != location.getWorld() ||
+                        !(e instanceof LivingEntity) ||
+                        (!singleChunk && location.distanceSquared(e.getLocation()) >= radius * radius)) {
+                    continue;
+                }
                 entities.add((LivingEntity) e);
             }
         }

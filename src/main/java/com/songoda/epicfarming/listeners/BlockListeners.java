@@ -22,12 +22,7 @@ import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.permissions.PermissionAttachmentInfo;
 
-/**
- * Created by songoda on 3/14/2017.
- */
-@SuppressWarnings("Duplicates")
 public class BlockListeners implements Listener {
-
     private final EpicFarming plugin;
 
     public BlockListeners(EpicFarming plugin) {
@@ -36,25 +31,30 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockFade(BlockFadeEvent e) {
-        Farm farm = plugin.getFarmManager().checkForFarm(e.getBlock().getLocation());
-        if (farm != null && farm.getFarmType() != FarmType.LIVESTOCK)
+        Farm farm = this.plugin.getFarmManager().checkForFarm(e.getBlock().getLocation());
+        if (farm != null && farm.getFarmType() != FarmType.LIVESTOCK) {
             e.setCancelled(true);
+        }
     }
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onGrow(BlockGrowEvent e) {
-        Farm farm = plugin.getFarmManager().checkForFarm(e.getBlock().getLocation());
-        if (farm != null && farm.getFarmType() != FarmType.LIVESTOCK)
+        Farm farm = this.plugin.getFarmManager().checkForFarm(e.getBlock().getLocation());
+        if (farm != null && farm.getFarmType() != FarmType.LIVESTOCK) {
             e.setCancelled(true);
+        }
     }
 
     private int maxFarms(Player player) {
         int limit = -1;
         for (PermissionAttachmentInfo permissionAttachmentInfo : player.getEffectivePermissions()) {
-            if (!permissionAttachmentInfo.getPermission().toLowerCase().startsWith("epicfarming.limit")) continue;
+            if (!permissionAttachmentInfo.getPermission().toLowerCase().startsWith("epicfarming.limit")) {
+                continue;
+            }
             int num = Integer.parseInt(permissionAttachmentInfo.getPermission().split("\\.")[2]);
-            if (num > limit)
+            if (num > limit) {
                 limit = num;
+            }
         }
         return limit;
     }
@@ -63,39 +63,45 @@ public class BlockListeners implements Listener {
     public void onBlockPlace(BlockPlaceEvent e) {
         Material farmBlock = Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getBlockMaterial();
 
-        if (e.getPlayer().getItemInHand().getType() != farmBlock
-                || plugin.getLevelFromItem(e.getItemInHand()) == 0 && !Settings.NON_COMMAND_FARMS.getBoolean())
+        if (e.getPlayer().getItemInHand().getType() != farmBlock || (this.plugin.getLevelFromItem(e.getItemInHand()) == 0 && !Settings.NON_COMMAND_FARMS.getBoolean())) {
             return;
+        }
 
-        if (e.getBlockAgainst().getType() == farmBlock) e.setCancelled(true);
+        if (e.getBlockAgainst().getType() == farmBlock) {
+            e.setCancelled(true);
+        }
 
         int amt = 0;
-        for (Farm farmm : plugin.getFarmManager().getFarms().values()) {
-            if (farmm.getPlacedBy() == null || !farmm.getPlacedBy().equals(e.getPlayer().getUniqueId())) continue;
+        for (Farm farm : this.plugin.getFarmManager().getFarms().values()) {
+            if (farm.getPlacedBy() == null || !farm.getPlacedBy().equals(e.getPlayer().getUniqueId())) {
+                continue;
+            }
             amt++;
         }
         int limit = maxFarms(e.getPlayer());
 
         if (limit != -1 && amt >= limit) {
             e.setCancelled(true);
-            plugin.getLocale().getMessage("event.limit.hit")
+            this.plugin.getLocale().getMessage("event.limit.hit")
                     .processPlaceholder("limit", limit).sendPrefixedMessage(e.getPlayer());
             return;
         }
 
         Location location = e.getBlock().getLocation();
-        if (e.getBlockPlaced().getType().equals(Material.MELON_SEEDS) || e.getBlockPlaced().getType().equals(Material.PUMPKIN_SEEDS)) {
-            if (plugin.getFarmManager().checkForFarm(location) != null) {
-                plugin.getLocale().getMessage("event.warning.noauto").sendPrefixedMessage(e.getPlayer());
+        if (e.getBlockPlaced().getType() == Material.MELON_SEEDS || e.getBlockPlaced().getType() == Material.PUMPKIN_SEEDS) {
+            if (this.plugin.getFarmManager().checkForFarm(location) != null) {
+                this.plugin.getLocale().getMessage("event.warning.noauto").sendPrefixedMessage(e.getPlayer());
             }
         }
-        int level = plugin.getLevelFromItem(e.getItemInHand());
-        Bukkit.getScheduler().runTaskLater(plugin, () -> {
-            if (location.getBlock().getType() != farmBlock) return;
+        int level = this.plugin.getLevelFromItem(e.getItemInHand());
+        Bukkit.getScheduler().runTaskLater(this.plugin, () -> {
+            if (location.getBlock().getType() != farmBlock) {
+                return;
+            }
 
-            Farm farm = new Farm(location, plugin.getLevelManager().getLevel(level == 0 ? 1 : level), e.getPlayer().getUniqueId());
-            plugin.getFarmManager().addFarm(location, farm);
-            plugin.getDataManager().createFarm(farm);
+            Farm farm = new Farm(location, this.plugin.getLevelManager().getLevel(level == 0 ? 1 : level), e.getPlayer().getUniqueId());
+            this.plugin.getFarmManager().addFarm(location, farm);
+            this.plugin.getDataManager().createFarm(farm);
 
             farm.tillLand();
         }, 1);
@@ -103,21 +109,23 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial())
+        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial()) {
             return;
+        }
 
-        Farm farm = plugin.getFarmManager().removeFarm(event.getBlock().getLocation());
+        Farm farm = this.plugin.getFarmManager().removeFarm(event.getBlock().getLocation());
+        if (farm == null) {
+            return;
+        }
 
-        if (farm == null) return;
-
-        plugin.getDataManager().deleteFarm(farm);
+        this.plugin.getDataManager().deleteFarm(farm);
         farm.forceMenuClose();
 
-        plugin.getFarmTask().getCrops(farm, false);
+        this.plugin.getFarmTask().getCrops(farm, false);
 
         event.setCancelled(true);
 
-        ItemStack item = plugin.makeFarmItem(farm.getLevel());
+        ItemStack item = this.plugin.makeFarmItem(farm.getLevel());
 
         Block block = event.getBlock();
 
@@ -131,20 +139,23 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
-        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial())
+        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial()) {
             return;
+        }
 
-        Farm farm = plugin.getFarmManager().removeFarm(event.getBlock().getLocation());
+        Farm farm = this.plugin.getFarmManager().removeFarm(event.getBlock().getLocation());
 
-        if (farm == null) return;
-        plugin.getFarmTask().getCrops(farm, false);
+        if (farm == null) {
+            return;
+        }
+        this.plugin.getFarmTask().getCrops(farm, false);
 
-        plugin.getDataManager().deleteFarm(farm);
+        this.plugin.getDataManager().deleteFarm(farm);
         farm.forceMenuClose();
 
         event.setCancelled(true);
 
-        ItemStack item = plugin.makeFarmItem(farm.getLevel());
+        ItemStack item = this.plugin.makeFarmItem(farm.getLevel());
 
         Block block = event.getBlock();
 
@@ -159,7 +170,7 @@ public class BlockListeners implements Listener {
     @EventHandler(priority = EventPriority.LOWEST, ignoreCancelled = true)
     public void onBlockFromToEventMonitor(BlockFromToEvent event) {
         // prevent water/lava/egg griefs
-        if (plugin.getFarmManager().getFarm(event.getToBlock()) != null) {
+        if (this.plugin.getFarmManager().getFarm(event.getToBlock()) != null) {
             event.setCancelled(true);
         }
     }
