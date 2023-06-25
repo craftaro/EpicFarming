@@ -68,6 +68,14 @@
                                         <exclude>LICENSE.**</exclude>
                                     </excludes>
                                 </filter>
+
+                                <filter>
+                                    <artifact>com.craftaro:CraftaroCore</artifact>
+                                    <excludeDefaults>false</excludeDefaults>
+                                    <includes>
+                                        <include>**/nms/v*/**</include>
+                                    </includes>
+                                </filter>
                             </filters>
                         </configuration>
                     </execution>
