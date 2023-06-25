@@ -20,7 +20,7 @@ public class UnloadListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onUnload(ChunkUnloadEvent event) {
-        Material type = Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial();
+        Material type = Settings.FARM_BLOCK_MATERIAL.getMaterial().parseMaterial();
         for (Farm farm : new ArrayList<>(this.plugin.getFarmManager().getFarms().values())) {
             int x = farm.getLocation().getBlockX() >> 4;
             int z = farm.getLocation().getBlockZ() >> 4;

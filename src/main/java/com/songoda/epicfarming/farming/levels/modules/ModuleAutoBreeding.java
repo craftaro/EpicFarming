@@ -1,9 +1,9 @@
 package com.songoda.epicfarming.farming.levels.modules;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
-import com.songoda.core.compatibility.CompatibleParticleHandler;
-import com.songoda.core.gui.GuiUtils;
-import com.songoda.core.hooks.EntityStackerManager;
+import com.craftaro.core.compatibility.CompatibleParticleHandler;
+import com.craftaro.core.gui.GuiUtils;
+import com.craftaro.core.hooks.EntityStackerManager;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmType;
@@ -84,7 +84,7 @@ public class ModuleAutoBreeding extends Module {
                     } else {
                         handleBreed(entity);
                     }
-                    Bukkit.getScheduler().runTask(this.plugin, () -> Methods.animate(farm.getLocation(), CompatibleMaterial.EGG));
+                    Bukkit.getScheduler().runTask(this.plugin, () -> Methods.animate(farm.getLocation(), XMaterial.EGG));
                     return;
                 }
 
@@ -131,7 +131,7 @@ public class ModuleAutoBreeding extends Module {
 
     @Override
     public ItemStack getGUIButton(Farm farm) {
-        return GuiUtils.createButtonItem(CompatibleMaterial.EGG, this.plugin.getLocale().getMessage("interface.button.autobreeding")
+        return GuiUtils.createButtonItem(XMaterial.EGG, this.plugin.getLocale().getMessage("interface.button.autobreeding")
                         .processPlaceholder("status", isEnabled(farm)
                                 ? this.plugin.getLocale().getMessage("general.interface.on").getMessage()
                                 : this.plugin.getLocale().getMessage("general.interface.off").getMessage())

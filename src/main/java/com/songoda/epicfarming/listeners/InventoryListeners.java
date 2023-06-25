@@ -27,7 +27,7 @@ public class InventoryListeners implements Listener {
                 event.getAction() != InventoryAction.NOTHING &&
                 event.getCurrentItem().getType() != Material.AIR) {
             ItemStack item = event.getCurrentItem();
-            if (item.getType() == Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial()) {
+            if (item.getType() == Settings.FARM_BLOCK_MATERIAL.getMaterial().parseMaterial()) {
                 event.setCancelled(true);
             }
         }

@@ -1,10 +1,10 @@
 package com.songoda.epicfarming.settings;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
-import com.songoda.core.compatibility.ServerVersion;
-import com.songoda.core.configuration.Config;
-import com.songoda.core.configuration.ConfigSetting;
-import com.songoda.core.hooks.EconomyManager;
+import com.craftaro.core.compatibility.CompatibleMaterial;
+import com.craftaro.core.compatibility.ServerVersion;
+import com.craftaro.core.configuration.Config;
+import com.craftaro.core.configuration.ConfigSetting;
+import com.craftaro.core.hooks.EconomyManager;
 import com.songoda.epicfarming.EpicFarming;
 
 import java.util.Arrays;

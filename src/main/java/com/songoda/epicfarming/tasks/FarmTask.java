@@ -1,8 +1,10 @@
 package com.songoda.epicfarming.tasks;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
-import com.songoda.core.compatibility.ServerVersion;
-import com.songoda.core.utils.BlockUtils;
+import com.craftaro.core.compatibility.CompatibleMaterial;
+import com.craftaro.core.compatibility.ServerVersion;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XBlock;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.core.utils.BlockUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.farming.Farm;
@@ -22,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -52,9 +55,9 @@ public class FarmTask extends BukkitRunnable {
                     for (int fy = -2; fy <= 1; fy++) {
                         for (int fz = -radius; fz <= radius; fz++) {
                             Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
-                            CompatibleMaterial mat = CompatibleMaterial.getBlockMaterial(b2.getType());
+                            Optional<XMaterial> mat = CompatibleMaterial.getMaterial(b2.getType());
 
-                            if (mat == null || !mat.isCrop()) {
+                            if (!mat.isPresent() || !XBlock.isCrop(mat.get())) {
                                 continue;
                             }
 

@@ -1,10 +1,13 @@
 package com.songoda.epicfarming.farming;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
-import com.songoda.core.compatibility.CompatibleParticleHandler;
-import com.songoda.core.compatibility.CompatibleSound;
-import com.songoda.core.hooks.EconomyManager;
-import com.songoda.core.hooks.ProtectionManager;
+import com.craftaro.core.compatibility.CompatibleMaterial;
+import com.craftaro.core.compatibility.CompatibleParticleHandler;
+import com.craftaro.core.compatibility.CompatibleSound;
+import com.craftaro.core.hooks.EconomyManager;
+import com.craftaro.core.hooks.ProtectionManager;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XBlock;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XSound;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.levels.Level;
 import com.songoda.epicfarming.gui.OverviewGui;
@@ -18,7 +21,13 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Random;
+import java.util.UUID;
 
 public class Farm {
     // This is the unique identifier for this farm.
@@ -153,18 +162,18 @@ public class Farm {
                     Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
 
                     // ToDo: enum for all flowers.
-                    if (Settings.BREAKABLE_BLOCKS.getStringList().contains(CompatibleMaterial.getMaterial(b2.getType()).name())) {
+                    if (Settings.BREAKABLE_BLOCKS.getStringList().contains(CompatibleMaterial.getMaterial(b2.getType()).get().name())) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
-                            b2.getRelative(BlockFace.DOWN).setType(CompatibleMaterial.FARMLAND.getMaterial());
+                            XBlock.setType(b2.getRelative(BlockFace.DOWN), XMaterial.FARMLAND);
                             b2.breakNaturally();
-                            b2.getWorld().playSound(b2.getLocation(), CompatibleSound.BLOCK_GRASS_BREAK.getSound(), 10, 15);
+                            XSound.BLOCK_GRASS_BREAK.play(b2.getLocation(), 10, 15);
                         }, random.nextInt(30) + 1);
                     }
-                    if ((b2.getType() == CompatibleMaterial.GRASS_BLOCK.getMaterial()
+                    if ((b2.getType() == XMaterial.GRASS_BLOCK.parseMaterial()
                             || b2.getType() == Material.DIRT) && b2.getRelative(BlockFace.UP).getType() == Material.AIR) {
                         Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
-                            b2.setType(CompatibleMaterial.FARMLAND.getMaterial());
-                            b2.getWorld().playSound(b2.getLocation(), CompatibleSound.BLOCK_GRASS_BREAK.getSound(), 10, 15);
+                            XBlock.setType(b2, XMaterial.FARMLAND);
+                            XSound.BLOCK_GRASS_BREAK.play(b2.getLocation(), 10, 15);
                         }, random.nextInt(30) + 1);
                     }
                 }

@@ -1,6 +1,6 @@
 package com.songoda.epicfarming.listeners;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmType;
@@ -61,7 +61,7 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockPlace(BlockPlaceEvent e) {
-        Material farmBlock = Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getBlockMaterial();
+        Material farmBlock = Settings.FARM_BLOCK_MATERIAL.getMaterial(XMaterial.END_ROD).parseMaterial();
 
         if (e.getPlayer().getItemInHand().getType() != farmBlock || (this.plugin.getLevelFromItem(e.getItemInHand()) == 0 && !Settings.NON_COMMAND_FARMS.getBoolean())) {
             return;
@@ -109,7 +109,7 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockBreak(BlockBreakEvent event) {
-        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial()) {
+        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(XMaterial.END_ROD).parseMaterial()) {
             return;
         }
 
@@ -139,7 +139,7 @@ public class BlockListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onBlockExplode(BlockExplodeEvent event) {
-        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial()) {
+        if (event.getBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(XMaterial.END_ROD).parseMaterial()) {
             return;
         }
 

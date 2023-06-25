@@ -1,6 +1,6 @@
 package com.songoda.epicfarming.listeners;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.settings.Settings;
 import com.songoda.skyblock.SkyBlock;
@@ -26,13 +26,11 @@ public class InteractListeners implements Listener {
         }
         Location location = e.getClickedBlock().getLocation();
 
-        if (e.getItem() != null &&
-                CompatibleMaterial.getMaterial(e.getItem()) == CompatibleMaterial.BONE_MEAL &&
-                this.plugin.getFarmManager().checkForFarm(location) != null) {
+        if (e.getItem() != null && XMaterial.BONE_MEAL.isSimilar(e.getItem()) && this.plugin.getFarmManager().checkForFarm(location) != null) {
             e.setCancelled(true);
         }
 
-        if (e.getClickedBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial().getMaterial()) {
+        if (e.getClickedBlock().getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial().parseMaterial()) {
             return;
         }
 

@@ -1,6 +1,6 @@
 package com.songoda.epicfarming.farming.levels.modules;
 
-import com.songoda.core.configuration.Config;
+import com.craftaro.core.configuration.Config;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.utils.Methods;

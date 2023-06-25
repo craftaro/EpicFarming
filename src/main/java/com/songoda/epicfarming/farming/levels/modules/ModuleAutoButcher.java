@@ -1,9 +1,9 @@
 package com.songoda.epicfarming.farming.levels.modules;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
-import com.songoda.core.compatibility.CompatibleSound;
-import com.songoda.core.gui.GuiUtils;
-import com.songoda.core.hooks.EntityStackerManager;
+import com.craftaro.core.gui.GuiUtils;
+import com.craftaro.core.hooks.EntityStackerManager;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XSound;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.FarmType;
@@ -59,17 +59,16 @@ public class ModuleAutoButcher extends Module {
             count += stackSize;
         }
 
-        if (count <= 2 || !farm.willFit(CompatibleMaterial.STONE.getItem())) {
+        if (count <= 2 || !farm.willFit(XMaterial.STONE.parseItem())) {
             return;
         }
 
         for (LivingEntity entity : entities) {
             entity.setMetadata("EFA-TAGGED", new FixedMetadataValue(this.plugin, farm.getLocation()));
-            entity.getLocation().getWorld().playSound(entity.getLocation(),
-                    CompatibleSound.ENTITY_PLAYER_ATTACK_SWEEP.getSound(), 1L, 1L);
+            XSound.ENTITY_PLAYER_ATTACK_SWEEP.play(entity);
             Bukkit.getScheduler().runTask(this.plugin, () -> {
                 entity.damage(99999999, entity);
-                Methods.animate(farm.getLocation(), CompatibleMaterial.IRON_SWORD);
+                Methods.animate(farm.getLocation(), XMaterial.IRON_SWORD);
             });
             return;
         }
@@ -77,7 +76,7 @@ public class ModuleAutoButcher extends Module {
 
     @Override
     public ItemStack getGUIButton(Farm farm) {
-        return GuiUtils.createButtonItem(CompatibleMaterial.STONE_SWORD, this.plugin.getLocale().getMessage("interface.button.autobutcher")
+        return GuiUtils.createButtonItem(XMaterial.STONE_SWORD, this.plugin.getLocale().getMessage("interface.button.autobutcher")
                         .processPlaceholder("status", isEnabled(farm)
                                 ? this.plugin.getLocale().getMessage("general.interface.on").getMessage()
                                 : this.plugin.getLocale().getMessage("general.interface.off").getMessage())

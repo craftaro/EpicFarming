@@ -1,6 +1,7 @@
 package com.songoda.epicfarming.listeners;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XBlock;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Farm;
 import com.songoda.epicfarming.farming.levels.modules.Module;
@@ -92,7 +93,7 @@ public class EntityListeners implements Listener {
             event.setCancelled(true);
             Block block = event.getEntity().getLocation().getBlock().getRelative(BlockFace.DOWN);
             if (block.getType() == Material.DIRT) {
-                block.setType(Material.GRASS_BLOCK);
+                XBlock.setType(block, XMaterial.GRASS_BLOCK);
             }
         }
     }
@@ -104,7 +105,7 @@ public class EntityListeners implements Listener {
         List<Block> toCancel = new ArrayList<>();
         while (it.hasNext()) {
             Block block = it.next();
-            if (block.getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getMaterial()) {
+            if (block.getType() != Settings.FARM_BLOCK_MATERIAL.getMaterial(XMaterial.END_ROD).parseMaterial()) {
                 continue;
             }
 

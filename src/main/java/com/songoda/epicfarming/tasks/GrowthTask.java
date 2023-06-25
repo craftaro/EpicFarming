@@ -1,7 +1,9 @@
 package com.songoda.epicfarming.tasks;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
-import com.songoda.core.utils.BlockUtils;
+import com.craftaro.core.compatibility.CompatibleMaterial;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XBlock;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.core.utils.BlockUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.Crop;
 import com.songoda.epicfarming.farming.FarmType;
@@ -13,6 +15,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ThreadLocalRandom;
 
 public class GrowthTask extends BukkitRunnable {
@@ -31,8 +34,8 @@ public class GrowthTask extends BukkitRunnable {
                 continue;
             }
 
-            CompatibleMaterial blockMat = CompatibleMaterial.getBlockMaterial(crop.getLocation().getBlock().getType());
-            if (!blockMat.isCrop()) {
+            Optional<XMaterial> blockMat = CompatibleMaterial.getMaterial(crop.getLocation().getBlock().getType());
+            if (!blockMat.isPresent() || !XBlock.isCrop(blockMat.get())) {
                 toRemove.add(crop);
                 continue;
             }

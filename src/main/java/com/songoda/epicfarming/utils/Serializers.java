@@ -1,6 +1,6 @@
 package com.songoda.epicfarming.utils;
 
-import com.songoda.core.utils.NumberUtils;
+import com.craftaro.core.utils.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Color;
@@ -19,7 +19,7 @@ import java.util.Map;
 public class Serializers {
     public static String serialize(ItemStack item) {
         StringBuilder builder = new StringBuilder();
-        builder.append(item.getType().toString());
+        builder.append(item.getType());
         if (item.getDurability() != 0) {
             builder.append(":").append(item.getDurability());
         }

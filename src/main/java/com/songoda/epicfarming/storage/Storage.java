@@ -1,6 +1,6 @@
 package com.songoda.epicfarming.storage;
 
-import com.songoda.core.configuration.Config;
+import com.craftaro.core.configuration.Config;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;

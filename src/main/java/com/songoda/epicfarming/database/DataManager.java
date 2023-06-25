@@ -1,8 +1,8 @@
 package com.songoda.epicfarming.database;
 
-import com.songoda.core.database.DataManagerAbstract;
-import com.songoda.core.database.DatabaseConnector;
-import com.songoda.core.utils.ItemSerializer;
+import com.craftaro.core.database.DataManagerAbstract;
+import com.craftaro.core.database.DatabaseConnector;
+import com.craftaro.core.utils.ItemSerializer;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;

@@ -1,6 +1,6 @@
 package com.songoda.epicfarming.farming;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
 import com.songoda.epicfarming.farming.levels.Level;
 import com.songoda.epicfarming.farming.levels.LevelManager;
 import com.songoda.epicfarming.settings.Settings;
@@ -45,8 +45,7 @@ public class FarmManager {
     }
 
     public Farm checkForFarm(Location location) {
-        Material farmBlock = Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD).getBlockMaterial();
-
+        Material farmBlock = Settings.FARM_BLOCK_MATERIAL.getMaterial(XMaterial.END_ROD).parseMaterial();
 
         Block block = location.getBlock();
         for (Level level : this.levelManager.getLevels().values()) {

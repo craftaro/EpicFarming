@@ -1,8 +1,10 @@
 package com.songoda.epicfarming.farming.levels.modules;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
-import com.songoda.core.gui.GuiUtils;
-import com.songoda.core.utils.BlockUtils;
+import com.craftaro.core.compatibility.CompatibleMaterial;
+import com.craftaro.core.gui.GuiUtils;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XBlock;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.core.utils.BlockUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;
@@ -63,7 +65,7 @@ public class ModuleAutoCollect extends Module {
 
     private void collectCrops(Farm farm, List<Block> crops) {
         for (Block block : crops) {
-            if (BlockUtils.isCropFullyGrown(block) && isEnabled(farm) && doCropDrop(farm, CompatibleMaterial.getBlockMaterial(block.getType()))) {
+            if (BlockUtils.isCropFullyGrown(block) && isEnabled(farm) && doCropDrop(farm, CompatibleMaterial.getMaterial(block.getType()).get())) {
                 if (farm.getLevel().isAutoReplant()) {
                     Bukkit.getScheduler().runTask(this.plugin, () ->
                             BlockUtils.resetGrowthStage(block));
@@ -110,7 +112,7 @@ public class ModuleAutoCollect extends Module {
                     doLivestockDrop(farm, new ItemStack(Material.EGG, 1));
                 }
                 Bukkit.getScheduler().runTask(this.plugin, () ->
-                        Methods.animate(farm.getLocation(), CompatibleMaterial.EGG));
+                        Methods.animate(farm.getLocation(), XMaterial.EGG));
             } else if (entity instanceof Sheep) {
                 if (!((Ageable) entity).isAdult()) {
                     continue;
@@ -147,7 +149,7 @@ public class ModuleAutoCollect extends Module {
 
     @Override
     public ItemStack getGUIButton(Farm farm) {
-        return GuiUtils.createButtonItem(CompatibleMaterial.BUCKET, this.plugin.getLocale().getMessage("interface.button.autocollect")
+        return GuiUtils.createButtonItem(XMaterial.BUCKET, this.plugin.getLocale().getMessage("interface.button.autocollect")
                         .processPlaceholder("status", isEnabled(farm)
                                 ? this.plugin.getLocale().getMessage("general.interface.on").getMessage()
                                 : this.plugin.getLocale().getMessage("general.interface.off").getMessage()).getMessage(),
@@ -194,10 +196,10 @@ public class ModuleAutoCollect extends Module {
 
     private boolean useBoneMeal(Farm farm) {
         for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
-            if (item == null || item.getType() != CompatibleMaterial.BONE_MEAL.getMaterial()) {
+            if (item == null || item.getType() != XMaterial.BONE_MEAL.parseMaterial()) {
                 continue;
             }
-            farm.removeMaterial(CompatibleMaterial.BONE_MEAL.getMaterial(), 1);
+            farm.removeMaterial(XMaterial.BONE_MEAL.parseMaterial(), 1);
             return true;
         }
 
@@ -225,17 +227,19 @@ public class ModuleAutoCollect extends Module {
         }
     }
 
-    private boolean doCropDrop(Farm farm, CompatibleMaterial material) {
-        if (material == null || farm == null || !material.isCrop() || !this.plugin.isEnabled()) {
+    private boolean doCropDrop(Farm farm, XMaterial material) {
+        if (material == null || farm == null || !XBlock.isCrop(material) || !this.plugin.isEnabled()) {
             return false;
         }
 
         BoostData boostData = this.plugin.getBoostManager().getBoost(farm.getPlacedBy());
 
-        CompatibleMaterial yield = material.getCropYield();
+        XMaterial yield = CompatibleMaterial.getYieldForCrop(material);
 
-        ItemStack stack = yield.getItem((useBoneMeal(farm) ? random.nextInt(2) + 2 : 1) * (boostData == null ? 1 : boostData.getMultiplier()));
-        ItemStack seedStack = material.getCropSeed().getItem(random.nextInt(3) + 1 + (useBoneMeal(farm) ? 1 : 0));
+        ItemStack stack = yield.parseItem();
+        stack.setAmount((useBoneMeal(farm) ? random.nextInt(2) + 2 : 1) * (boostData == null ? 1 : boostData.getMultiplier()));
+        ItemStack seedStack = CompatibleMaterial.getSeedForCrop(material).parseItem();
+        seedStack.setAmount(random.nextInt(3) + 1 + (useBoneMeal(farm) ? 1 : 0));
 
         if (!farm.willFit(stack) || !farm.willFit(seedStack)) {
             return false;

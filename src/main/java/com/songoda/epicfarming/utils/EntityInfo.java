@@ -1,21 +1,21 @@
 package com.songoda.epicfarming.utils;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
 import org.bukkit.Material;
 import org.bukkit.entity.EntityType;
 
 public enum EntityInfo {
-    CHICKEN(EntityType.CHICKEN, CompatibleMaterial.WHEAT_SEEDS),
-    COW(EntityType.COW, CompatibleMaterial.WHEAT),
-    PIG(EntityType.PIG, CompatibleMaterial.CARROT),
-    SHEEP(EntityType.SHEEP, CompatibleMaterial.WHEAT);
+    CHICKEN(EntityType.CHICKEN, XMaterial.WHEAT_SEEDS),
+    COW(EntityType.COW, XMaterial.WHEAT),
+    PIG(EntityType.PIG, XMaterial.CARROT),
+    SHEEP(EntityType.SHEEP, XMaterial.WHEAT);
 
     private final EntityType entityType;
     private final Material material;
 
-    EntityInfo(EntityType entityType, CompatibleMaterial material) {
+    EntityInfo(EntityType entityType, XMaterial material) {
         this.entityType = entityType;
-        this.material = material.getMaterial();
+        this.material = material.parseMaterial();
     }
 
     public static EntityInfo of(EntityType entityType) {

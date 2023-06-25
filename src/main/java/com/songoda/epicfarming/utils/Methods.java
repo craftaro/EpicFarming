@@ -1,6 +1,6 @@
 package com.songoda.epicfarming.utils;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.settings.Settings;
 import org.bukkit.Bukkit;
@@ -29,8 +29,8 @@ public class Methods {
                 .getMessage();
     }
 
-    public static void animate(Location location, CompatibleMaterial material) {
-        animate(location, material.getItem());
+    public static void animate(Location location, XMaterial material) {
+        animate(location, material.parseItem());
     }
 
     public static void animate(Location location, ItemStack item) {

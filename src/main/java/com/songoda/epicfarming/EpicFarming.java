@@ -1,21 +1,21 @@
 package com.songoda.epicfarming;
 
-import com.songoda.core.SongodaCore;
-import com.songoda.core.SongodaPlugin;
-import com.songoda.core.commands.CommandManager;
-import com.songoda.core.compatibility.CompatibleMaterial;
-import com.songoda.core.compatibility.ServerVersion;
-import com.songoda.core.configuration.Config;
-import com.songoda.core.database.DataMigrationManager;
-import com.songoda.core.database.DatabaseConnector;
-import com.songoda.core.database.MySQLConnector;
-import com.songoda.core.database.SQLiteConnector;
-import com.songoda.core.gui.GuiManager;
-import com.songoda.core.hooks.EconomyManager;
-import com.songoda.core.hooks.EntityStackerManager;
-import com.songoda.core.hooks.ProtectionManager;
-import com.songoda.core.third_party.de.tr7zw.nbtapi.NBTItem;
-import com.songoda.core.utils.TextUtils;
+import com.craftaro.core.SongodaCore;
+import com.craftaro.core.SongodaPlugin;
+import com.craftaro.core.commands.CommandManager;
+import com.craftaro.core.compatibility.ServerVersion;
+import com.craftaro.core.configuration.Config;
+import com.craftaro.core.database.DataMigrationManager;
+import com.craftaro.core.database.DatabaseConnector;
+import com.craftaro.core.database.MySQLConnector;
+import com.craftaro.core.database.SQLiteConnector;
+import com.craftaro.core.gui.GuiManager;
+import com.craftaro.core.hooks.EconomyManager;
+import com.craftaro.core.hooks.EntityStackerManager;
+import com.craftaro.core.hooks.ProtectionManager;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.core.third_party.de.tr7zw.nbtapi.NBTItem;
+import com.craftaro.core.utils.TextUtils;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.boost.BoostManager;
 import com.songoda.epicfarming.commands.CommandBoost;
@@ -102,7 +102,7 @@ public class EpicFarming extends SongodaPlugin {
     @Override
     public void onPluginEnable() {
         // Run Songoda Updater
-        SongodaCore.registerPlugin(this, 21, CompatibleMaterial.WHEAT);
+        SongodaCore.registerPlugin(this, 21, XMaterial.WHEAT);
 
         // Load Economy
         EconomyManager.load();
@@ -218,7 +218,7 @@ public class EpicFarming extends SongodaPlugin {
                 converted = true;
                 Storage storage = new StorageYaml(this);
                 if (storage.containsGroup("farms")) {
-                    this.console.sendMessage("[" + getDescription().getName() + "] " + ChatColor.RED +
+                    Bukkit.getConsoleSender().sendMessage("[" + getDescription().getName() + "] " + ChatColor.RED +
                             "Conversion process starting. Do NOT turn off your server." +
                             "EpicFarming hasn't fully loaded yet, so make sure users don't" +
                             "interact with the plugin until the conversion process is complete.");
@@ -276,7 +276,7 @@ public class EpicFarming extends SongodaPlugin {
             final boolean finalConverted = converted;
             this.dataManager.runAsync(() -> {
                 if (finalConverted) {
-                    this.console.sendMessage("[" + getDescription().getName() + "] " + ChatColor.GREEN + "Conversion complete :)");
+                    Bukkit.getConsoleSender().sendMessage("[" + getDescription().getName() + "] " + ChatColor.GREEN + "Conversion complete :)");
                 }
 
                 this.dataManager.getFarms((farms) -> {
@@ -379,7 +379,7 @@ public class EpicFarming extends SongodaPlugin {
     }
 
     public ItemStack makeFarmItem(Level level) {
-        ItemStack item = Settings.FARM_BLOCK_MATERIAL.getMaterial().getItem();
+        ItemStack item = Settings.FARM_BLOCK_MATERIAL.getMaterial().parseItem();
         ItemMeta meta = item.getItemMeta();
         meta.setDisplayName(TextUtils.formatText(Methods.formatName(level.getLevel())));
         String line = getLocale().getMessage("general.nametag.lore").getMessage();

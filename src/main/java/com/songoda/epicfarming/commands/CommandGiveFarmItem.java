@@ -1,6 +1,6 @@
 package com.songoda.epicfarming.commands;
 
-import com.songoda.core.commands.AbstractCommand;
+import com.craftaro.core.commands.AbstractCommand;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.farming.levels.Level;
 import org.bukkit.Bukkit;

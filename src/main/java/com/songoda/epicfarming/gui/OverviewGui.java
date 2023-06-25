@@ -1,11 +1,11 @@
 package com.songoda.epicfarming.gui;
 
-import com.songoda.core.compatibility.CompatibleMaterial;
-import com.songoda.core.gui.CustomizableGui;
-import com.songoda.core.gui.GuiUtils;
-import com.songoda.core.utils.NumberUtils;
-import com.songoda.core.utils.TextUtils;
-import com.songoda.core.utils.TimeUtils;
+import com.craftaro.core.gui.CustomizableGui;
+import com.craftaro.core.gui.GuiUtils;
+import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.core.utils.NumberUtils;
+import com.craftaro.core.utils.TextUtils;
+import com.craftaro.core.utils.TimeUtils;
 import com.songoda.epicfarming.EpicFarming;
 import com.songoda.epicfarming.boost.BoostData;
 import com.songoda.epicfarming.farming.Farm;
@@ -20,7 +20,6 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -74,8 +73,8 @@ public class OverviewGui extends CustomizableGui {
         // enable page events
         if (this.level.getPages() > 1) {
             setPages(this.level.getPages());
-            setPrevPage(2, 0, GuiUtils.createButtonItem(CompatibleMaterial.ARROW, this.plugin.getLocale().getMessage("general.interface.previous").getMessage()));
-            setNextPage(2, 8, GuiUtils.createButtonItem(CompatibleMaterial.ARROW, this.plugin.getLocale().getMessage("general.interface.next").getMessage()));
+            setPrevPage(2, 0, GuiUtils.createButtonItem(XMaterial.ARROW, this.plugin.getLocale().getMessage("general.interface.previous").getMessage()));
+            setNextPage(2, 8, GuiUtils.createButtonItem(XMaterial.ARROW, this.plugin.getLocale().getMessage("general.interface.next").getMessage()));
             setOnPage((event) -> updateInventory());
         }
 
@@ -118,14 +117,14 @@ public class OverviewGui extends CustomizableGui {
             }
         }
 
-        setItem("farm", 13, GuiUtils.createButtonItem(Settings.FARM_BLOCK_MATERIAL.getMaterial(CompatibleMaterial.END_ROD),
+        setItem("farm", 13, GuiUtils.createButtonItem(Settings.FARM_BLOCK_MATERIAL.getMaterial(XMaterial.END_ROD),
                 this.plugin.getLocale().getMessage("general.nametag.farm")
                         .processPlaceholder("level", this.level.getLevel()).getMessage(),
                 farmLore));
 
         if (this.player != null && Settings.UPGRADE_WITH_XP.getBoolean() && this.player.hasPermission("EpicFarming.Upgrade.XP")) {
 
-            setButton("xp", 11, GuiUtils.createButtonItem(Settings.XP_ICON.getMaterial(CompatibleMaterial.EXPERIENCE_BOTTLE),
+            setButton("xp", 11, GuiUtils.createButtonItem(Settings.XP_ICON.getMaterial(XMaterial.EXPERIENCE_BOTTLE),
                             this.plugin.getLocale().getMessage("interface.button.upgradewithxp").getMessage(),
                             nextLevel != null
                                     ? this.plugin.getLocale().getMessage("interface.button.upgradewithxplore")
@@ -140,7 +139,7 @@ public class OverviewGui extends CustomizableGui {
 
         if (Settings.UPGRADE_WITH_ECONOMY.getBoolean() && this.player != null && this.player.hasPermission("EpicFarming.Upgrade.ECO")) {
 
-            setButton("eco", 15, GuiUtils.createButtonItem(Settings.ECO_ICON.getMaterial(CompatibleMaterial.SUNFLOWER),
+            setButton("eco", 15, GuiUtils.createButtonItem(Settings.ECO_ICON.getMaterial(XMaterial.SUNFLOWER),
                     this.plugin.getLocale().getMessage("interface.button.upgradewitheconomy").getMessage(),
                     nextLevel != null
                             ? this.plugin.getLocale().getMessage("interface.button.upgradewitheconomylore")
@@ -152,11 +151,11 @@ public class OverviewGui extends CustomizableGui {
             });
         }
 
-        Material farmTypeMaterial = CompatibleMaterial.WHEAT.getMaterial();
+        Material farmTypeMaterial = XMaterial.WHEAT.parseMaterial();
         if (this.farm.getFarmType() == FarmType.LIVESTOCK) {
-            farmTypeMaterial = CompatibleMaterial.BEEF.getMaterial();
+            farmTypeMaterial = XMaterial.BEEF.parseMaterial();
         } else if (this.farm.getFarmType() == FarmType.BOTH) {
-            farmTypeMaterial = CompatibleMaterial.GOLD_NUGGET.getMaterial();
+            farmTypeMaterial = XMaterial.GOLD_NUGGET.parseMaterial();
         }
 
         ItemStack farmType = new ItemStack(farmTypeMaterial, 1);
