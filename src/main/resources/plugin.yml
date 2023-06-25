@@ -1,13 +1,38 @@
-name: EpicFarming
-description: EpicFarming
-main: com.songoda.epicfarming.EpicFarming
-version: maven-version-number
-softdepend: [FabledSkyBlock, Arconix, SkyBlock, Towny, RedProtect, Kingdoms, PlotSquared, GriefPrevention, USkyBlock, ASkyBlock, WorldGuard, Factions, PlaceholderAPI, Vault, PlayerPoints, Reserve, StackMob, UltimateStacker, WildStacker, DecentHolograms]
-author: Songoda
+name: ${project.parent.name}
+description: ${project.parent.description}
+version: ${project.version}
 api-version: 1.13
+
+main: com.songoda.epicfarming.EpicFarming
+softdepend:
+  - Arconix
+  - ASkyBlock
+  - DecentHolograms
+  - FabledSkyBlock
+  - Factions
+  - GriefPrevention
+  - Kingdoms
+  - PlaceholderAPI
+  - PlayerPoints
+  - PlotSquared
+  - RedProtect
+  - Reserve
+  - SkyBlock
+  - StackMob
+  - Towny
+  - UltimateStacker
+  - USkyBlock
+  - Vault
+  - WildStacker
+  - WorldGuard
+
+author: Craftaro
+website: ${project.parent.url}
+
+# TODO: cleanup commands section
 commands:
   EFA:
     description: View information on this plugin.
     default: true
-    aliases: [EpicFarming]
+    aliases: [ EpicFarming ]
     usage: /efa
