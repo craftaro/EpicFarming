@@ -3,7 +3,7 @@
 <img src="https://craftaro.com/images/products/479/icons/uzlMhPaZ3d5rX1pFeK8ijaDuAzM1a4NpiKhScvro.png" width="128px">
 
 # EpicFarming
-**Allow your players to grow crops faster, automatically replant crops, harvest and store crop and animal produce in the farms inventory, as well as much more.**
+**Allow your players to grow crops faster, automatically replant, harvest and store crops and animal produce in the farm&#39;s inventory, as well as much more.**
 
 
 [![Discord][Discord shield]][Discord invite]
