@@ -1,5 +1,5 @@
-name: ${project.parent.name}
-description: ${project.parent.description}
+name: ${project.name}
+description: ${project.description}
 version: ${project.version}
 api-version: 1.13
 
@@ -27,7 +27,7 @@ softdepend:
   - WorldGuard
 
 author: Craftaro
-website: ${project.parent.url}
+website: ${project.url}
 
 # TODO: cleanup commands section
 commands:
