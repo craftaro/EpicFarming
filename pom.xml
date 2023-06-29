@@ -95,7 +95,7 @@
         </repository>
 
         <repository>
-            <id>spigot-repo</id>
+            <id>SpigotMC</id>
             <url>https://hub.spigotmc.org/nexus/content/repositories/snapshots/</url>
         </repository>
     </repositories>
