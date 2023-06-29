@@ -4,7 +4,7 @@
 
 ## Maven
 /**/target/
-dependency-reduced-pom.xml
+/dependency-reduced-pom.xml
 
 ## Misc.
 .DS_Store
