@@ -87,13 +87,13 @@ public class Settings {
         // convert glass pane settings
         int color;
         if ((color = GLASS_TYPE_1.getInt(-1)) != -1) {
-            CONFIG.set(GLASS_TYPE_1.getKey(), CompatibleMaterial.getGlassPaneColor(color).name());
+            CONFIG.set(GLASS_TYPE_1.getKey(), CompatibleMaterial.getGlassPaneForColor(color).name());
         }
         if ((color = GLASS_TYPE_2.getInt(-1)) != -1) {
-            CONFIG.set(GLASS_TYPE_2.getKey(), CompatibleMaterial.getGlassPaneColor(color).name());
+            CONFIG.set(GLASS_TYPE_2.getKey(), CompatibleMaterial.getGlassPaneForColor(color).name());
         }
         if ((color = GLASS_TYPE_3.getInt(-1)) != -1) {
-            CONFIG.set(GLASS_TYPE_3.getKey(), CompatibleMaterial.getGlassPaneColor(color).name());
+            CONFIG.set(GLASS_TYPE_3.getKey(), CompatibleMaterial.getGlassPaneForColor(color).name());
         }
 
         if (Settings.FARM_TICK_SPEED.getInt() == 70) {
