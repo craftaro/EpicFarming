@@ -2,7 +2,6 @@ package com.songoda.epicfarming.farming;
 
 import com.craftaro.core.compatibility.CompatibleMaterial;
 import com.craftaro.core.compatibility.CompatibleParticleHandler;
-import com.craftaro.core.compatibility.CompatibleSound;
 import com.craftaro.core.hooks.EconomyManager;
 import com.craftaro.core.hooks.ProtectionManager;
 import com.craftaro.core.third_party.com.cryptomorin.xseries.XBlock;
@@ -137,13 +136,13 @@ public class Farm {
         CompatibleParticleHandler.spawnParticles(Settings.PARTICLE_TYPE.getString(), loc, 200, .5, .5, .5);
 
         if (instance.getLevelManager().getHighestLevel() != level) {
-            CompatibleSound.ENTITY_PLAYER_LEVELUP.play(player, 0.6F, 15.0F);
+            XSound.ENTITY_PLAYER_LEVELUP.play(player, .6f, 15);
         } else {
-            CompatibleSound.ENTITY_PLAYER_LEVELUP.play(player, 2F, 25.0F);
+            XSound.ENTITY_PLAYER_LEVELUP.play(player, 2, 25);
 
-            CompatibleSound.BLOCK_NOTE_BLOCK_CHIME.play(player, 2F, 25.0F);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> CompatibleSound.BLOCK_NOTE_BLOCK_CHIME.play(player, 1.2F, 35.0F), 5L);
-            Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> CompatibleSound.BLOCK_NOTE_BLOCK_CHIME.play(player, 1.8F, 35.0F), 10L);
+            XSound.BLOCK_NOTE_BLOCK_CHIME.play(player, 2, 25);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> XSound.BLOCK_NOTE_BLOCK_CHIME.play(player, 1.2f, 35), 5);
+            Bukkit.getScheduler().scheduleSyncDelayedTask(instance, () -> XSound.BLOCK_NOTE_BLOCK_CHIME.play(player, 1.8f, 35), 10);
         }
     }
 
