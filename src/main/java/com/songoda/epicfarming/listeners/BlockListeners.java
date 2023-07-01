@@ -99,7 +99,7 @@ public class BlockListeners implements Listener {
                 return;
             }
 
-            Farm farm = new Farm(location, this.plugin.getLevelManager().getLevel(level == 0 ? 1 : level), e.getPlayer().getUniqueId(), FarmType.CROPS); //TODO check if the FarmType is correct
+            Farm farm = new Farm(location, this.plugin.getLevelManager().getLevel(level == 0 ? 1 : level), e.getPlayer().getUniqueId(), FarmType.BOTH);
             this.plugin.getFarmManager().addFarm(location, farm);
             this.plugin.getDataManager().save(farm);
 

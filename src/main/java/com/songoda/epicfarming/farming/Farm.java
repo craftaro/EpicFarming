@@ -50,7 +50,7 @@ public class Farm implements Data {
     private UUID viewing = null;
     private long lastCached = 0;
 
-    private FarmType farmType = FarmType.BOTH;
+    private FarmType farmType;
 
     private final Map<String, Object> moduleCache = new HashMap<>();
 
