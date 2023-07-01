@@ -35,7 +35,7 @@ public class BoostManager {
         for (BoostData boostData : this.registeredBoosts) {
             if (boostData.getPlayer().toString().equals(player.toString())) {
                 if (System.currentTimeMillis() >= boostData.getEndTime()) {
-                    EpicFarming.getPlugin(EpicFarming.class).getDataManager().deleteBoost(boostData);
+                    EpicFarming.getPlugin(EpicFarming.class).getDataManager().delete(boostData);
                     removeBoostFromPlayer(boostData);
                 }
                 return boostData;

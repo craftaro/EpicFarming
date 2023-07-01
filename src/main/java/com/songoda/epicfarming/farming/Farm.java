@@ -2,6 +2,8 @@ package com.songoda.epicfarming.farming;
 
 import com.craftaro.core.compatibility.CompatibleMaterial;
 import com.craftaro.core.compatibility.CompatibleParticleHandler;
+import com.craftaro.core.database.Data;
+import com.craftaro.core.database.SerializedLocation;
 import com.craftaro.core.hooks.EconomyManager;
 import com.craftaro.core.hooks.ProtectionManager;
 import com.craftaro.core.third_party.com.cryptomorin.xseries.XBlock;
@@ -28,13 +30,13 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-public class Farm {
+public class Farm implements Data {
     // This is the unique identifier for this farm.
     // It is reset on every plugin load.
     private final UUID uniqueId = UUID.randomUUID();
 
     // Id for database usage.
-    private int id;
+    private final int id;
 
     private boolean needsToBeSaved = false;
 
@@ -52,10 +54,35 @@ public class Farm {
 
     private final Map<String, Object> moduleCache = new HashMap<>();
 
-    public Farm(Location location, Level level, UUID placedBy) {
+    /**
+     * This is the constructor for a new farm.
+     * It is used when a player places a new farm.
+     *
+     * @param location The location of the farm.
+     * @param level    The level of the farm.
+     * @param placedBy The player who placed the farm.
+     * @param farmType The type of farm.
+     */
+    public Farm(Location location, Level level, UUID placedBy, FarmType farmType) {
+        this(EpicFarming.getPlugin(EpicFarming.class).getDataManager().getNextId("active_farms"), location, level, placedBy, farmType);
+    }
+
+    /**
+     * This is the constructor for a new farm.
+     * It is used when we load a farm from the database.
+     *
+     * @param id       The id of the farm.
+     * @param location The location of the farm.
+     * @param level    The level of the farm.
+     * @param placedBy The player who placed the farm.
+     * @param farmType The type of farm.
+     */
+    public Farm(int id, Location location, Level level, UUID placedBy, FarmType farmType) {
+        this.id = id;
         this.location = location;
         this.level = level;
         this.placedBy = placedBy;
+        this.farmType = farmType;
     }
 
     public void view(Player player, boolean force) {
@@ -123,7 +150,7 @@ public class Farm {
     private void upgradeFinal(Level level, Player player) {
         EpicFarming instance = EpicFarming.getInstance();
         this.level = level;
-        instance.getDataManager().updateFarm(this);
+        instance.getDataManager().save(this);
         if (instance.getLevelManager().getHighestLevel() != level) {
             instance.getLocale().getMessage("event.upgrade.success")
                     .processPlaceholder("level", level.getLevel()).sendPrefixedMessage(player);
@@ -181,8 +208,40 @@ public class Farm {
         return false;
     }
 
-    public UUID getUniqueId() {
+    //Don't use getUniqueId here as it conflicts with the Data interface.
+    public UUID getFarmUUID() {
         return this.uniqueId;
+    }
+
+    @Override
+    public int getId() {
+        return this.id;
+    }
+
+    @Override
+    public Map<String, Object> serialize() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("id", this.id);
+        map.put("farm_type", this.farmType.name());
+        map.put("level", this.level.getLevel());
+        map.put("placed_by", this.placedBy.toString());
+        map.putAll(SerializedLocation.of(this.location));
+        return map;
+    }
+
+    @Override
+    public Data deserialize(Map<String, Object> map) {
+        int id = (int) map.get("id");
+        FarmType farmType = FarmType.valueOf((String) map.get("farm_type"));
+        Level level = EpicFarming.getPlugin(EpicFarming.class).getLevelManager().getLevel((int) map.get("level"));
+        UUID placedBy = UUID.fromString((String) map.get("placed_by"));
+        Location location = SerializedLocation.of(map);
+        return new Farm(id, location, level, placedBy, farmType);
+    }
+
+    @Override
+    public String getTableName() {
+        return "active_farms";
     }
 
     public List<ItemStack> getItems() {
@@ -352,20 +411,12 @@ public class Farm {
                 this.farmType = FarmType.CROPS;
                 break;
         }
-        EpicFarming.getInstance().getDataManager().updateFarm(this);
+        EpicFarming.getInstance().getDataManager().save(this);
     }
 
     public void setFarmType(FarmType farmType) {
         this.farmType = farmType;
-        EpicFarming.getInstance().getDataManager().updateFarm(this);
-    }
-
-    public int getId() {
-        return this.id;
-    }
-
-    public void setId(int id) {
-        this.id = id;
+        EpicFarming.getInstance().getDataManager().save(this);
     }
 
     public boolean needsToBeSaved() {

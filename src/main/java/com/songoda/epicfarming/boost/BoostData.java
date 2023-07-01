@@ -1,9 +1,12 @@
 package com.songoda.epicfarming.boost;
 
+import com.craftaro.core.database.Data;
+
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
-public class BoostData {
+public class BoostData implements Data {
     private final int multiplier;
     private final long endTime;
     private final UUID player;
@@ -50,4 +53,22 @@ public class BoostData {
                 && Objects.equals(this.player, other.player);
     }
 
+    @Override
+    public Map<String, Object> serialize() {
+        Map<String, Object> map = new java.util.HashMap<>();
+        map.put("player", this.player.toString());
+        map.put("multiplier", this.multiplier);
+        map.put("end_time", this.endTime);
+        return map;
+    }
+
+    @Override
+    public Data deserialize(Map<String, Object> map) {
+        return new BoostData((int) map.get("multiplier"), (long) map.get("end_time"), UUID.fromString((String) map.get("player")));
+    }
+
+    @Override
+    public String getTableName() {
+        return "boosted_players";
+    }
 }

@@ -121,7 +121,7 @@ public class EntityListeners implements Listener {
             event.blockList().remove(block);
 
             Farm farm = this.plugin.getFarmManager().removeFarm(block.getLocation());
-            this.plugin.getDataManager().deleteFarm(farm);
+            this.plugin.getDataManager().delete(farm);
             farm.forceMenuClose();
 
             this.plugin.getFarmTask().getCrops(farm, false);

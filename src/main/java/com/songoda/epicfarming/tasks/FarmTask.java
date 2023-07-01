@@ -99,13 +99,13 @@ public class FarmTask extends BukkitRunnable {
 
                 double radius = farm.getLevel().getRadius() + .5;
                 Bukkit.getScheduler().runTask(this.plugin, () -> {
-                    this.entityCache.remove(farm.getUniqueId());
-                    this.entityCache.put(farm.getUniqueId(), this.plugin.getEntityUtils().getNearbyEntities(location, radius, false)
+                    this.entityCache.remove(farm.getFarmUUID());
+                    this.entityCache.put(farm.getFarmUUID(), this.plugin.getEntityUtils().getNearbyEntities(location, radius, false)
                             .stream().filter(e -> !(e instanceof Player) && e != null && !(e instanceof ArmorStand))
                             .collect(Collectors.toCollection(ArrayList::new)));
                 });
 
-                Collection<LivingEntity> entitiesAroundFarm = this.entityCache.get(farm.getUniqueId());
+                Collection<LivingEntity> entitiesAroundFarm = this.entityCache.get(farm.getFarmUUID());
 
                 if (entitiesAroundFarm == null) {
                     continue;

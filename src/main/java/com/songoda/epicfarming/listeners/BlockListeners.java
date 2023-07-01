@@ -99,9 +99,9 @@ public class BlockListeners implements Listener {
                 return;
             }
 
-            Farm farm = new Farm(location, this.plugin.getLevelManager().getLevel(level == 0 ? 1 : level), e.getPlayer().getUniqueId());
+            Farm farm = new Farm(location, this.plugin.getLevelManager().getLevel(level == 0 ? 1 : level), e.getPlayer().getUniqueId(), FarmType.CROPS); //TODO check if the FarmType is correct
             this.plugin.getFarmManager().addFarm(location, farm);
-            this.plugin.getDataManager().createFarm(farm);
+            this.plugin.getDataManager().save(farm);
 
             farm.tillLand();
         }, 1);
@@ -118,7 +118,7 @@ public class BlockListeners implements Listener {
             return;
         }
 
-        this.plugin.getDataManager().deleteFarm(farm);
+        this.plugin.getDataManager().delete(farm);
         farm.forceMenuClose();
 
         this.plugin.getFarmTask().getCrops(farm, false);
@@ -150,7 +150,7 @@ public class BlockListeners implements Listener {
         }
         this.plugin.getFarmTask().getCrops(farm, false);
 
-        this.plugin.getDataManager().deleteFarm(farm);
+        this.plugin.getDataManager().delete(farm);
         farm.forceMenuClose();
 
         event.setCancelled(true);
