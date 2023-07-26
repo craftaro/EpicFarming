@@ -54,7 +54,7 @@
                             <relocations>
                                 <relocation>
                                     <pattern>com.craftaro.core</pattern>
-                                    <shadedPattern>com.songoda.epicfarming.core</shadedPattern>
+                                    <shadedPattern>com.craftaro.epicfarming.core</shadedPattern>
                                 </relocation>
                             </relocations>
 
@@ -74,8 +74,7 @@
                                     <excludeDefaults>false</excludeDefaults>
                                     <includes>
                                         <include>**/nms/v*/**</include>
-                                        <include>**/third_party/org/h2/**</include>
-                                        <include>**/third_party/org/mariadb/**</include>
+                                        <include>**/core/third_party/**</include>
                                     </includes>
                                 </filter>
                             </filters>
