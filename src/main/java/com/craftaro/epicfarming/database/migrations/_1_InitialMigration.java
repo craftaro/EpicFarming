@@ -5,6 +5,7 @@ import com.craftaro.core.database.DatabaseConnector;
 import com.craftaro.core.database.MySQLConnector;
 import com.craftaro.epicfarming.EpicFarming;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.sql.Statement;
 
@@ -14,11 +15,11 @@ public class _1_InitialMigration extends DataMigration {
     }
 
     @Override
-    public void migrate(DatabaseConnector databaseConnector, String tablePrefix) throws SQLException {
+    public void migrate(Connection connection, String tablePrefix) throws SQLException {
         String autoIncrement = EpicFarming.getPlugin(EpicFarming.class).getDatabaseConnector() instanceof MySQLConnector ? " AUTO_INCREMENT" : "";
 
         // Create farms table.
-        try (Statement statement = databaseConnector.getConnection().createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.execute("CREATE TABLE " + tablePrefix + "active_farms (" +
                     "id INTEGER PRIMARY KEY" + autoIncrement + ", " +
                     "farm_type TEXT NOT NULL, " +
@@ -34,7 +35,7 @@ public class _1_InitialMigration extends DataMigration {
         // Create items.
         // Items are stored as Base64. Dunno if this is the most efficient way to
         // store them, though.
-        try (Statement statement = databaseConnector.getConnection().createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.execute("CREATE TABLE " + tablePrefix + "items (" +
                     "farm_id INTEGER NOT NULL, " +
                     "item VARBINARY(999) NOT NULL" +
@@ -42,7 +43,7 @@ public class _1_InitialMigration extends DataMigration {
         }
 
         // Create player boosts
-        try (Statement statement = databaseConnector.getConnection().createStatement()) {
+        try (Statement statement = connection.createStatement()) {
             statement.execute("CREATE TABLE " + tablePrefix + "boosted_players (" +
                     "player VARCHAR(36) NOT NULL, " +
                     "multiplier INTEGER NOT NULL," +
