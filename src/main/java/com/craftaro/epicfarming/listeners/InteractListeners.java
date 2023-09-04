@@ -3,7 +3,7 @@ package com.craftaro.epicfarming.listeners;
 import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
 import com.craftaro.epicfarming.EpicFarming;
 import com.craftaro.epicfarming.settings.Settings;
-import com.songoda.skyblock.SkyBlock;
+import com.craftaro.skyblock.SkyBlock;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.event.EventHandler;

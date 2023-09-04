@@ -118,9 +118,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.songoda</groupId>
-            <artifactId>skyblock</artifactId>
-            <version>2.3.30</version>
+            <groupId>com.craftaro</groupId>
+            <artifactId>FabledSkyBlock</artifactId>
+            <version>3.0.0-b6-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 

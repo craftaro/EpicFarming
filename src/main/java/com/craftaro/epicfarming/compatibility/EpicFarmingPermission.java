@@ -1,11 +1,11 @@
 package com.craftaro.epicfarming.compatibility;
 
-import com.songoda.skyblock.core.compatibility.CompatibleMaterial;
-import com.songoda.skyblock.permission.BasicPermission;
-import com.songoda.skyblock.permission.PermissionType;
+import com.craftaro.skyblock.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.skyblock.permission.BasicPermission;
+import com.craftaro.skyblock.permission.PermissionType;
 
 public class EpicFarmingPermission extends BasicPermission {
     public EpicFarmingPermission() {
-        super("EpicFarming", CompatibleMaterial.END_ROD, PermissionType.GENERIC);
+        super("EpicFarming", XMaterial.END_ROD, PermissionType.GENERIC);
     }
 }
