@@ -6,7 +6,7 @@
 
     <groupId>com.craftaro</groupId>
     <artifactId>EpicFarming</artifactId>
-    <version>4.0.0-b1-SNAPSHOT</version>
+    <version>4.0.0-b2-SNAPSHOT</version>
 
     <name>EpicFarming</name>
     <description>Allow your players to grow crops faster, automatically replant, harvest and store crops and animal produce in the farm's inventory, as well as much more</description>
