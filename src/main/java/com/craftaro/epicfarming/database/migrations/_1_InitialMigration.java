@@ -1,5 +1,6 @@
 package com.craftaro.epicfarming.database.migrations;
 
+import com.craftaro.core.SongodaPlugin;
 import com.craftaro.core.database.DataMigration;
 import com.craftaro.core.database.DatabaseConnector;
 import com.craftaro.core.database.MySQLConnector;
@@ -16,7 +17,7 @@ public class _1_InitialMigration extends DataMigration {
 
     @Override
     public void migrate(Connection connection, String tablePrefix) throws SQLException {
-        String autoIncrement = EpicFarming.getPlugin(EpicFarming.class).getDatabaseConnector() instanceof MySQLConnector ? " AUTO_INCREMENT" : "";
+        String autoIncrement = /*EpicFarming.getPlugin(EpicFarming.class).getDatabaseConnector() instanceof MySQLConnector ? " AUTO_INCREMENT" :*/ "";
 
         // Create farms table.
         try (Statement statement = connection.createStatement()) {
