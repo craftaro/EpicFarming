@@ -128,6 +128,7 @@ public class EpicFarming extends SongodaPlugin {
 
         // Database stuff.
         initDatabase(Collections.singletonList(new _1_InitialMigration()));
+        DataHelper.init(this);
 
         this.loadLevelManager();
 
@@ -388,10 +389,6 @@ public class EpicFarming extends SongodaPlugin {
 
     public EntityUtils getEntityUtils() {
         return this.entityUtils;
-    }
-
-    public DatabaseConnector getDatabaseConnector() {
-        return this.dataManager.getDatabaseConnector();
     }
 
     /**

@@ -11,11 +11,15 @@ import java.util.List;
 
 public class DataHelper {
 
-    private static final EpicFarming plugin = EpicFarming.getPlugin(EpicFarming.class);
+    private static EpicFarming plugin;
+
+    public static void init(EpicFarming plugin) {
+        DataHelper.plugin = plugin;
+    }
 
     public static void createFarms(List<Farm> farms) {
 
-        plugin.getDatabaseConnector().connectDSL(dslContext -> {
+        plugin.getDataManager().getDatabaseConnector().connectDSL(dslContext -> {
             List<Query> queries = new ArrayList<>();
             for (Farm farm : farms) {
                 queries.add(dslContext.insertInto(DSL.table(plugin.getDataManager().getTablePrefix() + "active_farms"))
@@ -45,7 +49,7 @@ public class DataHelper {
     public static void updateItems(Farm farm) {
         String tablePrefix = plugin.getDataManager().getTablePrefix();
 
-        plugin.getDatabaseConnector().connectDSL(dslContext -> {
+        plugin.getDataManager().getDatabaseConnector().connectDSL(dslContext -> {
             dslContext.deleteFrom(DSL.table(tablePrefix + "items"))
                     .where(DSL.field("farm_id").eq(farm.getId()))
                     .execute();
