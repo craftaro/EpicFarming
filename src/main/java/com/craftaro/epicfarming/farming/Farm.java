@@ -55,6 +55,17 @@ public class Farm implements Data {
     private final Map<String, Object> moduleCache = new HashMap<>();
 
     /**
+     * Default constructor for database usage.
+     */
+    public Farm() {
+        this.id = 0;
+        this.location = null;
+        this.level = null;
+        this.placedBy = null;
+        this.farmType = null;
+    }
+
+    /**
      * This is the constructor for a new farm.
      * It is used when a player places a new farm.
      *

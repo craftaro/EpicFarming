@@ -246,10 +246,10 @@ public class EpicFarming extends SongodaPlugin {
 
             if (converted) {
                 Bukkit.getConsoleSender().sendMessage("[" + getDescription().getName() + "] " + ChatColor.GREEN + "Conversion complete :)");
-
-                this.farmManager.addFarms(this.dataManager.loadBatch(Farm.class, "active_farms"));
-                this.boostManager.addBoosts(this.dataManager.loadBatch(BoostData.class, "boosts"));
             }
+
+            this.farmManager.addFarms(this.dataManager.loadBatch(Farm.class, "active_farms"));
+            this.boostManager.addBoosts(this.dataManager.loadBatch(BoostData.class, "boosted_players"));
         });
     }
 

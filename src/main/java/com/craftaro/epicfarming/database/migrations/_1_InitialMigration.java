@@ -17,12 +17,11 @@ public class _1_InitialMigration extends DataMigration {
 
     @Override
     public void migrate(Connection connection, String tablePrefix) throws SQLException {
-        String autoIncrement = /*EpicFarming.getPlugin(EpicFarming.class).getDatabaseConnector() instanceof MySQLConnector ? " AUTO_INCREMENT" :*/ "";
 
         // Create farms table.
         try (Statement statement = connection.createStatement()) {
-            statement.execute("CREATE TABLE " + tablePrefix + "active_farms (" +
-                    "id INTEGER PRIMARY KEY" + autoIncrement + ", " +
+            statement.execute("CREATE TABLE IF NOT EXISTS " + tablePrefix + "active_farms (" +
+                    "id INTEGER PRIMARY KEY, " +
                     "farm_type TEXT NOT NULL, " +
                     "level INTEGER NOT NULL, " +
                     "placed_by VARCHAR(36), " +
@@ -37,7 +36,7 @@ public class _1_InitialMigration extends DataMigration {
         // Items are stored as Base64. Dunno if this is the most efficient way to
         // store them, though.
         try (Statement statement = connection.createStatement()) {
-            statement.execute("CREATE TABLE " + tablePrefix + "items (" +
+            statement.execute("CREATE TABLE IF NOT EXISTS " + tablePrefix + "items (" +
                     "farm_id INTEGER NOT NULL, " +
                     "item VARBINARY(999) NOT NULL" +
                     ")");
@@ -45,7 +44,7 @@ public class _1_InitialMigration extends DataMigration {
 
         // Create player boosts
         try (Statement statement = connection.createStatement()) {
-            statement.execute("CREATE TABLE " + tablePrefix + "boosted_players (" +
+            statement.execute("CREATE TABLE IF NOT EXISTS " + tablePrefix + "boosted_players (" +
                     "player VARCHAR(36) NOT NULL, " +
                     "multiplier INTEGER NOT NULL," +
                     "end_time BIGINT NOT NULL " +
