@@ -54,6 +54,11 @@ public class BoostData implements Data {
     }
 
     @Override
+    public UUID getUniqueId() {
+        return this.player;
+    }
+
+    @Override
     public Map<String, Object> serialize() {
         Map<String, Object> map = new java.util.HashMap<>();
         map.put("player", this.player.toString());

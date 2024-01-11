@@ -3,7 +3,7 @@ package com.craftaro.epicfarming.farming.levels.modules;
 import com.craftaro.core.compatibility.CompatibleParticleHandler;
 import com.craftaro.core.gui.GuiUtils;
 import com.craftaro.core.hooks.EntityStackerManager;
-import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.third_party.com.cryptomorin.xseries.XMaterial;
 import com.craftaro.epicfarming.EpicFarming;
 import com.craftaro.epicfarming.farming.Farm;
 import com.craftaro.epicfarming.farming.FarmType;

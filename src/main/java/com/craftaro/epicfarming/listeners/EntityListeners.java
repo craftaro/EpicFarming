@@ -1,7 +1,7 @@
 package com.craftaro.epicfarming.listeners;
 
-import com.craftaro.core.third_party.com.cryptomorin.xseries.XBlock;
-import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.third_party.com.cryptomorin.xseries.XBlock;
+import com.craftaro.third_party.com.cryptomorin.xseries.XMaterial;
 import com.craftaro.epicfarming.EpicFarming;
 import com.craftaro.epicfarming.farming.levels.modules.Module;
 import com.craftaro.epicfarming.farming.levels.modules.ModuleAutoCollect;

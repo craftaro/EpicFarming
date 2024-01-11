@@ -1,6 +1,6 @@
 package com.craftaro.epicfarming.farming;
 
-import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.third_party.com.cryptomorin.xseries.XMaterial;
 import com.craftaro.epicfarming.farming.levels.Level;
 import com.craftaro.epicfarming.farming.levels.LevelManager;
 import com.craftaro.epicfarming.settings.Settings;

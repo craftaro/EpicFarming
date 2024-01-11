@@ -2,8 +2,8 @@ package com.craftaro.epicfarming.farming.levels.modules;
 
 import com.craftaro.core.compatibility.CompatibleMaterial;
 import com.craftaro.core.gui.GuiUtils;
-import com.craftaro.core.third_party.com.cryptomorin.xseries.XBlock;
-import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.third_party.com.cryptomorin.xseries.XBlock;
+import com.craftaro.third_party.com.cryptomorin.xseries.XMaterial;
 import com.craftaro.core.utils.BlockUtils;
 import com.craftaro.epicfarming.EpicFarming;
 import com.craftaro.epicfarming.boost.BoostData;

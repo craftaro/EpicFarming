@@ -2,8 +2,8 @@ package com.craftaro.epicfarming.tasks;
 
 import com.craftaro.core.compatibility.CompatibleMaterial;
 import com.craftaro.core.compatibility.ServerVersion;
-import com.craftaro.core.third_party.com.cryptomorin.xseries.XBlock;
-import com.craftaro.core.third_party.com.cryptomorin.xseries.XMaterial;
+import com.craftaro.third_party.com.cryptomorin.xseries.XBlock;
+import com.craftaro.third_party.com.cryptomorin.xseries.XMaterial;
 import com.craftaro.core.utils.BlockUtils;
 import com.craftaro.epicfarming.EpicFarming;
 import com.craftaro.epicfarming.farming.Crop;
