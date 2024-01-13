@@ -5,24 +5,19 @@ import com.craftaro.core.SongodaPlugin;
 import com.craftaro.core.commands.CommandManager;
 import com.craftaro.core.compatibility.ServerVersion;
 import com.craftaro.core.configuration.Config;
-import com.craftaro.core.database.DatabaseConnector;
-import com.craftaro.core.dependency.Dependency;
 import com.craftaro.core.gui.GuiManager;
 import com.craftaro.core.hooks.EconomyManager;
 import com.craftaro.core.hooks.EntityStackerManager;
 import com.craftaro.core.hooks.ProtectionManager;
-import com.craftaro.third_party.com.cryptomorin.xseries.XMaterial;
 import com.craftaro.core.third_party.de.tr7zw.nbtapi.NBTItem;
 import com.craftaro.core.utils.TextUtils;
-import com.craftaro.epicfarming.database.migrations._1_InitialMigration;
-import com.craftaro.epicfarming.storage.Storage;
-import com.craftaro.epicfarming.storage.StorageRow;
 import com.craftaro.epicfarming.boost.BoostData;
 import com.craftaro.epicfarming.boost.BoostManager;
 import com.craftaro.epicfarming.commands.CommandBoost;
 import com.craftaro.epicfarming.commands.CommandGiveFarmItem;
 import com.craftaro.epicfarming.commands.CommandReload;
 import com.craftaro.epicfarming.commands.CommandSettings;
+import com.craftaro.epicfarming.database.migrations._1_InitialMigration;
 import com.craftaro.epicfarming.farming.Farm;
 import com.craftaro.epicfarming.farming.FarmManager;
 import com.craftaro.epicfarming.farming.FarmType;
@@ -39,6 +34,8 @@ import com.craftaro.epicfarming.listeners.InventoryListeners;
 import com.craftaro.epicfarming.listeners.MoistureListeners;
 import com.craftaro.epicfarming.listeners.UnloadListeners;
 import com.craftaro.epicfarming.settings.Settings;
+import com.craftaro.epicfarming.storage.Storage;
+import com.craftaro.epicfarming.storage.StorageRow;
 import com.craftaro.epicfarming.storage.types.StorageYaml;
 import com.craftaro.epicfarming.tasks.FarmTask;
 import com.craftaro.epicfarming.tasks.GrowthTask;
@@ -48,6 +45,7 @@ import com.craftaro.epicfarming.utils.EntityUtils;
 import com.craftaro.epicfarming.utils.Methods;
 import com.craftaro.skyblock.SkyBlock;
 import com.craftaro.skyblock.permission.BasicPermission;
+import com.craftaro.third_party.com.cryptomorin.xseries.XMaterial;
 import org.apache.commons.lang.math.NumberUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
@@ -60,9 +58,7 @@ import org.bukkit.plugin.PluginManager;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.UUID;
 
 public class EpicFarming extends SongodaPlugin {
@@ -78,11 +74,6 @@ public class EpicFarming extends SongodaPlugin {
     private FarmTask farmTask;
 
     private EntityUtils entityUtils;
-
-    @Override
-    protected Set<Dependency> getDependencies() {
-        return new HashSet<>();
-    }
 
     @Override
     public void onPluginLoad() {
