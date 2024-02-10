@@ -63,15 +63,15 @@ public class ModuleAutoButcher extends Module {
             return;
         }
 
-        for (LivingEntity entity : entities) {
-            entity.setMetadata("EFA-TAGGED", new FixedMetadataValue(this.plugin, farm.getLocation()));
-            XSound.ENTITY_PLAYER_ATTACK_SWEEP.play(entity);
-            Bukkit.getScheduler().runTask(this.plugin, () -> {
+        Bukkit.getScheduler().runTask(this.plugin, () -> {
+            for (LivingEntity entity : entities) {
+                entity.setMetadata("EFA-TAGGED", new FixedMetadataValue(this.plugin, farm.getLocation()));
+                XSound.ENTITY_PLAYER_ATTACK_SWEEP.play(entity);
                 entity.damage(99999999, entity);
                 Methods.animate(farm.getLocation(), XMaterial.IRON_SWORD);
-            });
-            return;
-        }
+
+            }
+        });
     }
 
     @Override
