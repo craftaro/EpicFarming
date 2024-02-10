@@ -11,6 +11,7 @@ import com.craftaro.epicfarming.farming.Farm;
 import com.craftaro.epicfarming.farming.FarmType;
 import com.craftaro.epicfarming.utils.Methods;
 import org.bukkit.Bukkit;
+import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.Block;
@@ -119,8 +120,11 @@ public class ModuleAutoCollect extends Module {
                 }
                 ((Sheep) entity).setSheared(true);
 
-                Wool woolColor = new Wool(((Sheep) entity).getColor());
-                ItemStack wool = woolColor.toItemStack((int) Math.round(1 + (Math.random() * 3)));
+
+                DyeColor dyeColor = ((Sheep) entity).getColor();
+                XMaterial woolColor = XMaterial.matchXMaterial(dyeColor.name() + "_WOOL").orElse(XMaterial.WHITE_WOOL);
+                ItemStack wool = woolColor.parseItem();
+                wool.setAmount((int) Math.round(1 + (Math.random() * 3)));
                 if (!isEnabled(farm)) {
                     Bukkit.getScheduler().runTask(this.plugin, () ->
                             entity.getLocation().getWorld().dropItemNaturally(entity.getLocation(), wool));
