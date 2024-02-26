@@ -54,7 +54,7 @@ public class ModuleAutoBreeding extends Module {
 
         List<LivingEntity> entities = new ArrayList<>(entitiesAroundFarm);
         Collections.shuffle(entities);
-        if (entities.size() >= this.autoBreedCap) {
+        if (entities.size() < this.autoBreedCap) {
             return;
         }
 
