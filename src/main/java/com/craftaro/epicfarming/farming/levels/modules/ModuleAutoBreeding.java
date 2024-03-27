@@ -29,6 +29,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class ModuleAutoBreeding extends Module {
+    private static final String BREED_COOLDOWN_METADATA = "breedCooldown";
+    private static final int BREED_COOLDOWN_TICKS = 5 * 20 * 60;
+
     private final int autoBreedCap;
 
     public ModuleAutoBreeding(EpicFarming plugin, int autoBreedCap) {
@@ -58,73 +61,59 @@ public class ModuleAutoBreeding extends Module {
             return;
         }
 
-        entities.removeIf(e -> !(e instanceof Ageable) || !((Ageable) e).isAdult() || e.hasMetadata("breedCooldown") || e.isDead());
+        entities.removeIf(e -> !(e instanceof Ageable) || !((Ageable) e).isAdult() || e.hasMetadata(BREED_COOLDOWN_METADATA) || e.isDead());
 
-        Map<EntityType, Long> counts =
-                entities.stream().collect(Collectors.groupingBy(Entity::getType, Collectors.counting()));
-
-        for (LivingEntity entity : entities) {
-            int stackSize = EntityStackerManager.getSize(entity);
-            if (stackSize == 0) {
-                stackSize = 1;
-            }
-            counts.put(entity.getType(), counts.get(entity.getType()) - 1 + stackSize);
-        }
+        Map<EntityType, Long> counts = entities.stream()
+                .collect(Collectors.groupingBy(Entity::getType, Collectors.summingLong(entity -> {
+                    int stackSize = EntityStackerManager.getSize(entity);
+                    return stackSize > 0 ? stackSize : 1;
+                })));
 
         boolean mate1 = false;
         for (Map.Entry<EntityType, Long> entry : counts.entrySet()) {
+            if (entry.getValue() < 2) {
+                continue;
+            }
+
+            EntityType entityType = entry.getKey();
+            ItemStack breedingItem = getBreedingItem(farm, entityType);
+            if (breedingItem == null || breedingItem.getAmount() < 2) {
+                continue;
+            }
+
             for (LivingEntity entity : entities) {
-                if (entry.getKey() != entity.getType()) {
+                if (entity.getType() != entityType) {
                     continue;
                 }
-                int count = EntityStackerManager.getSize(entity) == 0 ? 1 : EntityStackerManager.getSize(entity);
+
+                int stackSize = EntityStackerManager.getSize(entity);
+                if (stackSize == 0) {
+                    stackSize = 1;
+                }
+
                 if (mate1) {
-                    if (count > 1) {
+                    farm.removeMaterial(breedingItem.getType(), 2);
+
+                    if (stackSize > 1) {
                         handleStackedBreed(entity);
+                        if (stackSize > 2) {
+                            handleStackedBreed(entity);
+                        }
                     } else {
                         handleBreed(entity);
                     }
-                    Bukkit.getScheduler().runTask(this.plugin, () -> Methods.animate(farm.getLocation(), XMaterial.EGG));
+
+                    spawnParticlesAndAnimation(entity.getLocation(), farm.getLocation());
                     return;
                 }
 
-                if (entry.getValue() >= 2) {
-                    EntityType entityType = entry.getKey();
-
-                    for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
-                        EntityInfo info = EntityInfo.of(entityType);
-                        try {
-                            if (info == null || item.getType() != info.getMaterial() || item.getAmount() < 2) {
-                                continue;
-                            }
-                        } catch (IllegalArgumentException e) {
-                            continue;
-                        }
-
-                        farm.removeMaterial(item.getType(), 2);
-
-                        Location location = entity.getLocation();
-                        CompatibleParticleHandler.spawnParticles(CompatibleParticleHandler.ParticleType.HEART,
-                                location, 5, .5, .5, .5);
-                        Bukkit.getScheduler().runTask(this.plugin, () -> {
-                            Entity newSpawn = location.getWorld().spawnEntity(location, entityType);
-                            ((Ageable) newSpawn).setBaby();
-                        });
-
-                        if (count > 1) {
-                            handleStackedBreed(entity);
-                            if (count - 1 > 1) {
-                                handleStackedBreed(entity);
-                            } else {
-                                handleBreed(entity);
-                            }
-                            return;
-                        }
-                        handleBreed(entity);
-                        mate1 = true;
-                        break;
-                    }
+                if (stackSize > 1) {
+                    handleStackedBreed(entity);
+                } else {
+                    handleBreed(entity);
                 }
+                mate1 = true;
+                break;
             }
         }
     }
@@ -161,9 +150,9 @@ public class ModuleAutoBreeding extends Module {
     }
 
     private void handleBreed(Entity entity) {
+        entity.setMetadata(BREED_COOLDOWN_METADATA, new FixedMetadataValue(this.plugin, true));
         Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, () ->
-                entity.removeMetadata("breedCooldown", this.plugin), 5 * 20 * 60);
-        entity.setMetadata("breedCooldown", new FixedMetadataValue(this.plugin, true));
+                entity.removeMetadata(BREED_COOLDOWN_METADATA, this.plugin), BREED_COOLDOWN_TICKS);
     }
 
     private boolean isEnabled(Farm farm) {
@@ -173,5 +162,24 @@ public class ModuleAutoBreeding extends Module {
 
     private void toggleEnabled(Farm farm) {
         saveData(farm, "enabled", !isEnabled(farm));
+    }
+
+    private ItemStack getBreedingItem(Farm farm, EntityType entityType) {
+        EntityInfo info = EntityInfo.of(entityType);
+        if (info == null) {
+            return null;
+        }
+
+        for (ItemStack item : farm.getItems().toArray(new ItemStack[0])) {
+            if (item.getType() == info.getMaterial()) {
+                return item;
+            }
+        }
+        return null;
+    }
+
+    private void spawnParticlesAndAnimation(Location entityLocation, Location farmLocation) {
+        CompatibleParticleHandler.spawnParticles(CompatibleParticleHandler.ParticleType.HEART, entityLocation, 5, .5, .5, .5);
+        Bukkit.getScheduler().runTask(this.plugin, () -> Methods.animate(farmLocation, XMaterial.EGG));
     }
 }

@@ -22,13 +22,7 @@ import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
+import java.util.*;
 
 public class Farm implements Data {
     // This is the unique identifier for this farm.
@@ -198,25 +192,66 @@ public class Farm implements Data {
                 for (int fz = -radius; fz <= radius; fz++) {
                     Block b2 = block.getWorld().getBlockAt(bx + fx, by + fy, bz + fz);
 
-                    // ToDo: enum for all flowers.
-                    if (Settings.BREAKABLE_BLOCKS.getStringList().contains(CompatibleMaterial.getMaterial(b2.getType()).get().name())) {
-                        Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
-                            XBlock.setType(b2.getRelative(BlockFace.DOWN), XMaterial.FARMLAND);
-                            b2.breakNaturally();
-                            XSound.BLOCK_GRASS_BREAK.play(b2.getLocation(), 10, 15);
-                        }, random.nextInt(30) + 1);
-                    }
-                    if ((b2.getType() == XMaterial.GRASS_BLOCK.parseMaterial()
-                            || b2.getType() == Material.DIRT) && b2.getRelative(BlockFace.UP).getType() == Material.AIR) {
-                        Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
-                            XBlock.setType(b2, XMaterial.FARMLAND);
-                            XSound.BLOCK_GRASS_BREAK.play(b2.getLocation(), 10, 15);
-                        }, random.nextInt(30) + 1);
+                    // Check if the block is a grass block or dirt
+                    if (b2.getType() == XMaterial.GRASS_BLOCK.parseMaterial() || b2.getType() == Material.DIRT) {
+                        // Check if the block above is junk (grass or a flower)
+                        Block blockAbove = b2.getRelative(BlockFace.UP);
+                        if (isJunk(blockAbove.getType())) {
+                            Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
+                                XBlock.setType(b2, XMaterial.FARMLAND);
+                                Collection<ItemStack> drops = blockAbove.getDrops();
+                                if (!drops.isEmpty()) {
+                                    blockAbove.breakNaturally(drops.iterator().next());
+                                } else {
+                                    blockAbove.breakNaturally();
+                                }
+                                XSound.BLOCK_GRASS_BREAK.play(b2.getLocation(), 10, 15);
+                            }, random.nextInt(30) + 1);
+                        } else if (blockAbove.getType() == Material.AIR) {
+                            Bukkit.getScheduler().runTaskLater(EpicFarming.getInstance(), () -> {
+                                XBlock.setType(b2, XMaterial.FARMLAND);
+                                XSound.BLOCK_GRASS_BREAK.play(b2.getLocation(), 10, 15);
+                            }, random.nextInt(30) + 1);
+                        }
                     }
                 }
             }
         }
         return false;
+    }
+
+    private boolean isJunk(Material material) {
+        XMaterial xMaterial = XMaterial.matchXMaterial(material);
+        if (xMaterial == null) {
+            return false;
+        }
+
+        switch (xMaterial) {
+            case SHORT_GRASS:
+            case TALL_GRASS:
+            case FERN:
+            case LARGE_FERN:
+            case DANDELION:
+            case POPPY:
+            case BLUE_ORCHID:
+            case ALLIUM:
+            case AZURE_BLUET:
+            case RED_TULIP:
+            case ORANGE_TULIP:
+            case WHITE_TULIP:
+            case PINK_TULIP:
+            case OXEYE_DAISY:
+            case CORNFLOWER:
+            case LILY_OF_THE_VALLEY:
+            case WITHER_ROSE:
+            case SUNFLOWER:
+            case LILAC:
+            case ROSE_BUSH:
+            case PEONY:
+                return true;
+            default:
+                return false;
+        }
     }
 
     //Don't use getUniqueId here as it conflicts with the Data interface.
