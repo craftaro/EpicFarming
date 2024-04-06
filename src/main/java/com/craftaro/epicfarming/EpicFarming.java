@@ -74,6 +74,7 @@ public class EpicFarming extends SongodaPlugin {
     private FarmTask farmTask;
 
     private EntityUtils entityUtils;
+    private static EpicFarming instance;
 
     @Override
     public void onPluginLoad() {
@@ -94,6 +95,7 @@ public class EpicFarming extends SongodaPlugin {
 
     @Override
     public void onPluginEnable() {
+        instance = this;
         // Run Songoda Updater
         SongodaCore.registerPlugin(this, 21, XMaterial.WHEAT);
 
@@ -390,11 +392,7 @@ public class EpicFarming extends SongodaPlugin {
         return this.entityUtils;
     }
 
-    /**
-     * @deprecated Use {@link EpicFarming#getPlugin(Class)} instead.
-     */
-    @Deprecated
     public static EpicFarming getInstance() {
-        return getPlugin(EpicFarming.class);
+        return instance;
     }
 }
