@@ -7,6 +7,7 @@ import com.craftaro.epicfarming.farming.levels.modules.Module;
 import com.craftaro.epicfarming.farming.levels.modules.ModuleAutoCollect;
 import com.craftaro.epicfarming.settings.Settings;
 import com.craftaro.epicfarming.farming.Farm;
+import com.craftaro.ultimatestacker.api.events.entity.StackedItemSpawnEvent;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -39,6 +40,7 @@ public class EntityListeners implements Listener {
 
     @EventHandler(priority = EventPriority.HIGHEST)
     public void onEntityDeath(EntityDeathEvent event) {
+        if (event.getDrops().isEmpty()) return;
         LivingEntity entity = event.getEntity();
         if (!entity.hasMetadata("EFA-TAGGED")) {
             return;
@@ -60,6 +62,38 @@ public class EntityListeners implements Listener {
             event.getDrops().clear();
         }
     }
+
+    @EventHandler
+    public void onStackedItemSpawn(StackedItemSpawnEvent event) {
+        Location farmLocation = (Location) event.getExtraData().get("EFA-TAGGED");
+
+        if (farmLocation == null) {
+            return;
+        }
+
+        Farm farm = this.plugin.getFarmManager().getFarm(farmLocation);
+
+        boolean autoCollect = false;
+        for (Module module : farm.getLevel().getRegisteredModules()) {
+            if (module instanceof ModuleAutoCollect && ((ModuleAutoCollect) module).isEnabled(farm)) {
+                autoCollect = true;
+            }
+        }
+
+        if (autoCollect) {
+            long amount = event.getAmount();
+            ItemStack itemStack = event.getItemStack();
+
+            while (amount > 0) {
+                ItemStack clone = itemStack.clone();
+                clone.setAmount((int) Math.min(amount, clone.getMaxStackSize()));
+                amount -= clone.getAmount();
+                farm.addItem(clone);
+            }
+            event.setCancelled(true);
+        }
+    }
+
 
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSpawn(ItemSpawnEvent event) {
