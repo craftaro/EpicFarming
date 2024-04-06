@@ -6,7 +6,7 @@
 
     <groupId>com.craftaro</groupId>
     <artifactId>EpicFarming</artifactId>
-    <version>4.2.0</version>
+    <version>4.2.1</version>
 
     <name>EpicFarming</name>
     <description>Allow your players to grow crops faster, automatically replant, harvest and store crops and animal produce in the farm's inventory, as well as much more</description>
@@ -131,6 +131,13 @@
             <groupId>com.craftaro</groupId>
             <artifactId>FabledSkyBlock</artifactId>
             <version>3.0.4</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.craftaro</groupId>
+            <artifactId>UltimateStacker-API</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
