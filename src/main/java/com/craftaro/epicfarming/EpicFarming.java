@@ -32,6 +32,7 @@ import com.craftaro.epicfarming.listeners.EntityListeners;
 import com.craftaro.epicfarming.listeners.InteractListeners;
 import com.craftaro.epicfarming.listeners.InventoryListeners;
 import com.craftaro.epicfarming.listeners.MoistureListeners;
+import com.craftaro.epicfarming.listeners.UltimateStackerListener;
 import com.craftaro.epicfarming.listeners.UnloadListeners;
 import com.craftaro.epicfarming.settings.Settings;
 import com.craftaro.epicfarming.storage.Storage;
@@ -155,6 +156,10 @@ public class EpicFarming extends SongodaPlugin {
             } catch (ClassNotFoundException | InstantiationException | IllegalAccessException e) {
                 e.printStackTrace();
             }
+        }
+
+        if (pluginManager.isPluginEnabled("UltimateStacker")) {
+            pluginManager.registerEvents(new UltimateStackerListener(this), this);
         }
 
         // Start tasks

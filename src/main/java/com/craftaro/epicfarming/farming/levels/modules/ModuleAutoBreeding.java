@@ -56,10 +56,11 @@ public class ModuleAutoBreeding extends Module {
         }
 
         List<LivingEntity> entities = new ArrayList<>(entitiesAroundFarm);
-        Collections.shuffle(entities);
-        if (entities.size() < this.autoBreedCap) {
+        int actualAmount = entities.stream().filter(e -> e instanceof Ageable && ((Ageable) e).isAdult() && !e.hasMetadata(BREED_COOLDOWN_METADATA) && !e.isDead()).map(EntityStackerManager::getSize).reduce(Integer::sum).orElse(0);
+        if (actualAmount < this.autoBreedCap) {
             return;
         }
+        Collections.shuffle(entities);
 
         entities.removeIf(e -> !(e instanceof Ageable) || !((Ageable) e).isAdult() || e.hasMetadata(BREED_COOLDOWN_METADATA) || e.isDead());
 
@@ -109,6 +110,7 @@ public class ModuleAutoBreeding extends Module {
 
                 if (stackSize > 1) {
                     handleStackedBreed(entity);
+                    spawnParticlesAndAnimation(entity.getLocation(), farm.getLocation());
                 } else {
                     handleBreed(entity);
                 }
@@ -142,9 +144,10 @@ public class ModuleAutoBreeding extends Module {
     }
 
     private void handleStackedBreed(LivingEntity entity) {
-        EntityStackerManager.removeOne(entity);
         Bukkit.getScheduler().runTask(this.plugin, () -> {
             LivingEntity spawned = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+            Ageable ageable = (Ageable) spawned;
+            ageable.setBaby();
             handleBreed(spawned);
         });
     }

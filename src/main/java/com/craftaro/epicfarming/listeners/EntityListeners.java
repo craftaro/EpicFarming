@@ -63,38 +63,6 @@ public class EntityListeners implements Listener {
         }
     }
 
-    @EventHandler
-    public void onStackedItemSpawn(StackedItemSpawnEvent event) {
-        Location farmLocation = (Location) event.getExtraData().get("EFA-TAGGED");
-
-        if (farmLocation == null) {
-            return;
-        }
-
-        Farm farm = this.plugin.getFarmManager().getFarm(farmLocation);
-
-        boolean autoCollect = false;
-        for (Module module : farm.getLevel().getRegisteredModules()) {
-            if (module instanceof ModuleAutoCollect && ((ModuleAutoCollect) module).isEnabled(farm)) {
-                autoCollect = true;
-            }
-        }
-
-        if (autoCollect) {
-            long amount = event.getAmount();
-            ItemStack itemStack = event.getItemStack();
-
-            while (amount > 0) {
-                ItemStack clone = itemStack.clone();
-                clone.setAmount((int) Math.min(amount, clone.getMaxStackSize()));
-                amount -= clone.getAmount();
-                farm.addItem(clone);
-            }
-            event.setCancelled(true);
-        }
-    }
-
-
     @EventHandler(priority = EventPriority.HIGHEST, ignoreCancelled = true)
     public void onSpawn(ItemSpawnEvent event) {
         Item item = event.getEntity();
