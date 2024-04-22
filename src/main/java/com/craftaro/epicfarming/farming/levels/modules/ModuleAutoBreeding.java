@@ -56,13 +56,14 @@ public class ModuleAutoBreeding extends Module {
         }
 
         List<LivingEntity> entities = new ArrayList<>(entitiesAroundFarm);
+        entities.removeIf(e -> !(e instanceof Ageable) || !((Ageable) e).isAdult() || e.hasMetadata(BREED_COOLDOWN_METADATA) || e.isDead());
         int actualAmount = entities.stream().filter(e -> e instanceof Ageable && ((Ageable) e).isAdult() && !e.hasMetadata(BREED_COOLDOWN_METADATA) && !e.isDead()).map(EntityStackerManager::getSize).reduce(Integer::sum).orElse(0);
+
         if (actualAmount < this.autoBreedCap) {
             return;
         }
-        Collections.shuffle(entities);
 
-        entities.removeIf(e -> !(e instanceof Ageable) || !((Ageable) e).isAdult() || e.hasMetadata(BREED_COOLDOWN_METADATA) || e.isDead());
+        Collections.shuffle(entities);
 
         Map<EntityType, Long> counts = entities.stream()
                 .collect(Collectors.groupingBy(Entity::getType, Collectors.summingLong(entity -> {
@@ -101,7 +102,8 @@ public class ModuleAutoBreeding extends Module {
                             handleStackedBreed(entity);
                         }
                     } else {
-                        handleBreed(entity);
+                        handleBreedNatural(entity);
+                        spawnParticlesAndAnimation(entity.getLocation(), farm.getLocation());
                     }
 
                     spawnParticlesAndAnimation(entity.getLocation(), farm.getLocation());
@@ -112,7 +114,8 @@ public class ModuleAutoBreeding extends Module {
                     handleStackedBreed(entity);
                     spawnParticlesAndAnimation(entity.getLocation(), farm.getLocation());
                 } else {
-                    handleBreed(entity);
+                    handleBreedNatural(entity);
+                    spawnParticlesAndAnimation(entity.getLocation(), farm.getLocation());
                 }
                 mate1 = true;
                 break;
@@ -148,10 +151,17 @@ public class ModuleAutoBreeding extends Module {
             LivingEntity spawned = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
             Ageable ageable = (Ageable) spawned;
             ageable.setBaby();
-            handleBreed(spawned);
+            handleBreed(entity);
         });
     }
-
+    private void handleBreedNatural(Entity entity) {
+        Bukkit.getScheduler().runTask(this.plugin, () -> {
+            LivingEntity spawned = (LivingEntity) entity.getWorld().spawnEntity(entity.getLocation(), entity.getType());
+            Ageable ageable = (Ageable) spawned;
+            ageable.setBaby();
+            handleBreed(entity);
+        });
+    }
     private void handleBreed(Entity entity) {
         entity.setMetadata(BREED_COOLDOWN_METADATA, new FixedMetadataValue(this.plugin, true));
         Bukkit.getScheduler().scheduleSyncDelayedTask(this.plugin, () ->
