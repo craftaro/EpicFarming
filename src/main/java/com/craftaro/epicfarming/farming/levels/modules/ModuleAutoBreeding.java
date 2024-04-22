@@ -110,13 +110,13 @@ public class ModuleAutoBreeding extends Module {
                     return;
                 }
 
+                farm.removeMaterial(breedingItem.getType(), 2);
                 if (stackSize > 1) {
                     handleStackedBreed(entity);
-                    spawnParticlesAndAnimation(entity.getLocation(), farm.getLocation());
                 } else {
                     handleBreedNatural(entity);
-                    spawnParticlesAndAnimation(entity.getLocation(), farm.getLocation());
                 }
+                spawnParticlesAndAnimation(entity.getLocation(), farm.getLocation());
                 mate1 = true;
                 break;
             }
