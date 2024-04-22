@@ -13,6 +13,9 @@ import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class HopperTask extends BukkitRunnable {
     private static HopperTask instance;
     private final FarmManager manager;
@@ -23,10 +26,11 @@ public class HopperTask extends BukkitRunnable {
 
     @Override
     public void run() {
+        List<Farm> removal = new ArrayList<>();
         for (Farm farm : this.manager.getFarms().values()) {
             Location farmLocation = farm.getLocation();
             if (farmLocation == null || farmLocation.getWorld() == null) {
-                this.manager.removeFarm(farm.getLocation());
+                removal.add(farm);
                 continue;
             }
 
@@ -57,6 +61,8 @@ public class HopperTask extends BukkitRunnable {
                 break;
             }
         }
+
+        removal.forEach(farm -> this.manager.removeFarm(farm.getLocation()));
     }
 
     private boolean canHop(Inventory inventory, ItemStack item) {
