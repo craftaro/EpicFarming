@@ -11,6 +11,13 @@ public class BoostData implements Data {
     private final long endTime;
     private final UUID player;
 
+    // Default constructor for deserialization
+    public BoostData() {
+        this.multiplier = 0;
+        this.endTime = 0;
+        this.player = null;
+    }
+
     public BoostData(int multiplier, long endTime, UUID player) {
         this.multiplier = multiplier;
         this.endTime = endTime;
